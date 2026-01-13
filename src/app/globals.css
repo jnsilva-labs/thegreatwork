@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --obsidian: #0b0c10;
+  --bone: #e8e3d8;
+  --copper: #2b6f6a;
+  --gilt: #b89b5e;
+  --violet: #252435;
+  --mist: #b9b2a5;
+  --char: #15141b;
+  --font-ritual-serif: "Didot", "Bodoni 72", "Iowan Old Style", "Times New Roman", serif;
+  --font-ritual-sans: "Avenir Next", "Helvetica Neue", "Neue Haas Grotesk", "Segoe UI", sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--obsidian);
+  --color-foreground: var(--bone);
+  --font-sans: var(--font-ritual-sans);
+  --font-serif: var(--font-ritual-serif);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(37, 36, 53, 0.45), transparent 60%),
+    radial-gradient(circle at 75% 15%, rgba(43, 111, 106, 0.25), transparent 55%),
+    linear-gradient(180deg, #0b0c10 0%, #09090d 35%, #07070a 100%);
+  color: var(--bone);
+  font-family: var(--font-ritual-sans), system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.font-ritual {
+  font-family: var(--font-ritual-serif), "Times New Roman", serif;
+}
+
+.grain-overlay {
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.25'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity: 0.25;
+}
+
+.vellum-overlay {
+  pointer-events: none;
+  background-image: radial-gradient(circle at 30% 30%, rgba(232, 227, 216, 0.06), transparent 45%),
+    radial-gradient(circle at 70% 60%, rgba(232, 227, 216, 0.05), transparent 50%);
+  mix-blend-mode: screen;
+  opacity: 0.4;
+}
+
+.scrim {
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(11, 12, 16, 0.2) 0%, rgba(11, 12, 16, 0.5) 30%, rgba(11, 12, 16, 0.75) 100%);
+}
+
+.sigil-draw {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  animation: sigil-draw 1.2s ease-out infinite;
+}
+
+.ouroboros-ring {
+  stroke-dasharray: 10 6;
+  transition: stroke-dashoffset 1.6s ease, filter 0.6s ease;
+}
+
+.ouroboros:hover .ouroboros-ring {
+  stroke-dashoffset: -24;
+  filter: drop-shadow(0 0 6px rgba(184, 155, 94, 0.3));
+}
+
+.violet-aura {
+  position: absolute;
+  inset: -35%;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(94, 72, 140, 0.35), transparent 55%),
+    radial-gradient(circle at 50% 60%, rgba(62, 46, 98, 0.35), transparent 60%);
+  filter: blur(24px);
+  opacity: 0.65;
+  animation: aura-pulse 8s ease-in-out infinite;
+}
+
+@keyframes aura-pulse {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(0.98);
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .violet-aura {
+    animation: none;
+  }
+  .ouroboros-ring {
+    transition: none;
+  }
+}
+
+@keyframes sigil-draw {
+  0% {
+    stroke-dashoffset: 240;
+    opacity: 0.2;
+  }
+  60% {
+    stroke-dashoffset: 0;
+    opacity: 0.8;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.2;
+  }
+}
+
+:focus-visible {
+  outline: 1px solid var(--gilt);
+  outline-offset: 2px;
+}
