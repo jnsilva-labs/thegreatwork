@@ -46,7 +46,7 @@ export default function Home() {
                 Seven Principles
               </Link>
               <Link
-                href="/journey"
+                href="/ripley-scroll"
                 className="rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
               >
                 Scrollytelling

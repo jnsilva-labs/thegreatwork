@@ -23,6 +23,7 @@ export function RitualCanvas() {
   const stillnessMode = useHermeticStore((state) => state.stillnessMode);
   const qualityTier = useHermeticStore((state) => state.qualityTier);
   const autoQuality = useHermeticStore((state) => state.autoQuality);
+  const postBoost = useHermeticStore((state) => state.postBoost);
   const [paused, setPaused] = useState(false);
   const [dpr, setDpr] = useState<[number, number]>([1, 1.5]);
 
@@ -56,8 +57,9 @@ export function RitualCanvas() {
 
   const motionDisabled = reducedMotion || stillness || stillnessMode;
   const noiseOpacity = motionDisabled ? 0.05 : Math.max(0.06, 0.16 - clarity * 0.1);
-  const bloomIntensity =
+  const bloomIntensityBase =
     motionDisabled || qualityTier === "low" ? 0.12 : 0.2 + intensity * 0.2;
+  const bloomIntensity = Math.min(0.6, bloomIntensityBase + postBoost);
   const chromaOffset = motionDisabled || qualityTier === "low" ? 0 : 0.0015;
 
   return (

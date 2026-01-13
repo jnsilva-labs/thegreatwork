@@ -23,6 +23,9 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
   const overallProgress = useHermeticStore((state) => state.scrollProgress);
   const pointer = useHermeticStore((state) => state.pointer);
   const shift = useHermeticStore((state) => state.shift);
+  const cameraOverride = useHermeticStore((state) => state.cameraOverride);
+  const lineOpacityScale = useHermeticStore((state) => state.lineOpacityScale);
+  const lineRadiusScale = useHermeticStore((state) => state.lineRadiusScale);
   const cameraTargets = useMemo(
     () => [
       new Vector3(0, 0, 7),
@@ -60,12 +63,24 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
       cameraTargets[0];
     const transition = easeBreath(MathUtils.clamp((shift - 0.5) / 0.45, 0, 1));
     tempVector.current.lerpVectors(currentTarget, nextTarget, transition);
+    if (cameraOverride) {
+      const overridePosition = new Vector3(...cameraOverride.position);
+      tempVector.current.lerp(overridePosition, reducedMotion ? 0.05 : 0.12);
+    }
     if (activeChapter === 4 && !reducedMotion) {
       tempVector.current.x += Math.sin(state.clock.elapsedTime * 0.4) * 0.15;
       tempVector.current.y += Math.cos(state.clock.elapsedTime * 0.35) * 0.12;
     }
     camera.position.lerp(tempVector.current, reducedMotion ? 0.04 : 0.08);
-    camera.lookAt(0, 0, 0);
+    if (cameraOverride) {
+      camera.lookAt(
+        cameraOverride.target[0],
+        cameraOverride.target[1],
+        cameraOverride.target[2]
+      );
+    } else {
+      camera.lookAt(0, 0, 0);
+    }
   });
 
   const chapterProgress = progressByChapter[activeChapter] ?? 0;
@@ -86,6 +101,8 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
           reducedMotion={reducedMotion}
           chapterIndex={activeChapter}
           progress={chapterProgress}
+          lineOpacityScale={lineOpacityScale}
+          lineRadiusScale={lineRadiusScale}
         />
       </group>
     </>

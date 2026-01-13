@@ -15,6 +15,7 @@ export const fractalVeilFragment = /* glsl */ `
   uniform float uClarity;
   uniform float uGrain;
   uniform float uPrinciple;
+  uniform float uVeilIntensity;
 
   varying vec2 vUv;
 
@@ -70,6 +71,8 @@ export const fractalVeilFragment = /* glsl */ `
 
     float grain = (hash(uv * uResolution + uTime) - 0.5) * uGrain;
     vec3 color = vec3(0.08, 0.09, 0.12) + mixVeil * 0.08 + grain;
+    alpha *= uVeilIntensity;
+    color *= mix(0.85, 1.0, uVeilIntensity);
 
     gl_FragColor = vec4(color, alpha);
   }

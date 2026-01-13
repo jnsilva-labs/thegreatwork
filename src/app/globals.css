@@ -61,6 +61,76 @@ body {
   background: linear-gradient(180deg, rgba(11, 12, 16, 0.2) 0%, rgba(11, 12, 16, 0.5) 30%, rgba(11, 12, 16, 0.75) 100%);
 }
 
+.ripley-scroll {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(20, 18, 16, 0.92) 0%, rgba(28, 24, 22, 0.9) 100%),
+    repeating-linear-gradient(
+      180deg,
+      rgba(232, 227, 216, 0.05) 0px,
+      rgba(232, 227, 216, 0.05) 1px,
+      transparent 1px,
+      transparent 72px
+    ),
+    radial-gradient(circle at 20% 10%, rgba(232, 227, 216, 0.12), transparent 45%),
+    radial-gradient(circle at 80% 20%, rgba(232, 227, 216, 0.08), transparent 50%);
+  box-shadow: 0 40px 80px rgba(8, 8, 10, 0.35);
+}
+
+.ripley-scroll::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 52px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
+  pointer-events: none;
+}
+
+.ripley-scroll::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  box-shadow:
+    inset 0 0 0 1px rgba(184, 155, 94, 0.25),
+    inset 0 0 40px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.ripley-scroll--reading {
+  background:
+    linear-gradient(180deg, rgba(26, 23, 20, 0.97) 0%, rgba(36, 32, 28, 0.95) 100%),
+    repeating-linear-gradient(
+      180deg,
+      rgba(232, 227, 216, 0.08) 0px,
+      rgba(232, 227, 216, 0.08) 1px,
+      transparent 1px,
+      transparent 70px
+    );
+}
+
+.ripley-panel {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.4s ease;
+}
+
+.ripley-panel--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ripley-panel:hover {
+  border-color: rgba(184, 155, 94, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ripley-panel {
+    transition: none;
+    transform: none;
+  }
+}
+
 .sigil-draw {
   stroke-dasharray: 240;
   stroke-dashoffset: 240;

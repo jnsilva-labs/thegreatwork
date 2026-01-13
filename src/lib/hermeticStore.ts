@@ -16,11 +16,23 @@ export type SoundPreset =
   | "mercury-glass"
   | "saturn-deep";
 
+export type CameraOverride = {
+  position: [number, number, number];
+  target: [number, number, number];
+};
+
 type HermeticState = {
   principleId: number;
   shift: number;
   intensity: number;
   clarity: number;
+  lineOpacityScale: number;
+  lineRadiusScale: number;
+  particleScale: number;
+  particleBrightness: number;
+  veilIntensity: number;
+  postBoost: number;
+  cameraOverride: CameraOverride | null;
   stillnessMode: boolean;
   qualityTier: QualityTier;
   autoQuality: boolean;
@@ -46,6 +58,13 @@ export const useHermeticStore = create<HermeticState>((set) => ({
   shift: 0,
   intensity: 0.6,
   clarity: 0.5,
+  lineOpacityScale: 1,
+  lineRadiusScale: 1,
+  particleScale: 1,
+  particleBrightness: 1,
+  veilIntensity: 1,
+  postBoost: 0,
+  cameraOverride: null,
   stillnessMode: false,
   qualityTier: "high",
   autoQuality: true,

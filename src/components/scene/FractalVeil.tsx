@@ -19,6 +19,7 @@ const FractalVeilMaterial = shaderMaterial(
     uClarity: 0.5,
     uGrain: 0.1,
     uPrinciple: 1,
+    uVeilIntensity: 1,
     uTintA: new Color("#0b0c10"),
   },
   fractalVeilVertex,
@@ -42,6 +43,7 @@ export function FractalVeil() {
   const clarity = useHermeticStore((state) => state.clarity);
   const principleId = useHermeticStore((state) => state.principleId);
   const stillnessMode = useHermeticStore((state) => state.stillnessMode);
+  const veilIntensity = useHermeticStore((state) => state.veilIntensity);
 
   useFrame((state) => {
     const material = meshRef.current?.material as ShaderMaterial | undefined;
@@ -55,6 +57,7 @@ export function FractalVeil() {
     material.uniforms.uClarity.value = clarity;
     material.uniforms.uGrain.value = stillnessMode ? 0.04 : 0.1;
     material.uniforms.uPrinciple.value = principleId;
+    material.uniforms.uVeilIntensity.value = veilIntensity;
   });
 
   const scale = useMemo(() => [18, 18, 1] as const, []);

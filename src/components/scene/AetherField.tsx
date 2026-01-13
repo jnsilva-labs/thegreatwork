@@ -21,6 +21,8 @@ const AetherMaterial = shaderMaterial(
     uClarity: 0.6,
     uIntensity: 0.6,
     uPrinciple: 1,
+    uParticleScale: 1,
+    uBrightness: 1,
     uColorA: new Color("#2b6f6a"),
     uColorB: new Color("#b89b5e"),
   },
@@ -35,6 +37,8 @@ const AetherMaterial = shaderMaterial(
   uniform float uClarity;
   uniform float uIntensity;
   uniform float uPrinciple;
+  uniform float uParticleScale;
+  uniform float uBrightness;
 
   varying float vAlpha;
   varying float vDepth;
@@ -105,7 +109,7 @@ const AetherMaterial = shaderMaterial(
     }
 
     vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    gl_PointSize = aScale * (20.0 / -mvPosition.z) * mix(0.8, 1.2, uIntensity);
+    gl_PointSize = aScale * (20.0 / -mvPosition.z) * mix(0.8, 1.2, uIntensity) * uParticleScale;
     vAlpha = mix(0.15, 0.65, aScale) * (1.0 - uClarity * 0.4);
     vDepth = -mvPosition.z;
     gl_Position = projectionMatrix * mvPosition;
@@ -118,6 +122,7 @@ const AetherMaterial = shaderMaterial(
   uniform float uIntensity;
   uniform float uShift;
   uniform float uPrinciple;
+  uniform float uBrightness;
 
   varying float vAlpha;
   varying float vDepth;
@@ -129,8 +134,8 @@ const AetherMaterial = shaderMaterial(
     vec3 baseColor = mix(uColorA, uColorB, vAlpha * 0.6 + uIntensity * 0.2);
     vec3 altColor = mix(uColorB, uColorA, vAlpha * 0.6 + uIntensity * 0.2);
     float polarity = smoothstep(3.5, 4.5, uPrinciple);
-    vec3 color = mix(baseColor, altColor, polarity * uShift);
-    float alpha = soft * vAlpha * depthFade;
+    vec3 color = mix(baseColor, altColor, polarity * uShift) * uBrightness;
+    float alpha = soft * vAlpha * depthFade * uBrightness;
     alpha *= mix(0.65, 0.35, uClarity);
     gl_FragColor = vec4(color, alpha);
   }
@@ -153,6 +158,8 @@ export function AetherField({ reducedMotion }: AetherFieldProps) {
   const clarity = useHermeticStore((state) => state.clarity);
   const intensity = useHermeticStore((state) => state.intensity);
   const principleId = useHermeticStore((state) => state.principleId);
+  const particleScale = useHermeticStore((state) => state.particleScale);
+  const particleBrightness = useHermeticStore((state) => state.particleBrightness);
   const quality = useHermeticStore((state) => state.qualityTier);
 
   const count = quality === "low" ? 45000 : quality === "medium" ? 90000 : 140000;
@@ -190,6 +197,8 @@ export function AetherField({ reducedMotion }: AetherFieldProps) {
     material.uniforms.uClarity.value = clarity;
     material.uniforms.uIntensity.value = intensity;
     material.uniforms.uPrinciple.value = principleId;
+    material.uniforms.uParticleScale.value = particleScale;
+    material.uniforms.uBrightness.value = particleBrightness;
   });
 
   return (

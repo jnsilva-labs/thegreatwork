@@ -16,6 +16,8 @@ type SacredGeometrySigilProps = {
   chapterIndex: number;
   progress: number;
   reducedMotion: boolean;
+  lineOpacityScale?: number;
+  lineRadiusScale?: number;
 };
 
 const geometries = [
@@ -32,12 +34,14 @@ export function SacredGeometrySigil({
   chapterIndex,
   progress,
   reducedMotion,
+  lineOpacityScale = 1,
+  lineRadiusScale = 1,
 }: SacredGeometrySigilProps) {
   const currentIndex = MathUtils.clamp(chapterIndex, 0, geometries.length - 1);
   const nextIndex = Math.min(currentIndex + 1, geometries.length - 1);
   const transition = easeBreath(MathUtils.clamp((progress - 0.55) / 0.4, 0, 1));
-  const currentOpacity = MathUtils.lerp(0.15, 0.7, 1 - transition);
-  const nextOpacity = MathUtils.lerp(0, 0.65, transition);
+  const currentOpacity = MathUtils.lerp(0.15, 0.7, 1 - transition) * lineOpacityScale;
+  const nextOpacity = MathUtils.lerp(0, 0.65, transition) * lineOpacityScale;
   const baseScale = MathUtils.lerp(0.85, 1.05, progress);
   const polarityShift = chapterIndex === 3 ? MathUtils.lerp(0.2, 0.8, transition) : 0;
   const colorPrimary = chapterIndex === 3 ? "#252435" : "#b89b5e";
@@ -53,7 +57,7 @@ export function SacredGeometrySigil({
       <EngravedPath
         points={currentPoints}
         opacity={currentOpacity}
-        radius={0.014}
+        radius={0.014 * lineRadiusScale}
         roughness={0.4}
         metalness={0.65}
         jitter={0.018}
@@ -64,7 +68,7 @@ export function SacredGeometrySigil({
       <EngravedPath
         points={nextPoints}
         opacity={nextOpacity}
-        radius={0.012}
+        radius={0.012 * lineRadiusScale}
         roughness={0.38}
         metalness={0.7}
         jitter={0.016}
@@ -79,7 +83,7 @@ export function SacredGeometrySigil({
           <EngravedPath
             points={currentPoints}
             opacity={currentOpacity * 0.4}
-            radius={0.012}
+            radius={0.012 * lineRadiusScale}
             roughness={0.5}
             metalness={0.5}
             jitter={0.02}
@@ -96,7 +100,7 @@ export function SacredGeometrySigil({
               <EngravedPath
                 points={currentPoints}
                 opacity={currentOpacity * (0.35 - index * 0.08)}
-                radius={0.01}
+                radius={0.01 * lineRadiusScale}
                 roughness={0.6}
                 metalness={0.4}
                 jitter={0.025}
@@ -113,7 +117,7 @@ export function SacredGeometrySigil({
           <EngravedPath
             points={goldenSpiral(2.2, 160)}
             opacity={MathUtils.lerp(0.1, 0.5, progress)}
-            radius={0.012}
+            radius={0.012 * lineRadiusScale}
             roughness={0.4}
             metalness={0.6}
             jitter={0.02}
@@ -124,7 +128,7 @@ export function SacredGeometrySigil({
           <EngravedPath
             points={fibonacciRectangles(0.4, 5)}
             opacity={MathUtils.lerp(0.1, 0.45, progress)}
-            radius={0.013}
+            radius={0.013 * lineRadiusScale}
             roughness={0.45}
             metalness={0.5}
             jitter={0.018}

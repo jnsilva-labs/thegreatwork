@@ -201,7 +201,7 @@ export function CodexChrome() {
           onClick={() => setMenuOpen(false)}
         >
           <div
-            className="h-full w-full max-w-xs translate-x-0 border-l border-[color:var(--copper)]/50 bg-[color:var(--char)]/95 p-6 text-[0.7rem] uppercase tracking-[0.35em] text-[color:var(--mist)] shadow-2xl transition-transform"
+            className="h-full w-[85vw] max-w-[360px] overflow-y-auto border-l border-[color:var(--copper)]/50 bg-[color:var(--char)]/95 px-6 pb-10 pt-8 text-[0.75rem] uppercase tracking-[0.28em] text-[color:var(--mist)] shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -209,7 +209,7 @@ export function CodexChrome() {
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                className="text-[0.65rem] uppercase tracking-[0.35em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
+                className="text-[0.65rem] uppercase tracking-[0.3em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
               >
                 Close
               </button>
@@ -225,7 +225,7 @@ export function CodexChrome() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-center transition hover:border-[color:var(--gilt)]"
+                  className="rounded-full border border-[color:var(--copper)]/60 px-5 py-3 text-center text-[0.7rem] uppercase tracking-[0.3em] transition hover:border-[color:var(--gilt)]"
                 >
                   {link.label}
                 </Link>
