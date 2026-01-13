@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { RitualCanvas } from "@/components/scene/RitualCanvas";
 import { ScrollOrchestrator } from "@/components/ui/ScrollOrchestrator";
 import { ChapterSection } from "@/components/ui/ChapterSection";
@@ -38,12 +39,18 @@ export default function Home() {
               cosmos.
             </p>
             <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
-              <span className="rounded-full border border-[color:var(--copper)] px-4 py-2">
+              <Link
+                href="/principles"
+                className="rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+              >
                 Seven Principles
-              </span>
-              <span className="rounded-full border border-[color:var(--copper)] px-4 py-2">
+              </Link>
+              <Link
+                href="/journey"
+                className="rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+              >
                 Scrollytelling
-              </span>
+              </Link>
             </div>
           </div>
         </section>

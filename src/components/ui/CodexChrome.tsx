@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import { principles } from "@/data/principles";
@@ -27,6 +27,7 @@ export function CodexChrome() {
   const setSoundPreset = useHermeticStore((state) => state.setSoundPreset);
   const soundVolume = useHermeticStore((state) => state.soundVolume);
   const setSoundVolume = useHermeticStore((state) => state.setSoundVolume);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const presets = ["aether-drone", "cathedral", "lunar-pulse", "mercury-glass", "saturn-deep"] as const;
   const pathname = usePathname();
@@ -128,6 +129,14 @@ export function CodexChrome() {
         </div>
         <button
           type="button"
+          onClick={() => setMenuOpen(true)}
+          className="flex items-center gap-2 rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-[0.65rem] uppercase tracking-[0.35em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] sm:hidden"
+        >
+          Menu
+          <span aria-hidden="true">≡</span>
+        </button>
+        <button
+          type="button"
           onClick={toggleUi}
           className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-[0.65rem] uppercase tracking-[0.35em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
         >
@@ -186,6 +195,45 @@ export function CodexChrome() {
           />
         </div>
       </div>
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-40 flex justify-end bg-[color:var(--obsidian)]/70 sm:hidden"
+          onClick={() => setMenuOpen(false)}
+        >
+          <div
+            className="h-full w-full max-w-xs translate-x-0 border-l border-[color:var(--copper)]/50 bg-[color:var(--char)]/95 p-6 text-[0.7rem] uppercase tracking-[0.35em] text-[color:var(--mist)] shadow-2xl transition-transform"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <span>Navigation</span>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                className="text-[0.65rem] uppercase tracking-[0.35em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
+              >
+                Close
+              </button>
+            </div>
+            <div className="mt-8 flex flex-col gap-4 text-[color:var(--bone)]">
+              {[
+                { href: "/", label: "Home" },
+                { href: "/great-work", label: "The Great Work" },
+                { href: "/principles", label: "Principles" },
+                { href: "/gallery", label: "Gallery" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-center transition hover:border-[color:var(--gilt)]"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
