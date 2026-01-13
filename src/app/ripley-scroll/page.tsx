@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { WebGLGuard } from "@/components/ui/WebGLGuard";
 import { FallbackEngraving } from "@/components/ui/FallbackEngraving";
@@ -9,10 +9,6 @@ import { PlateSVG } from "@/components/PlateSVG";
 import { ripleyScrollPanels } from "@/data/ripleyScroll";
 import { getRipleyPreset } from "@/lib/scene/ripleyPresets";
 import { useHermeticStore } from "@/lib/hermeticStore";
-import { GalleryViewer } from "@/components/gallery/GalleryViewer";
-import { generateGeometry } from "@/lib/geometry/generators";
-import { geometryToLineSet } from "@/lib/geometry/convertToLineSet";
-import type { LineSet } from "@/lib/geometry";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import {
   createEngine,
@@ -58,16 +54,6 @@ export default function RipleyScrollPage() {
   const setSoundVolume = useHermeticStore((state) => state.setSoundVolume);
   const setState = useHermeticStore((state) => state.setState);
 
-  const plateLines = useMemo(() => {
-    const cache = new Map<string, { lines: LineSet; radius: number }>();
-    ripleyScrollPanels.forEach((panel) => {
-      if (cache.has(panel.plateSlug)) return;
-      const geometry = generateGeometry(panel.plateSlug, { size: 2.4, detail: 160 });
-      const lines = geometryToLineSet(geometry, 180);
-      cache.set(panel.plateSlug, { lines, radius: getBoundsRadius(lines) });
-    });
-    return cache;
-  }, []);
 
   const applyPreset = useCallback(
     (index: number) => {
@@ -252,11 +238,6 @@ export default function RipleyScrollPage() {
     setSoundPlaying(true);
   };
 
-  const activePanel = ripleyScrollPanels[activeIndex];
-  const activeLines = activePanel ? plateLines.get(activePanel.plateSlug)?.lines : null;
-  const activeRadius = activePanel ? plateLines.get(activePanel.plateSlug)?.radius ?? 1 : 1;
-  const viewerScale = activePanel ? getViewerScale(activePanel.scenePreset) : 1;
-  const viewerPreset = activePanel ? getRipleyPreset(activePanel.scenePreset) : null;
 
   return (
     <div className="relative min-h-screen text-[color:var(--bone)]">
@@ -349,40 +330,23 @@ export default function RipleyScrollPage() {
             </div>
           </aside>
 
-          <section className="space-y-8">
-            <div className="sticky top-6 z-20 space-y-4 rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]/60 p-3">
-              <div className="flex flex-wrap items-center justify-between gap-3 px-2 lg:hidden">
-                <button
-                  type="button"
-                  onClick={() => setReadingMode((prev) => !prev)}
-                  className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-[0.6rem] uppercase tracking-[0.35em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
-                >
-                  {readingMode ? "Reading On" : "Reading Mode"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleAudioToggle()}
-                  className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-[0.6rem] uppercase tracking-[0.35em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
-                >
-                  {soundPlaying ? "Stop" : "Play"}
-                </button>
-              </div>
-              {activeLines && viewerPreset ? (
-                <GalleryViewer
-                  lines={activeLines}
-                  cameraMode="cinematic"
-                  particleSize={16 * viewerScale}
-                  particleAlpha={0.9 * viewerPreset.particleBrightness}
-                  particleDensity={1.1 * viewerPreset.particleScale}
-                  flowStrength={0.6}
-                  trailAmount={0.25}
-                  scale={viewerScale}
-                  boundsRadius={activeRadius}
-                  fitKey={activeIndex}
-                />
-              ) : null}
+          <section className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]/60 p-4 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setReadingMode((prev) => !prev)}
+                className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-[0.6rem] uppercase tracking-[0.35em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+              >
+                {readingMode ? "Reading On" : "Reading Mode"}
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleAudioToggle()}
+                className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 text-[0.6rem] uppercase tracking-[0.35em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+              >
+                {soundPlaying ? "Stop" : "Play"}
+              </button>
             </div>
-
             <div
               ref={scrollContainerRef}
               className={`ripley-scroll space-y-10 rounded-3xl border border-[color:var(--copper)]/40 px-6 py-12 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:snap-y lg:snap-mandatory ${
@@ -523,19 +487,6 @@ function scrollToPanel(index: number, panelRefs: { current: (HTMLElement | null)
   node.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function getBoundsRadius(lines: LineSet) {
-  let maxDistance = 0;
-  lines.forEach((line) => {
-    line.forEach((point) => {
-      const distance = point.length();
-      if (Number.isFinite(distance)) {
-        maxDistance = Math.max(maxDistance, distance);
-      }
-    });
-  });
-  return maxDistance > 0 ? maxDistance : 1;
-}
-
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value));
 }
@@ -546,19 +497,4 @@ function lerp(a: number, b: number, t: number) {
 
 function easeInOut(t: number) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-}
-
-function getViewerScale(scenePreset: string) {
-  switch (scenePreset) {
-    case "rubedo":
-      return 1.1;
-    case "distillation":
-      return 1.15;
-    case "conjunction":
-      return 1.05;
-    case "solve":
-      return 1.1;
-    default:
-      return 1;
-  }
 }
