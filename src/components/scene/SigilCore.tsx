@@ -4,6 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import type { Mesh } from "three";
 import { useHermeticStore } from "@/lib/hermeticStore";
+import { useThemeStore } from "@/lib/themeStore";
 
 type SigilCoreProps = {
   reducedMotion: boolean;
@@ -13,15 +14,16 @@ export function SigilCore({ reducedMotion }: SigilCoreProps) {
   const meshRef = useRef<Mesh | null>(null);
   const intensity = useHermeticStore((state) => state.intensity);
   const clarity = useHermeticStore((state) => state.clarity);
+  const themeColors = useThemeStore((state) => state.colors);
   const materialProps = useMemo(
     () => ({
-      color: "#b89b5e",
+      color: themeColors.line,
       metalness: Math.min(1, 0.5 + clarity * 0.4),
       roughness: Math.max(0.2, 0.55 - clarity * 0.3),
-      emissive: "#2b6f6a",
+      emissive: themeColors.glow,
       emissiveIntensity: 0.15 + intensity * 0.2,
     }),
-    [clarity, intensity]
+    [clarity, intensity, themeColors]
   );
 
   useFrame((state, delta) => {

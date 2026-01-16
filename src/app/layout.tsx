@@ -34,7 +34,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="obsidian" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(() => {
+  try {
+    const stored = localStorage.getItem("ap-theme");
+    const theme = stored === "obsidian" || stored === "abyssal" || stored === "crimson" ? stored : "obsidian";
+    document.documentElement.dataset.theme = theme;
+  } catch (e) {}
+})();`,
+          }}
+        />
+      </head>
       <body className="antialiased">
         <CodexChrome />
         <div className="relative z-10">{children}</div>

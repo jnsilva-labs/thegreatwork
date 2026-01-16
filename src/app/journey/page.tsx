@@ -157,7 +157,7 @@ export default function JourneyPage() {
               <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
                 The Journey
               </p>
-              <h1 className="font-ritual text-4xl">Scrollytelling</h1>
+              <h1 className="font-ritual text-4xl">Principles in Motion</h1>
             </div>
             <div className="space-y-6">
               <div className="h-40 w-px bg-[color:var(--copper)]/40">

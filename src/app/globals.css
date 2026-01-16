@@ -2,20 +2,56 @@
 
 :root {
   color-scheme: dark;
-  --obsidian: #0b0c10;
-  --bone: #e8e3d8;
-  --copper: #2b6f6a;
-  --gilt: #b89b5e;
-  --violet: #252435;
-  --mist: #b9b2a5;
-  --char: #15141b;
+  --bg: #0b0c10;
+  --fg: #e8e3d8;
+  --muted: #b9b2a5;
+  --panel: #15141b;
+  --border: #2b6f6a;
+  --accent: #b89b5e;
+  --accent2: #252435;
+  --paper: #1b1714;
+  --line: #e8e3d8;
+  --glow: #b89b5e;
+  --obsidian: var(--bg);
+  --bone: var(--fg);
+  --mist: var(--muted);
+  --char: var(--panel);
+  --copper: var(--border);
+  --gilt: var(--accent);
+  --violet: var(--accent2);
   --font-ritual-serif: "Didot", "Bodoni 72", "Iowan Old Style", "Times New Roman", serif;
   --font-ritual-sans: "Avenir Next", "Helvetica Neue", "Neue Haas Grotesk", "Segoe UI", sans-serif;
 }
 
+html[data-theme="abyssal"] {
+  --bg: #0a0f16;
+  --fg: #e6e4dd;
+  --muted: #a6b0ba;
+  --panel: #121824;
+  --border: #334155;
+  --accent: #7aa5c9;
+  --accent2: #1f2a44;
+  --paper: #141b26;
+  --line: #e5e9f0;
+  --glow: #4b6d8f;
+}
+
+html[data-theme="crimson"] {
+  --bg: #0f0b0b;
+  --fg: #e9e2d6;
+  --muted: #c0a89d;
+  --panel: #181111;
+  --border: #5a2a2a;
+  --accent: #b17755;
+  --accent2: #3a1b1b;
+  --paper: #1f1412;
+  --line: #efe4d6;
+  --glow: #b24c3f;
+}
+
 @theme inline {
-  --color-background: var(--obsidian);
-  --color-foreground: var(--bone);
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
   --font-sans: var(--font-ritual-sans);
   --font-serif: var(--font-ritual-serif);
 }
@@ -29,12 +65,16 @@
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 20% 20%, rgba(37, 36, 53, 0.45), transparent 60%),
-    radial-gradient(circle at 75% 15%, rgba(43, 111, 106, 0.25), transparent 55%),
-    linear-gradient(180deg, #0b0c10 0%, #09090d 35%, #07070a 100%);
-  color: var(--bone);
+    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--accent2) 55%, transparent), transparent 60%),
+    radial-gradient(circle at 75% 15%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, #000 15%) 35%, #07070a 100%);
+  color: var(--fg);
   font-family: var(--font-ritual-sans), system-ui, sans-serif;
   letter-spacing: 0.01em;
+}
+
+.theme-transition * {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
 }
 
 .font-ritual {
@@ -58,23 +98,33 @@ body {
 
 .scrim {
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(11, 12, 16, 0.2) 0%, rgba(11, 12, 16, 0.5) 30%, rgba(11, 12, 16, 0.75) 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 20%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 50%, transparent) 30%,
+    color-mix(in srgb, var(--bg) 75%, transparent) 100%
+  );
 }
 
 .ripley-scroll {
   position: relative;
   background:
-    linear-gradient(180deg, rgba(20, 18, 16, 0.92) 0%, rgba(28, 24, 22, 0.9) 100%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper) 85%, transparent) 0%,
+      color-mix(in srgb, var(--paper) 92%, transparent) 100%
+    ),
     repeating-linear-gradient(
       180deg,
-      rgba(232, 227, 216, 0.05) 0px,
-      rgba(232, 227, 216, 0.05) 1px,
+      color-mix(in srgb, var(--fg) 6%, transparent) 0px,
+      color-mix(in srgb, var(--fg) 6%, transparent) 1px,
       transparent 1px,
       transparent 72px
     ),
-    radial-gradient(circle at 20% 10%, rgba(232, 227, 216, 0.12), transparent 45%),
-    radial-gradient(circle at 80% 20%, rgba(232, 227, 216, 0.08), transparent 50%);
+    radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--fg) 12%, transparent), transparent 45%),
+    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--fg) 8%, transparent), transparent 50%);
   box-shadow: 0 40px 80px rgba(8, 8, 10, 0.35);
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .ripley-scroll::before {
@@ -99,11 +149,15 @@ body {
 
 .ripley-scroll--reading {
   background:
-    linear-gradient(180deg, rgba(26, 23, 20, 0.97) 0%, rgba(36, 32, 28, 0.95) 100%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper) 92%, transparent) 0%,
+      color-mix(in srgb, var(--paper) 98%, transparent) 100%
+    ),
     repeating-linear-gradient(
       180deg,
-      rgba(232, 227, 216, 0.08) 0px,
-      rgba(232, 227, 216, 0.08) 1px,
+      color-mix(in srgb, var(--fg) 8%, transparent) 0px,
+      color-mix(in srgb, var(--fg) 8%, transparent) 1px,
       transparent 1px,
       transparent 70px
     );
@@ -125,9 +179,18 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+  .theme-transition * {
+    transition: none;
+  }
   .ripley-panel {
     transition: none;
     transform: none;
+  }
+  .ripley-scroll {
+    transition: none;
   }
 }
 

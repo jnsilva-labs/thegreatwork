@@ -7,6 +7,8 @@ import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import { principles } from "@/data/principles";
 import { createEngine, setVolume, start, stop } from "@/lib/audio/engine";
+import { getStoredTheme, useThemeStore } from "@/lib/themeStore";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 const romanNumerals = ["I", "II", "III", "IV", "V", "VI", "VII"];
 
@@ -28,6 +30,9 @@ export function CodexChrome() {
   const soundVolume = useHermeticStore((state) => state.soundVolume);
   const setSoundVolume = useHermeticStore((state) => state.setSoundVolume);
   const [menuOpen, setMenuOpen] = useState(false);
+  const theme = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const presets = ["aether-drone", "cathedral", "lunar-pulse", "mercury-glass", "saturn-deep"] as const;
   const pathname = usePathname();
@@ -42,6 +47,24 @@ export function CodexChrome() {
       console.warn("[CodexChrome] Principle slugs must be defined and unique.", slugs);
     }
   }, []);
+
+  useEffect(() => {
+    const stored = getStoredTheme();
+    if (stored) {
+      setTheme(stored);
+    } else {
+      setTheme("obsidian");
+    }
+  }, [setTheme]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const root = document.documentElement;
+    const id = window.setTimeout(() => {
+      root.classList.add("theme-transition");
+    }, 50);
+    return () => window.clearTimeout(id);
+  }, [prefersReducedMotion]);
 
   const cycleQuality = () => {
     const next = qualityTier === "high" ? "medium" : qualityTier === "medium" ? "low" : "high";
@@ -127,6 +150,19 @@ export function CodexChrome() {
             Gallery
           </Link>
         </div>
+        <label className="hidden items-center gap-2 text-[0.55rem] uppercase tracking-[0.35em] text-[color:var(--mist)] sm:flex">
+          Theme
+          <select
+            value={theme}
+            onChange={(event) => setTheme(event.target.value as typeof theme)}
+            className="rounded-full border border-[color:var(--copper)]/60 bg-transparent px-3 py-2 text-[0.55rem] uppercase tracking-[0.3em] text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+            aria-label="Theme"
+          >
+            <option value="obsidian">Obsidian</option>
+            <option value="abyssal">Third Eye</option>
+            <option value="crimson">Crimson</option>
+          </select>
+        </label>
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
@@ -230,6 +266,19 @@ export function CodexChrome() {
                   {link.label}
                 </Link>
               ))}
+              <label className="mt-2 flex flex-col gap-2 text-[0.55rem] uppercase tracking-[0.3em] text-[color:var(--mist)]">
+                Theme
+                <select
+                  value={theme}
+                  onChange={(event) => setTheme(event.target.value as typeof theme)}
+                  className="rounded-full border border-[color:var(--copper)]/60 bg-transparent px-4 py-2 text-center text-[0.6rem] uppercase tracking-[0.3em] text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                  aria-label="Theme"
+                >
+                  <option value="obsidian">Obsidian</option>
+                  <option value="abyssal">Third Eye</option>
+                  <option value="crimson">Crimson</option>
+                </select>
+              </label>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import type { JSX } from "react";
 import { Color } from "three";
 import type { Points, ShaderMaterial } from "three";
 import { useHermeticStore } from "@/lib/hermeticStore";
+import { useThemeStore } from "@/lib/themeStore";
 
 type AetherFieldProps = {
   reducedMotion: boolean;
@@ -161,6 +162,14 @@ export function AetherField({ reducedMotion }: AetherFieldProps) {
   const particleScale = useHermeticStore((state) => state.particleScale);
   const particleBrightness = useHermeticStore((state) => state.particleBrightness);
   const quality = useHermeticStore((state) => state.qualityTier);
+  const themeColors = useThemeStore((state) => state.colors);
+  const particleColors = useMemo(
+    () => ({
+      line: new Color(themeColors.line),
+      glow: new Color(themeColors.glow),
+    }),
+    [themeColors]
+  );
 
   const count = quality === "low" ? 45000 : quality === "medium" ? 90000 : 140000;
 
@@ -199,6 +208,8 @@ export function AetherField({ reducedMotion }: AetherFieldProps) {
     material.uniforms.uPrinciple.value = principleId;
     material.uniforms.uParticleScale.value = particleScale;
     material.uniforms.uBrightness.value = particleBrightness;
+    material.uniforms.uColorA.value = particleColors.glow;
+    material.uniforms.uColorB.value = particleColors.line;
   });
 
   return (

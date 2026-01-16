@@ -11,6 +11,7 @@ import {
 } from "@/lib/sacredGeometry";
 import { EngravedPath } from "@/components/scene/EngravedPath";
 import { HaloNodes } from "@/components/scene/HaloNodes";
+import { useThemeStore } from "@/lib/themeStore";
 
 type SacredGeometrySigilProps = {
   chapterIndex: number;
@@ -37,6 +38,7 @@ export function SacredGeometrySigil({
   lineOpacityScale = 1,
   lineRadiusScale = 1,
 }: SacredGeometrySigilProps) {
+  const themeColors = useThemeStore((state) => state.colors);
   const currentIndex = MathUtils.clamp(chapterIndex, 0, geometries.length - 1);
   const nextIndex = Math.min(currentIndex + 1, geometries.length - 1);
   const transition = easeBreath(MathUtils.clamp((progress - 0.55) / 0.4, 0, 1));
@@ -44,8 +46,10 @@ export function SacredGeometrySigil({
   const nextOpacity = MathUtils.lerp(0, 0.65, transition) * lineOpacityScale;
   const baseScale = MathUtils.lerp(0.85, 1.05, progress);
   const polarityShift = chapterIndex === 3 ? MathUtils.lerp(0.2, 0.8, transition) : 0;
-  const colorPrimary = chapterIndex === 3 ? "#252435" : "#b89b5e";
-  const emissive = chapterIndex === 3 ? "#b89b5e" : "#2b6f6a";
+  const colorPrimary =
+    chapterIndex === 3 ? themeColors.accent2 : themeColors.line;
+  const emissive =
+    chapterIndex === 3 ? themeColors.line : themeColors.glow;
 
   const currentPoints = useMemo(() => geometries[currentIndex](), [currentIndex]);
   const nextPoints = useMemo(() => geometries[nextIndex](), [nextIndex]);
@@ -87,8 +91,8 @@ export function SacredGeometrySigil({
             roughness={0.5}
             metalness={0.5}
             jitter={0.02}
-            color="#2b6f6a"
-            emissive="#b89b5e"
+            color={themeColors.accent2}
+            emissive={themeColors.line}
             emissiveIntensity={0.08}
           />
         </group>
@@ -104,8 +108,8 @@ export function SacredGeometrySigil({
                 roughness={0.6}
                 metalness={0.4}
                 jitter={0.025}
-                color="#7a6a45"
-                emissive="#2b6f6a"
+                color={themeColors.accent}
+                emissive={themeColors.glow}
                 emissiveIntensity={0.05}
               />
             </group>
@@ -121,8 +125,8 @@ export function SacredGeometrySigil({
             roughness={0.4}
             metalness={0.6}
             jitter={0.02}
-            color="#2b6f6a"
-            emissive="#b89b5e"
+            color={themeColors.accent2}
+            emissive={themeColors.glow}
             emissiveIntensity={0.12}
           />
           <EngravedPath
@@ -132,8 +136,8 @@ export function SacredGeometrySigil({
             roughness={0.45}
             metalness={0.5}
             jitter={0.018}
-            color="#b89b5e"
-            emissive="#2b6f6a"
+            color={themeColors.accent}
+            emissive={themeColors.glow}
             emissiveIntensity={0.1}
           />
         </>
@@ -142,7 +146,7 @@ export function SacredGeometrySigil({
         <mesh rotation={[0, 0, Math.PI / 3]}>
           <torusGeometry args={[2.2, 0.01, 8, 220]} />
           <meshStandardMaterial
-            color="#e8e3d8"
+            color={themeColors.line}
             metalness={0.4}
             roughness={0.6}
             transparent

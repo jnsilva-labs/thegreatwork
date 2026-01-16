@@ -31,7 +31,7 @@ export default function Home() {
               Ritual Interface
             </div>
             <h1 className="font-ritual text-4xl leading-tight text-[color:var(--bone)] sm:text-6xl lg:text-7xl">
-              Sacred Geometry Codex
+              Awareness Paradox
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
               A digital grimoire of Hermetic law, etched in golden ratios and
@@ -49,7 +49,7 @@ export default function Home() {
                 href="/ripley-scroll"
                 className="rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
               >
-                Scrollytelling
+                Principles in Motion
               </Link>
             </div>
           </div>
