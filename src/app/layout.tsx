@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CodexChrome } from "@/components/ui/CodexChrome";
+import { NavBar } from "@/components/ui/NavBar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -50,8 +51,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <NavBar />
         <CodexChrome />
-        <div className="relative z-10">{children}</div>
+        <div className="relative z-10 pt-20">{children}</div>
       </body>
     </html>
   );
