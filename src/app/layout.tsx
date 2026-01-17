@@ -7,13 +7,14 @@ export const metadata: Metadata = {
   title: "Sacred Geometry Codex",
   description:
     "A ritual interface exploring the seven Hermetic principles through sacred geometry.",
+  metadataBase: new URL("https://awarenessparadox.com"),
   openGraph: {
     title: "Sacred Geometry Codex",
     description:
       "A ritual interface exploring the seven Hermetic principles through sacred geometry.",
     images: [
       {
-        url: "/og.svg",
+        url: "/opengraph-image.png",
         width: 1200,
         height: 630,
         alt: "Sacred Geometry Codex",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     title: "Sacred Geometry Codex",
     description:
       "A ritual interface exploring the seven Hermetic principles through sacred geometry.",
-    images: ["/og.svg"],
+    images: ["/twitter-image.png"],
   },
 };
 

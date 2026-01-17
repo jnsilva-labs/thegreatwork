@@ -130,7 +130,7 @@ export function NavBar() {
           <button
             type="button"
             onClick={openControls}
-            className="rounded-full border border-[color:var(--copper)]/60 p-2 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+            className="hidden rounded-full border border-[color:var(--copper)]/60 p-2 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] lg:inline-flex"
             aria-label="Open controls"
             title="Controls"
           >
@@ -139,7 +139,7 @@ export function NavBar() {
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="rounded-full border border-[color:var(--copper)]/60 p-2 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/60 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] lg:hidden"
             aria-label="Open menu"
             title="Menu"
           >
@@ -242,6 +242,12 @@ export function NavBar() {
           <div
             className="fixed bottom-0 left-0 right-0 rounded-t-3xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/95 px-6 pb-8 pt-6 text-[0.7rem] uppercase tracking-[0.32em] text-[color:var(--mist)]"
             onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setMobileOpen(false);
+              }
+            }}
+            tabIndex={-1}
           >
             <div className="flex items-center justify-between">
               <span>Menu</span>
@@ -266,7 +272,7 @@ export function NavBar() {
                   </Link>
                 ))}
               </div>
-              <details className="rounded-2xl border border-[color:var(--copper)]/50 p-4">
+              <details className="rounded-2xl border border-[color:var(--copper)]/50 p-4" open>
                 <summary className="cursor-pointer text-[0.65rem] tracking-[0.32em] text-[color:var(--bone)]">
                   Controls
                 </summary>
