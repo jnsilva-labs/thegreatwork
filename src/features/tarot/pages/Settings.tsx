@@ -40,11 +40,11 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
                 <Key size={18} /> The Voice (API Key)
               </h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-2">
-                This Tarot feature uses your own Gemini key directly from your browser.
+                Readings use the app&apos;s shared free Gemini key first. Add your own key only as a fallback if shared quota is reached.
               </p>
               <div className="flex items-start gap-2 text-xs text-alchemy-gold/80 bg-alchemy-gold/5 p-3 rounded border border-alchemy-gold/10">
                 <Zap size={14} className="mt-0.5 shrink-0" />
-                <span>Adding your key enables private interpretations and avoids shared limits.</span>
+                <span>Your personal key bypasses shared limits and keeps your readings available during peak traffic.</span>
               </div>
             </div>
 

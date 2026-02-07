@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AlertTriangle, ArrowLeft, ChevronLeft, ChevronRight, Eye, Loader2, Save, Sparkles, X } from '../icons';
 import { DEFAULT_DECK, SPREADS } from '../constants';
 import SpreadLayout from '../components/SpreadLayout';
-import { generateInterpretation } from '../services/geminiService';
+import { generateInterpretation, TarotInterpretationError } from '../services/geminiService';
 import { getDecks, getSettings, saveReading } from '../services/storageService';
 import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, SpreadType, TarotView } from '../types';
 
@@ -84,19 +84,13 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
     const apiKey = getSettings().apiKey?.trim();
 
-    if (!apiKey) {
-      setApiKeyMissing(true);
-      setIsLoadingAI(false);
-      return;
-    }
-
     try {
       const result = await generateInterpretation({
         question,
         intention,
         spread,
         cards: drawnCards,
-        apiKey,
+        apiKey: apiKey || undefined,
       });
 
       setInterpretation(result);
@@ -113,7 +107,13 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
       };
       saveReading(newReading);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+      if (error instanceof TarotInterpretationError && error.needsPersonalKey) {
+        setApiKeyMissing(true);
+        setApiError(error.message);
+        return;
+      }
+
+      const message = error instanceof Error ? error.message : 'Unknown interpretation error.';
       let userMessage = 'The spirits are quiet. Please try again.';
 
       if (message.includes('429')) {
@@ -186,9 +186,9 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                 <div className="text-alchemy-red">
                   <AlertTriangle size={32} />
                 </div>
-                <h3 className="text-white font-serif text-xl">{apiError ? 'Connection Interrupted' : 'No Voice Found'}</h3>
+                <h3 className="text-white font-serif text-xl">{apiKeyMissing ? 'Personal Key Needed' : 'Connection Interrupted'}</h3>
                 <p className="text-slate-400 text-sm">
-                  {apiError ? `${apiError} Add your personal key for a stable connection.` : 'No Gemini key detected. Add one in Settings.'}
+                  {apiError || 'Shared free usage is unavailable right now. Add your personal Gemini key in Settings to continue.'}
                 </p>
                 <button
                   onClick={() => onNavigate('settings')}
