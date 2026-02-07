@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/great-work", label: "The Great Work" },
   { href: "/principles", label: "Principles" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/tarot", label: "Tarot" },
 ];
 
 export function NavBar() {
