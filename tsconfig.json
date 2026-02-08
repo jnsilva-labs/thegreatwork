@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "tarot"]
+  "exclude": ["node_modules", "tarot", "astro-service"]
 }
