@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Astrology — Awareness Paradox",
   description:
-    "The Emerald Tablet declares: that which is below is like that which is above. Explore astrology as the ancients practiced it, through the bonds of cosmic sympathy.",
+    "Astrology carries a long lineage, from Mesopotamian sky omens to Greek and Renaissance cosmology."
 };
 
 export default function AstrologyPage() {
@@ -25,31 +26,32 @@ export default function AstrologyPage() {
 
         <div className="space-y-5">
           <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-            The Emerald Tablet of Hermes opens with a declaration that has
-            echoed through every century since: &quot;That which is below is
-            like that which is above, and that which is above is like that
-            which is below, to do the miracles of one only thing.&quot; The
-            Arabic original says <em>from</em>, not <em>like</em>. You are
-            not a reflection of the cosmos. You are from the same source.
+            Astrology began as careful sky watching in ancient Mesopotamia, where priests recorded eclipses,
+            planetary motions, and unusual alignments as signs tied to seasons, kingship, and civic life.
+            In Egypt, temple astronomer-priests refined calendar systems and star lore, then Greek thinkers
+            gathered these traditions into a more systematic language of zodiac signs, aspects, and houses.
           </p>
           <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-            In Hermetic cosmology, the soul descends through seven planetary
-            spheres to arrive on earth, gathering qualities at each stage.
-            Your natal chart is a record of that passage. Ptolemy, writing in
-            the second century, treated astrology as natural philosophy: the
-            study of how celestial patterns correspond to earthly life through
-            the bonds of <em>sympatheia</em>.
+            By the Hellenistic era, astrology became part of natural philosophy, and Ptolemy treated it as the
+            study of celestial influence within an ordered cosmos. Through Arabic scholarship and the Latin West,
+            those methods were preserved, translated, and expanded across the medieval and Renaissance periods,
+            shaping medicine, agriculture, court timing, and personal natal practice for centuries.
           </p>
         </div>
 
         <div className="rounded-2xl border border-[color:var(--copper)]/30 p-5 sm:p-8 text-center">
-          <p className="text-sm uppercase tracking-[0.4em] text-[color:var(--gilt)]">
-            Coming Soon
-          </p>
+          <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--gilt)]">Private Beta</p>
           <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
-            Natal chart readings, planetary transits, and zodiac profiles,
-            drawn from the tradition of Hermetic correspondence.
+            Natal oracle is live in limited preview.
           </p>
+          <div className="mt-5 flex justify-center">
+            <Link
+              href="/astro"
+              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/70 bg-[color:var(--gilt)]/12 px-6 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/22"
+            >
+              Enter Natal Oracle
+            </Link>
+          </div>
         </div>
 
         <ZodiacWheel />
@@ -61,14 +63,14 @@ export default function AstrologyPage() {
 function ZodiacWheel() {
   const signs = [
     "\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D",
-    "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653",
+    "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653"
   ];
 
   return (
     <div className="flex justify-center py-8">
       <svg
         viewBox="0 0 200 200"
-        className="h-48 w-48 sm:h-56 sm:w-56 text-[color:var(--copper)] opacity-40"
+        className="h-48 w-48 text-[color:var(--copper)] opacity-40 sm:h-56 sm:w-56"
         aria-hidden="true"
       >
         <circle

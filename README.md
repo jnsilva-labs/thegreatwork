@@ -49,6 +49,24 @@ Visit `/styleguide` to see tokens, type scale, and sigils.
 npm run check:plates
 ```
 
+## Astro Share Cards
+
+`/astro` now includes a Share panel that renders deterministic SVG cards from natal chart facts:
+
+- `Chart Totem` (1080x1350)
+- `Zodiac Constellation Map` (1080x1080)
+
+Exports:
+
+- `Download PNG` (rendered from the generated SVG)
+- `Download SVG` (source vector)
+
+Caveats:
+
+- The export is deterministic from chart placements, so identical chart JSON produces identical SVG output.
+- PNG export relies on browser SVG-to-canvas decode; modern desktop/mobile browsers work, but very old browsers may fail silently.
+- No AI interpretation is used in share-card rendering; only chart facts are mapped.
+
 ## Geometry Plate Assets
 
 Place finalized plate SVGs in `public/geometry` with these filenames:
