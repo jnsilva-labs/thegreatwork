@@ -1,12 +1,20 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import { useUiStore } from "@/lib/uiStore";
 import { principles } from "@/data/principles";
+import { trackedSections } from "@/data/homepage";
 
 export function AnnotationBar() {
   const activeChapter = useHermeticStore((state) => state.activeChapter);
   const showUi = useUiStore((state) => state.showUi);
+  const pathname = usePathname();
+
+  const isHomepage = pathname === "/";
+  const annotation = isHomepage
+    ? trackedSections[activeChapter]?.subtitle ?? trackedSections[activeChapter]?.title
+    : principles[activeChapter]?.short;
 
   return (
     <div
@@ -14,7 +22,7 @@ export function AnnotationBar() {
         showUi ? "opacity-100" : "opacity-0"
       }`}
     >
-      {principles[activeChapter]?.short}
+      {annotation}
     </div>
   );
 }

@@ -11,9 +11,10 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/great-work", label: "The Great Work" },
-  { href: "/principles", label: "Principles" },
-  { href: "/gallery", label: "Gallery" },
   { href: "/tarot", label: "Tarot" },
+  { href: "/astrology", label: "Astrology" },
+  { href: "/gallery", label: "Sacred Geometry" },
+  { href: "/principles", label: "Principles" },
 ];
 
 export function NavBar() {

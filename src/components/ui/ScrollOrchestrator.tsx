@@ -9,10 +9,15 @@ type SectionMeasure = {
   height: number;
 };
 
-export function ScrollOrchestrator() {
+type ScrollOrchestratorProps = {
+  slugs?: string[];
+};
+
+export function ScrollOrchestrator({ slugs: propSlugs }: ScrollOrchestratorProps) {
   const measuresRef = useRef<SectionMeasure[]>([]);
   const setState = useHermeticStore((state) => state.setState);
-  const { goToChapter, slugs } = useChapterNavigation();
+  const { goToChapter, slugs: defaultSlugs } = useChapterNavigation();
+  const slugs = propSlugs ?? defaultSlugs;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -98,7 +103,7 @@ export function ScrollOrchestrator() {
       }
       if (event.key === "ArrowRight") {
         goToChapter(
-          Math.min(useHermeticStore.getState().activeChapter + 1, 6)
+          Math.min(useHermeticStore.getState().activeChapter + 1, slugs.length - 1)
         );
       }
       if (event.key === "ArrowLeft") {

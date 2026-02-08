@@ -23,6 +23,10 @@ export function CodexChrome() {
     }
   }, []);
 
+  const isHomepage = pathname === "/";
+
+  if (isHomepage) return null;
+
   return (
     <>
       <nav

@@ -1,31 +1,32 @@
 import type { Metadata } from "next";
 import { CodexChrome } from "@/components/ui/CodexChrome";
 import { NavBar } from "@/components/ui/NavBar";
+import { Footer } from "@/components/ui/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Sacred Geometry Codex",
+  title: "Awareness Paradox",
   description:
-    "A ritual interface exploring the seven Hermetic principles through sacred geometry.",
+    "Ancient wisdom for modern awakening. Explore alchemy, tarot, astrology, sacred geometry, and the Hermetic principles.",
   metadataBase: new URL("https://awarenessparadox.com"),
   openGraph: {
-    title: "Sacred Geometry Codex",
+    title: "Awareness Paradox",
     description:
-      "A ritual interface exploring the seven Hermetic principles through sacred geometry.",
+      "Ancient wisdom for modern awakening. Explore alchemy, tarot, astrology, sacred geometry, and the Hermetic principles.",
     images: [
       {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "Sacred Geometry Codex",
+        alt: "Awareness Paradox",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sacred Geometry Codex",
+    title: "Awareness Paradox",
     description:
-      "A ritual interface exploring the seven Hermetic principles through sacred geometry.",
+      "Ancient wisdom for modern awakening. Explore alchemy, tarot, astrology, sacred geometry, and the Hermetic principles.",
     images: ["/twitter-image.png"],
   },
 };
@@ -55,6 +56,7 @@ export default function RootLayout({
         <NavBar />
         <CodexChrome />
         <div className="relative z-10 pt-20">{children}</div>
+        <Footer />
       </body>
     </html>
   );
