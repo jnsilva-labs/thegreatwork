@@ -1,5 +1,7 @@
 import "server-only";
 
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import sharp from "sharp";
 import { cropSignTile, isZodiacSign, type ZodiacSign } from "../assets/zodiacGrid";
 
@@ -12,12 +14,7 @@ const PANEL_HEIGHT = 420;
 const FIRST_PANEL_Y = 280;
 const PANEL_GAP = 520;
 
-const LABELS = ["SOLAR SELF", "LUNAR HEART", "ASCENDANT MASK"] as const;
-
 const panelY = (index: number): number => FIRST_PANEL_Y + index * PANEL_GAP;
-const TITLE_FONT_FAMILY = "Georgia, serif";
-const LABEL_FONT_FAMILY = "Arial, Helvetica, sans-serif";
-
 export interface BigThreeFromGridInput {
   sunSign: ZodiacSign;
   moonSign: ZodiacSign;
@@ -41,6 +38,32 @@ const renderBackgroundSvg = (): string => {
 `;
 };
 
+const OVERLAY_PATH = path.join(process.cwd(), "assets", "astro", "big-three-overlay.png");
+const OVERLAY_WATERMARK_PATH = path.join(
+  process.cwd(),
+  "assets",
+  "astro",
+  "big-three-overlay-watermark.png"
+);
+
+let overlayBufferPromise: Promise<Buffer> | null = null;
+let overlayWatermarkBufferPromise: Promise<Buffer> | null = null;
+
+const readOverlay = (watermark: boolean): Promise<Buffer> => {
+  if (watermark) {
+    if (!overlayWatermarkBufferPromise) {
+      overlayWatermarkBufferPromise = readFile(OVERLAY_WATERMARK_PATH);
+    }
+    return overlayWatermarkBufferPromise;
+  }
+
+  if (!overlayBufferPromise) {
+    overlayBufferPromise = readFile(OVERLAY_PATH);
+  }
+
+  return overlayBufferPromise;
+};
+
 const renderPlaceholderSvg = (width: number, height: number): string => {
   const stars = Array.from({ length: 52 }, (_, index) => {
     const x = ((index * 73) % (width - 24)) + 12;
@@ -62,42 +85,7 @@ const renderPlaceholderSvg = (width: number, height: number): string => {
   <rect width="100%" height="100%" fill="url(#panelFade)" />
   <rect width="100%" height="100%" fill="#000" opacity="0.36" />
   ${stars}
-  <text x="50%" y="53%" text-anchor="middle" fill="#efe6d3" opacity="0.85" font-size="40" letter-spacing="2" font-family="${LABEL_FONT_FAMILY}">Birth time needed</text>
-</svg>
-`;
-};
-
-const renderFrameOverlaySvg = (watermark: boolean): string => {
-  const borderColor = "#9a7a4a";
-
-  const panelRects = [0, 1, 2]
-    .map((index) => {
-      const y = panelY(index);
-      return `<rect x="${PANEL_X}" y="${y}" width="${PANEL_WIDTH}" height="${PANEL_HEIGHT}" rx="2" fill="none" stroke="${borderColor}" stroke-opacity="0.9" stroke-width="2" />`;
-    })
-    .join("\n");
-
-  const labels = LABELS.map((label, index) => {
-    const labelY = panelY(index) + PANEL_HEIGHT + 44;
-    const labelX = PANEL_X + PANEL_WIDTH / 2;
-    return `<text x="${labelX}" y="${labelY}" text-anchor="middle" fill="#d2be92" font-size="27" letter-spacing="8" font-family="${LABEL_FONT_FAMILY}">${label}</text>`;
-  }).join("\n");
-
-  const header = `
-    <text x="${CARD_WIDTH / 2}" y="132" text-anchor="middle" fill="#dcc8a1" font-size="72" letter-spacing="1.6" font-family="${TITLE_FONT_FAMILY}">Trinity of Self</text>
-    <text x="${CARD_WIDTH / 2}" y="174" text-anchor="middle" fill="#bea982" fill-opacity="0.95" font-size="22" letter-spacing="6" font-family="${LABEL_FONT_FAMILY}">AWARENESS PARADOX</text>
-  `;
-
-  const watermarkText = watermark
-    ? `<text x="${CARD_WIDTH - 48}" y="${CARD_HEIGHT - 42}" text-anchor="end" fill="#e4d9c0" fill-opacity="0.3" font-size="22" letter-spacing="3.5" font-family="${LABEL_FONT_FAMILY}">@awarenessparadox</text>`
-    : "";
-
-  return `
-<svg xmlns="http://www.w3.org/2000/svg" width="${CARD_WIDTH}" height="${CARD_HEIGHT}" viewBox="0 0 ${CARD_WIDTH} ${CARD_HEIGHT}">
-  ${header}
-  ${panelRects}
-  ${labels}
-  ${watermarkText}
+  <text x="50%" y="53%" text-anchor="middle" fill="#efe6d3" opacity="0.85" font-size="40" letter-spacing="2" font-family="Arial, Helvetica, sans-serif">Birth time needed</text>
 </svg>
 `;
 };
@@ -122,6 +110,7 @@ export const generateBigThreeFromGridPng = async (
   input: BigThreeFromGridInput
 ): Promise<Buffer> => {
   const watermark = input.watermark !== false;
+  const frameOverlay = await readOverlay(watermark);
 
   const sunPanel = await tileToPanel(input.sunSign);
   const moonPanel = await tileToPanel(input.moonSign);
@@ -150,7 +139,7 @@ export const generateBigThreeFromGridPng = async (
       { input: sunPanel, left: PANEL_X, top: panelY(0) },
       { input: moonPanel, left: PANEL_X, top: panelY(1) },
       { input: risingPanel, left: PANEL_X, top: panelY(2) },
-      { input: Buffer.from(renderFrameOverlaySvg(watermark)) }
+      { input: frameOverlay }
     ])
     .png()
     .toBuffer();
