@@ -271,7 +271,7 @@ export const generateConstellationSvg = (
         <g>
           <circle cx="${marker.x.toFixed(2)}" cy="${marker.y.toFixed(2)}" r="${marker.radius.toFixed(2)}" fill="${theme.markerColor}" opacity="0.9" />
           <circle cx="${marker.x.toFixed(2)}" cy="${marker.y.toFixed(2)}" r="${(marker.radius + 5.2).toFixed(2)}" fill="none" stroke="${theme.markerColor}" opacity="0.22" stroke-width="1" />
-          <text x="${(marker.x + marker.radius + 8).toFixed(2)}" y="${(marker.y + 4).toFixed(2)}" fill="${theme.textMuted}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="11" letter-spacing="1.1">${marker.label}</text>
+          <text x="${(marker.x + marker.radius + 8).toFixed(2)}" y="${(marker.y + 4).toFixed(2)}" fill="${theme.textMuted}" font-family="Arial, Helvetica, sans-serif" font-size="11" letter-spacing="1.1">${marker.label}</text>
         </g>
       `;
     })
@@ -312,8 +312,8 @@ export const generateConstellationSvg = (
   <g>
     <circle cx="${cx}" cy="${cy}" r="96" fill="none" stroke="${theme.sealColor}" stroke-width="1.4" />
     <circle cx="${cx}" cy="${cy}" r="66" fill="none" stroke="${theme.sealColor}" stroke-width="1" />
-    <text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="${theme.textMain}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" letter-spacing="4">NATAL CONSTELLATION</text>
-    <text x="${cx}" y="${cy + 26}" text-anchor="middle" fill="${theme.textMuted}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" letter-spacing="3">PROCEDURAL STAR WHEEL</text>
+    <text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="${theme.textMain}" font-family="Arial, Helvetica, sans-serif" font-size="20" letter-spacing="4">NATAL CONSTELLATION</text>
+    <text x="${cx}" y="${cy + 26}" text-anchor="middle" fill="${theme.textMuted}" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="3">PROCEDURAL STAR WHEEL</text>
   </g>
 
   ${renderWatermark({ enabled: opts.watermark ?? true, width, height, color: background === "light" ? "rgba(25,32,45,0.33)" : "rgba(232,227,216,0.3)" })}

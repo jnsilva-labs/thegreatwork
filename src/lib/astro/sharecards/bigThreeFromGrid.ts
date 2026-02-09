@@ -15,6 +15,8 @@ const PANEL_GAP = 520;
 const LABELS = ["SOLAR SELF", "LUNAR HEART", "ASCENDANT MASK"] as const;
 
 const panelY = (index: number): number => FIRST_PANEL_Y + index * PANEL_GAP;
+const TITLE_FONT_FAMILY = "Georgia, serif";
+const LABEL_FONT_FAMILY = "Arial, Helvetica, sans-serif";
 
 export interface BigThreeFromGridInput {
   sunSign: ZodiacSign;
@@ -60,7 +62,7 @@ const renderPlaceholderSvg = (width: number, height: number): string => {
   <rect width="100%" height="100%" fill="url(#panelFade)" />
   <rect width="100%" height="100%" fill="#000" opacity="0.36" />
   ${stars}
-  <text x="50%" y="53%" text-anchor="middle" fill="#efe6d3" opacity="0.85" font-size="40" letter-spacing="2" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">Birth time needed</text>
+  <text x="50%" y="53%" text-anchor="middle" fill="#efe6d3" opacity="0.85" font-size="40" letter-spacing="2" font-family="${LABEL_FONT_FAMILY}">Birth time needed</text>
 </svg>
 `;
 };
@@ -78,16 +80,16 @@ const renderFrameOverlaySvg = (watermark: boolean): string => {
   const labels = LABELS.map((label, index) => {
     const labelY = panelY(index) + PANEL_HEIGHT + 44;
     const labelX = PANEL_X + PANEL_WIDTH / 2;
-    return `<text x="${labelX}" y="${labelY}" text-anchor="middle" fill="#d2be92" font-size="27" letter-spacing="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">${label}</text>`;
+    return `<text x="${labelX}" y="${labelY}" text-anchor="middle" fill="#d2be92" font-size="27" letter-spacing="8" font-family="${LABEL_FONT_FAMILY}">${label}</text>`;
   }).join("\n");
 
   const header = `
-    <text x="${CARD_WIDTH / 2}" y="132" text-anchor="middle" fill="#dcc8a1" font-size="72" letter-spacing="1.6" font-family="'Iowan Old Style', Baskerville, 'Times New Roman', Georgia, serif">Trinity of Self</text>
-    <text x="${CARD_WIDTH / 2}" y="174" text-anchor="middle" fill="#bea982" fill-opacity="0.95" font-size="22" letter-spacing="6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">AWARENESS PARADOX</text>
+    <text x="${CARD_WIDTH / 2}" y="132" text-anchor="middle" fill="#dcc8a1" font-size="72" letter-spacing="1.6" font-family="${TITLE_FONT_FAMILY}">Trinity of Self</text>
+    <text x="${CARD_WIDTH / 2}" y="174" text-anchor="middle" fill="#bea982" fill-opacity="0.95" font-size="22" letter-spacing="6" font-family="${LABEL_FONT_FAMILY}">AWARENESS PARADOX</text>
   `;
 
   const watermarkText = watermark
-    ? `<text x="${CARD_WIDTH - 48}" y="${CARD_HEIGHT - 42}" text-anchor="end" fill="#e4d9c0" fill-opacity="0.3" font-size="22" letter-spacing="3.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">@awarenessparadox</text>`
+    ? `<text x="${CARD_WIDTH - 48}" y="${CARD_HEIGHT - 42}" text-anchor="end" fill="#e4d9c0" fill-opacity="0.3" font-size="22" letter-spacing="3.5" font-family="${LABEL_FONT_FAMILY}">@awarenessparadox</text>`
     : "";
 
   return `
