@@ -9,6 +9,7 @@ import {
 } from "@/lib/astro/types";
 import { requestNatalReading } from "@/lib/openai/respond";
 import { deriveBigThreeFromChart, derivePlacementFacts } from "@/lib/astro/derive";
+import { hasAstroBetaAccess } from "@/lib/astro/auth";
 
 export const runtime = "nodejs";
 
@@ -116,6 +117,10 @@ const scrubTimedChartData = (chart: AstroChart): AstroChart => {
 };
 
 export async function POST(request: NextRequest) {
+  if (!hasAstroBetaAccess(request.cookies)) {
+    return jsonError("UNAUTHORIZED", "Private beta access required.", 401);
+  }
+
   const routeStart = performance.now();
   const ip = getClientIp(request);
   const rate = consumeRateLimit(ip);

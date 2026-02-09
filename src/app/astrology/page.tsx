@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { AstroEntryButton } from "@/components/astro/AstroEntryButton";
 
 export const metadata: Metadata = {
   title: "Astrology — Awareness Paradox",
@@ -45,12 +45,7 @@ export default function AstrologyPage() {
             Natal oracle is live in limited preview.
           </p>
           <div className="mt-5 flex justify-center">
-            <Link
-              href="/astro"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/70 bg-[color:var(--gilt)]/12 px-6 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/22"
-            >
-              Enter Natal Oracle
-            </Link>
+            <AstroEntryButton />
           </div>
         </div>
 

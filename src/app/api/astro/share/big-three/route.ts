@@ -5,6 +5,7 @@ import {
   type ZodiacSign
 } from "../../../../../lib/astro/assets/zodiacGrid";
 import { generateBigThreeFromGridPng } from "../../../../../lib/astro/sharecards/bigThreeFromGrid";
+import { hasAstroBetaAccess } from "@/lib/astro/auth";
 
 export const runtime = "nodejs";
 
@@ -41,6 +42,10 @@ const jsonError = (status: number, code: string, error: string, details?: unknow
 };
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  if (!hasAstroBetaAccess(request.cookies)) {
+    return jsonError(401, "UNAUTHORIZED", "Private beta access required.");
+  }
+
   let body: unknown;
 
   try {
