@@ -15,6 +15,22 @@ export default function GalleryPage() {
             A curated cabinet of geometric constructions rendered as engraved plates and
             living linework.
           </p>
+          <div className="max-w-3xl space-y-4 text-sm text-[color:var(--mist)] sm:text-base">
+            <p>
+              For centuries, these forms were treated as instruments, not decoration.
+              Artisans set them into temples and cathedrals, scholars drafted them into
+              treatises, and initiatory schools used them to train attention, memory, and
+              proportion. Geometry was a way to study order with the eyes and the hands at
+              the same time.
+            </p>
+            <p>
+              Spend a few minutes with each plate and let your pacing slow down. Follow the
+              repetitions, intersections, and expansions until the pattern becomes familiar.
+              That practice can settle mental noise, improve spatial clarity, and sharpen
+              your sense of relationship across scales, from your own body to the larger
+              structures of nature.
+            </p>
+          </div>
         </header>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
