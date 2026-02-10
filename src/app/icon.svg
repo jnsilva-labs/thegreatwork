@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Awareness Paradox icon">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="35%" r="72%">
+      <stop offset="0%" stop-color="#1d2334"/>
+      <stop offset="65%" stop-color="#0d1322"/>
+      <stop offset="100%" stop-color="#070b16"/>
+    </radialGradient>
+    <linearGradient id="copper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e7c78a"/>
+      <stop offset="100%" stop-color="#8c6a34"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <g stroke="url(#copper)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="256" cy="256" r="196" stroke-width="8" opacity="0.95"/>
+    <circle cx="256" cy="256" r="170" stroke-width="3" opacity="0.65"/>
+    <circle cx="256" cy="256" r="86" stroke-width="2" opacity="0.55"/>
+
+    <polygon
+      points="256,98 392,177 392,335 256,414 120,335 120,177"
+      stroke-width="5"
+      opacity="0.55"
+    />
+
+    <line x1="256" y1="98" x2="256" y2="414" stroke-width="2" opacity="0.45"/>
+    <line x1="120" y1="177" x2="392" y2="335" stroke-width="2" opacity="0.45"/>
+    <line x1="120" y1="335" x2="392" y2="177" stroke-width="2" opacity="0.45"/>
+
+    <circle cx="256" cy="170" r="86" stroke-width="1.8" opacity="0.35"/>
+    <circle cx="330" cy="213" r="86" stroke-width="1.8" opacity="0.35"/>
+    <circle cx="330" cy="299" r="86" stroke-width="1.8" opacity="0.35"/>
+    <circle cx="256" cy="342" r="86" stroke-width="1.8" opacity="0.35"/>
+    <circle cx="182" cy="299" r="86" stroke-width="1.8" opacity="0.35"/>
+    <circle cx="182" cy="213" r="86" stroke-width="1.8" opacity="0.35"/>
+  </g>
+
+  <circle cx="256" cy="256" r="8" fill="#f4ead6" opacity="0.9"/>
+</svg>
