@@ -1,12 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = buildPageMetadata({
-  title: "Thank You",
-  path: "/thank-you/starter-guide",
+export const metadata: Metadata = {
+  title: "Your Guide Is Ready | Awareness Paradox",
   description: "Thanks for requesting the Hermetic Principles Starter Guide.",
-  noIndex: true,
-});
+  robots: { index: false, follow: false },
+};
 
 export default function StarterGuideThankYouPage() {
   return (
