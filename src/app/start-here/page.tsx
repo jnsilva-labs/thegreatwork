@@ -31,7 +31,11 @@ const tracks = [
 ];
 
 export default function StartHerePage() {
-  const substackUrl = process.env.NEXT_PUBLIC_SUBSTACK_URL ?? "/letters";
+  const envSubstackUrl = process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim();
+  const substackUrl =
+    envSubstackUrl && envSubstackUrl.length > 0
+      ? envSubstackUrl
+      : "https://substack.com/@awarenessparadox";
   const isExternal = substackUrl.startsWith("https://") || substackUrl.startsWith("http://");
 
   return (
