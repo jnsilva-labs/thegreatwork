@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { CodexChrome } from "@/components/ui/CodexChrome";
 import { NavBar } from "@/components/ui/NavBar";
 import { Footer } from "@/components/ui/Footer";
@@ -65,6 +66,7 @@ export default function RootLayout({
         <CodexChrome />
         <div className="relative z-10 pt-20">{children}</div>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
