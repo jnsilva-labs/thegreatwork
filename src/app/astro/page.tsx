@@ -1,28 +1,17 @@
-import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import { NatalChartWidget } from "@/components/astro/NatalChartWidget";
-import { AstroAccessGate } from "@/components/astro/AstroAccessGate";
-import { hasAstroBetaAccess } from "@/lib/astro/auth";
+import { redirect } from "next/navigation";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Natal Oracle — Awareness Paradox",
-  description:
-    "Private beta: generate a deterministic natal chart and reflective interpretation for self-inquiry.",
-  robots: {
-    index: false,
-    follow: false
-  }
-};
+const ASTRO_BETA_DESCRIPTION =
+  "Natal oracle route retained as a legacy alias that redirects into the public astrology experience.";
 
-export default async function AstroPage() {
-  const cookieStore = await cookies();
-  const hasAccess = hasAstroBetaAccess(cookieStore);
+export const metadata = buildPageMetadata({
+  title: "Natal Oracle",
+  path: "/astro",
+  description: ASTRO_BETA_DESCRIPTION,
+  noIndex: true,
+  keywords: ["natal chart", "astrology reading"],
+});
 
-  return (
-    <main className="min-h-screen bg-sacred-geo pb-16 pt-10">
-      <div className="mx-auto w-full max-w-6xl">
-        {hasAccess ? <NatalChartWidget /> : <AstroAccessGate />}
-      </div>
-    </main>
-  );
+export default function AstroPage() {
+  redirect("/astrology");
 }

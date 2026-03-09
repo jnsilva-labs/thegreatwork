@@ -121,3 +121,104 @@ export interface AstroNatalResponse {
     zodiac: "tropical";
   };
 }
+
+export const astroMonthAheadRequestSchema = z
+  .object({
+    chart: astroChartSchema,
+    timeUnknown: z.boolean(),
+    startDateUtc: z.string().datetime({ offset: true }).optional()
+  })
+  .strict();
+
+export type AstroMonthAheadRequest = z.infer<typeof astroMonthAheadRequestSchema>;
+
+export const lunarStageEventSchema = z.object({
+  kind: z.literal("lunarStage"),
+  phase: z.enum(["newMoon", "firstQuarter", "fullMoon", "lastQuarter"]),
+  timestampUtc: z.string(),
+  orb: z.number(),
+  priority: z.number()
+});
+
+export const skyShiftEventSchema = z.object({
+  kind: z.literal("skyShift"),
+  eventType: z.enum(["ingress", "stationRetrograde", "stationDirect"]),
+  planet: z.enum(["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]),
+  timestampUtc: z.string(),
+  longitude: z.number(),
+  speed: z.number(),
+  priority: z.number(),
+  transitHouse: z.number().int().min(1).max(12).optional(),
+  fromSign: z.string().optional(),
+  toSign: z.string().optional(),
+  sign: z.string().optional()
+});
+
+export const transitContactEventSchema = z.object({
+  kind: z.literal("transitContact"),
+  transitPlanet: z.enum(["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]),
+  natalPoint: z.enum(["sun", "moon", "asc"]),
+  aspect: z.enum(["conjunction", "sextile", "square", "trine", "opposition"]),
+  timestampUtc: z.string(),
+  orb: z.number(),
+  transitLongitude: z.number(),
+  natalLongitude: z.number(),
+  priority: z.number(),
+  transitHouse: z.number().int().min(1).max(12).optional()
+});
+
+export const monthAheadHighlightSchema = z.discriminatedUnion("kind", [
+  lunarStageEventSchema,
+  skyShiftEventSchema,
+  transitContactEventSchema
+]);
+
+export const astroMonthAheadResponseSchema = z.object({
+  meta: z.object({
+    startDateUtc: z.string(),
+    endDateUtc: z.string(),
+    durationDays: z.number(),
+    generatedAt: z.string(),
+    sampleHours: z.number(),
+    zodiac: z.literal("tropical")
+  }),
+  lunarStages: z.array(lunarStageEventSchema),
+  skyShifts: z.array(skyShiftEventSchema),
+  transitContacts: z.array(transitContactEventSchema),
+  highlights: z.array(monthAheadHighlightSchema)
+});
+
+export type AstroMonthAheadResponse = z.infer<typeof astroMonthAheadResponseSchema>;
+
+export const monthAheadTransitHighlightSchema = z.object({
+  title: z.string(),
+  window: z.string(),
+  guidance: z.string()
+});
+
+export const monthAheadLunarCueSchema = z.object({
+  phase: z.enum(["newMoon", "firstQuarter", "fullMoon", "lastQuarter"]),
+  window: z.string(),
+  cue: z.string()
+});
+
+export const monthAheadReadingSchema = z.object({
+  title: z.string(),
+  timeframe: z.string(),
+  overview: z.string(),
+  majorThemes: z.array(z.string()).min(3).max(5),
+  transitHighlights: z.array(monthAheadTransitHighlightSchema).min(3).max(6),
+  lunarStages: z.array(monthAheadLunarCueSchema).length(4),
+  practiceSuggestions: z.array(z.string()).min(3).max(5),
+  cautions: z.array(z.string()).min(2).max(4),
+  closingLine: z.string(),
+  disclaimer: z.string()
+});
+
+export type MonthAheadReading = z.infer<typeof monthAheadReadingSchema>;
+
+export const astroMonthAheadReadingResponseSchema = astroMonthAheadResponseSchema.extend({
+  reading: monthAheadReadingSchema
+});
+
+export type AstroMonthAheadReadingResponse = z.infer<typeof astroMonthAheadReadingResponseSchema>;

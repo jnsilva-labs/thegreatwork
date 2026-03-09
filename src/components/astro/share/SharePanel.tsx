@@ -337,6 +337,8 @@ export function SharePanel({ chart }: SharePanelProps) {
             >
               {style === "bigThree" ? (
                 bigThreePreviewUrl ? (
+                  // Blob URLs are generated client-side; Next image optimization is not applicable.
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={bigThreePreviewUrl}
                     alt="Big Three preview"

@@ -1,10 +1,10 @@
 import { roundTo, normalizeDegrees } from "./math";
 
 // No official type package is available for swisseph.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const swe = require("swisseph");
+import swe from "swisseph";
 
 export type SwissEphemeris = typeof swe;
+type SwePayload = Record<string, unknown>;
 
 const getNumber = (...values: unknown[]): number | undefined => {
   for (const value of values) {
@@ -15,12 +15,14 @@ const getNumber = (...values: unknown[]): number | undefined => {
   return undefined;
 };
 
-const extractLongitude = (payload: any): number => {
+const extractLongitude = (payload: SwePayload): number => {
+  const xx = Array.isArray(payload.xx) ? payload.xx : undefined;
+  const data = Array.isArray(payload.data) ? payload.data : undefined;
   const longitude = getNumber(
-    payload?.longitude,
-    payload?.lon,
-    payload?.xx?.[0],
-    payload?.data?.[0]
+    payload.longitude,
+    payload.lon,
+    xx?.[0],
+    data?.[0]
   );
 
   if (longitude === undefined) {
@@ -28,6 +30,17 @@ const extractLongitude = (payload: any): number => {
   }
 
   return roundTo(normalizeDegrees(longitude));
+};
+
+const extractSpeed = (payload: SwePayload): number | undefined => {
+  const xx = Array.isArray(payload.xx) ? payload.xx : undefined;
+  const data = Array.isArray(payload.data) ? payload.data : undefined;
+  return getNumber(
+    payload.speed,
+    payload.speedLongitude,
+    xx?.[3],
+    data?.[3]
+  );
 };
 
 const parseCuspArray = (houseData: unknown): number[] => {
@@ -57,29 +70,31 @@ const parseCuspArray = (houseData: unknown): number[] => {
 const callSwe = <T>(
   method: string,
   args: unknown[],
-  parser: (payload: any) => T
+  parser: (payload: SwePayload) => T
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
-    const fn = swe[method];
+    const fn = (swe as Record<string, unknown>)[method];
 
     if (typeof fn !== "function") {
       reject(new Error(`Swiss Ephemeris method missing: ${method}`));
       return;
     }
 
-    fn(...args, (result: any) => {
-      if (!result) {
+    (fn as (...callArgs: unknown[]) => void)(...args, (result: unknown) => {
+      if (!result || typeof result !== "object") {
         reject(new Error(`Swiss Ephemeris returned empty payload for ${method}`));
         return;
       }
 
-      if (result.error) {
-        reject(new Error(String(result.error)));
+      const payload = result as SwePayload;
+
+      if (payload.error) {
+        reject(new Error(String(payload.error)));
         return;
       }
 
       try {
-        resolve(parser(result));
+        resolve(parser(payload));
       } catch (error) {
         reject(error);
       }
@@ -124,6 +139,36 @@ export const calcPlanetLongitude = async (
   return callSwe("swe_calc_ut", [jdUt, planetId, flags], extractLongitude);
 };
 
+export const calcPlanetState = async (
+  jdUt: number,
+  planetId: number,
+  flags = calcUtFlags
+): Promise<{ longitude: number; speed: number }> => {
+  const deltaDays = 0.125;
+  const native = await callSwe("swe_calc_ut", [jdUt, planetId, flags], (payload) => ({
+    longitude: extractLongitude(payload),
+    speed: extractSpeed(payload)
+  }));
+
+  if (typeof native.speed === "number" && Number.isFinite(native.speed)) {
+    return {
+      longitude: native.longitude,
+      speed: roundTo(native.speed)
+    };
+  }
+
+  const [backward, forward] = await Promise.all([
+    calcPlanetLongitude(jdUt - deltaDays, planetId, flags),
+    calcPlanetLongitude(jdUt + deltaDays, planetId, flags)
+  ]);
+  const signedDelta = ((forward - backward + 540) % 360) - 180;
+
+  return {
+    longitude: native.longitude,
+    speed: roundTo(signedDelta / (deltaDays * 2))
+  };
+};
+
 export interface PlacidusHousesResult {
   cusps: number[];
   asc: number;
@@ -136,9 +181,10 @@ export const calcHousesPlacidus = async (
   lon: number
 ): Promise<PlacidusHousesResult> => {
   return callSwe("swe_houses", [jdUt, lat, lon, "P"], (payload) => {
+    const ascmc = Array.isArray(payload.ascmc) ? payload.ascmc : undefined;
     const cusps = parseCuspArray(payload.house);
-    const asc = getNumber(payload.ascmc?.[0], payload.ascendant);
-    const mc = getNumber(payload.ascmc?.[1], payload.mc);
+    const asc = getNumber(ascmc?.[0], payload.ascendant);
+    const mc = getNumber(ascmc?.[1], payload.mc);
 
     if (asc === undefined || mc === undefined) {
       throw new Error("Swiss Ephemeris did not return asc/mc values");

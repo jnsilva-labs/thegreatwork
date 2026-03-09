@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
-import type { AstroNatalResponse } from "@/lib/astro/types";
+import type { AstroMonthAheadReadingResponse, AstroNatalResponse } from "@/lib/astro/types";
+import { trackEvent } from "@/lib/analytics/track";
 import { PlanetaryArc } from "./PlanetaryArc";
 import { SharePanel } from "./share/SharePanel";
 
@@ -55,6 +57,25 @@ const sentenceCase = (value: string): string => {
   return value.slice(0, 1).toUpperCase() + value.slice(1);
 };
 
+const lunarPhaseLabels: Record<string, string> = {
+  newMoon: "New Moon",
+  firstQuarter: "First Quarter",
+  fullMoon: "Full Moon",
+  lastQuarter: "Last Quarter"
+};
+
+const houseSystemDescriptions: Record<HouseSystem, string> = {
+  wholeSign: "Whole Sign maps one full sign to each house.",
+  placidus: "Placidus divides houses by time and quadrant."
+};
+
+const formatUtcDate = (timestampUtc: string): string => {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric"
+  }).format(new Date(timestampUtc));
+};
+
 export function NatalChartWidget() {
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -67,9 +88,14 @@ export function NatalChartWidget() {
   const [error, setError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [result, setResult] = useState<AstroNatalResponse | null>(null);
+  const [monthAheadLoading, setMonthAheadLoading] = useState(false);
+  const [monthAheadError, setMonthAheadError] = useState<string | null>(null);
+  const [monthAheadStatus, setMonthAheadStatus] = useState("");
+  const [monthAheadResult, setMonthAheadResult] = useState<AstroMonthAheadReadingResponse | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "done" | "failed">("idle");
 
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const pageViewTrackedRef = useRef(false);
 
   useEffect(() => {
     if (!result || !resultRef.current) return;
@@ -89,7 +115,13 @@ export function NatalChartWidget() {
     }, resultRef);
 
     return () => context.revert();
-  }, [result]);
+  }, [result, monthAheadResult]);
+
+  useEffect(() => {
+    if (pageViewTrackedRef.current) return;
+    pageViewTrackedRef.current = true;
+    trackEvent("astro_page_view", { page: "astrology" });
+  }, []);
 
   const placements = useMemo(() => {
     if (!result) return [];
@@ -127,13 +159,24 @@ export function NatalChartWidget() {
     ].join("\n");
   }, [result]);
 
+  const lettersHref = process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim() || "/letters";
+  const lettersIsExternal = lettersHref.startsWith("https://") || lettersHref.startsWith("http://");
+  const houseSystemDescription = houseSystemDescriptions[houseSystem];
+
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setLoading(true);
     setError(null);
+    setMonthAheadResult(null);
+    setMonthAheadError(null);
+    setMonthAheadStatus("");
     setCopyState("idle");
     setStatusMessage("Calculating chart and composing your reflection...");
+    trackEvent("astro_natal_submit", {
+      houseSystem,
+      timeUnknown
+    });
 
     try {
       const response = await fetch("/api/astro/natal", {
@@ -168,6 +211,10 @@ export function NatalChartWidget() {
 
       setResult(payload as AstroNatalResponse);
       setStatusMessage("Reading complete.");
+      trackEvent("astro_natal_success", {
+        houseSystem,
+        timeUnknown
+      });
     } catch (submitError) {
       setResult(null);
       setStatusMessage("Reading failed.");
@@ -176,8 +223,69 @@ export function NatalChartWidget() {
           ? submitError.message
           : "Unable to reveal the pattern right now. Please try again."
       );
+      trackEvent("astro_natal_error", {
+        houseSystem,
+        timeUnknown
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onRequestMonthAhead = async () => {
+    if (!result) return;
+
+    setMonthAheadLoading(true);
+    setMonthAheadError(null);
+    setMonthAheadStatus("Computing the month ahead from the current sky...");
+    trackEvent("astro_month_ahead_click", {
+      timeUnknown: result.meta.timeUnknown
+    });
+
+    try {
+      const response = await fetch("/api/astro/month-ahead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chart: result.chart,
+          timeUnknown: result.meta.timeUnknown
+        })
+      });
+
+      const payload = (await response.json()) as
+        | AstroMonthAheadReadingResponse
+        | { error?: string; code?: string; details?: unknown };
+
+      if (!response.ok) {
+        const fallback = "Could not interpret the month ahead. Please try again.";
+        const message =
+          typeof payload === "object" && payload && "error" in payload
+            ? String(payload.error ?? fallback)
+            : fallback;
+
+        throw new Error(message);
+      }
+
+      setMonthAheadResult(payload as AstroMonthAheadReadingResponse);
+      setMonthAheadStatus("Month-ahead reading complete.");
+      trackEvent("astro_month_ahead_success", {
+        timeUnknown: result.meta.timeUnknown,
+        highlights: (payload as AstroMonthAheadReadingResponse).highlights.length
+      });
+    } catch (monthAheadRequestError) {
+      setMonthAheadError(
+        monthAheadRequestError instanceof Error
+          ? monthAheadRequestError.message
+          : "Unable to interpret the month ahead right now. Please try again."
+      );
+      setMonthAheadStatus("Month-ahead reading failed.");
+      trackEvent("astro_month_ahead_error", {
+        timeUnknown: result.meta.timeUnknown
+      });
+    } finally {
+      setMonthAheadLoading(false);
     }
   };
 
@@ -187,6 +295,9 @@ export function NatalChartWidget() {
     try {
       await navigator.clipboard.writeText(shareText);
       setCopyState("done");
+      trackEvent("astro_share_export", {
+        method: "copy_text"
+      });
     } catch {
       setCopyState("failed");
     }
@@ -204,7 +315,7 @@ export function NatalChartWidget() {
             <p className="text-[10px] uppercase tracking-[0.35em] text-[color:var(--mist)]">Natal Oracle</p>
             <h1 className="font-ritual text-3xl text-[color:var(--bone)] sm:text-4xl">Reveal the Pattern</h1>
             <p className="max-w-2xl text-sm leading-relaxed text-[color:var(--mist)]">
-              For reflection and self-inquiry. Not deterministic fate.
+              For reflection and self-inquiry, written from computed chart facts rather than generalized horoscope copy.
             </p>
             <p className="text-xs text-[color:var(--mist)]">
               If your birth time is unknown, we interpret without houses and rising sign.
@@ -264,6 +375,9 @@ export function NatalChartWidget() {
                 onChange={(event) => {
                   setTimeUnknown(event.target.checked);
                   if (event.target.checked) setBirthTime("");
+                  if (event.target.checked) {
+                    trackEvent("astro_time_unknown_enabled", { page: "astrology" });
+                  }
                 }}
               />
               I don&apos;t know my exact birth time
@@ -276,9 +390,10 @@ export function NatalChartWidget() {
                 onChange={(event) => setHouseSystem(event.target.value as HouseSystem)}
                 className="min-h-[44px] w-full rounded-xl border border-[color:var(--copper)]/45 bg-[color:var(--bg)]/65 px-3 py-2 text-sm text-[color:var(--bone)]"
               >
-                <option value="wholeSign">Whole Sign</option>
-                <option value="placidus">Placidus</option>
+                <option value="wholeSign">Whole Sign • sign-based</option>
+                <option value="placidus">Placidus • quadrant-based</option>
               </select>
+              <p className="text-xs leading-relaxed text-[color:var(--mist)]">{houseSystemDescription}</p>
             </label>
 
             <div className="sm:col-span-2 flex flex-wrap items-center gap-3 pt-1">
@@ -366,7 +481,7 @@ export function NatalChartWidget() {
               </article>
 
               <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
-                <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Shadows</h3>
+                <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Growth Edges</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[color:var(--bone)]">
                   {result.reading.shadows.map((item) => (
                     <li key={item}>{item}</li>
@@ -405,6 +520,230 @@ export function NatalChartWidget() {
               <p className="mt-2 font-ritual text-2xl text-[color:var(--bone)]">{result.reading.mantra}</p>
             </div>
 
+            <div className="astro-reveal rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+              <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">How this reading is formed</h3>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[color:var(--mist)]">
+                <li>- Birthplace is geocoded into coordinates and timezone before the chart is calculated.</li>
+                <li>- Planetary positions are computed from ephemeris data, then translated into symbolic guidance.</li>
+                <li>- If birth time is unknown, houses and Ascendant claims are removed on purpose.</li>
+              </ul>
+            </div>
+
+            <section className="astro-reveal rounded-2xl border border-[color:var(--gilt)]/40 bg-[linear-gradient(180deg,rgba(184,155,94,0.12),rgba(184,155,94,0.03))] p-4 sm:p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="max-w-2xl space-y-2">
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">See the Month Ahead</p>
+                  <h3 className="font-ritual text-2xl text-[color:var(--bone)] sm:text-3xl">
+                    A 30-day reading from computed sky events
+                  </h3>
+                  <p className="text-sm leading-relaxed text-[color:var(--mist)]">
+                    This second reading is generated only when you ask for it. It draws from lunar stages,
+                    major sky shifts, and high-signal contacts to your chart, then translates those events
+                    into a measured monthly briefing.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onRequestMonthAhead}
+                  disabled={monthAheadLoading}
+                  className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 px-5 py-3 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/25 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {monthAheadLoading
+                    ? "Reading the Sky..."
+                    : monthAheadResult
+                      ? "Refresh the Month Ahead"
+                      : "See the Month Ahead"}
+                </button>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[color:var(--mist)]" aria-live="polite">
+                <span>{monthAheadStatus}</span>
+                {monthAheadResult ? (
+                  <span>
+                    Built from {monthAheadResult.lunarStages.length} lunar stages, {monthAheadResult.skyShifts.length} sky
+                    shifts, and {monthAheadResult.transitContacts.length} chart contacts.
+                  </span>
+                ) : null}
+              </div>
+
+              {monthAheadError ? (
+                <p
+                  className="mt-4 rounded-xl border border-rose-300/35 bg-rose-900/25 px-3 py-2 text-sm text-rose-100"
+                  role="alert"
+                >
+                  {monthAheadError}
+                </p>
+              ) : null}
+
+              {monthAheadResult ? (
+                <div className="mt-6 space-y-5">
+                  <div className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4 sm:p-5">
+                    <p className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Month-ahead reading</p>
+                    <h4 className="mt-2 font-ritual text-2xl text-[color:var(--bone)]">{monthAheadResult.reading.title}</h4>
+                    <p className="mt-2 text-xs uppercase tracking-[0.22em] text-[color:var(--gilt)]">
+                      {monthAheadResult.reading.timeframe}
+                    </p>
+                    {!result.meta.timeUnknown ? (
+                      <p className="mt-2 text-xs leading-relaxed text-[color:var(--mist)]">
+                        House context follows your selected {houseSystem === "wholeSign" ? "Whole Sign" : "Placidus"} system.
+                      </p>
+                    ) : null}
+                    <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)]">
+                      {monthAheadResult.reading.overview}
+                    </p>
+                  </div>
+
+                  <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                    <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Major themes</h4>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {monthAheadResult.reading.majorThemes.map((item) => (
+                        <span
+                          key={item}
+                          className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/30 bg-[color:var(--char)]/35 px-4 py-2 text-sm text-[color:var(--bone)]"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </article>
+
+                  <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                    <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Transit highlights</h4>
+                    <div className="mt-3 space-y-3">
+                      {monthAheadResult.reading.transitHighlights.map((item) => (
+                        <div
+                          key={`${item.title}-${item.window}`}
+                          className="rounded-xl border border-[color:var(--copper)]/25 bg-[color:var(--char)]/35 p-4"
+                        >
+                          <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)]">{item.window}</p>
+                          <p className="mt-2 text-sm text-[color:var(--bone)]">{item.title}</p>
+                          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[color:var(--mist)]">{item.guidance}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </article>
+
+                  <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                    <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Lunar rhythm</h4>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                      {monthAheadResult.reading.lunarStages.map((item) => (
+                        <div
+                          key={`${item.phase}-${item.window}`}
+                          className="rounded-xl border border-[color:var(--copper)]/25 bg-[color:var(--char)]/35 p-3"
+                        >
+                          <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)]">
+                            {lunarPhaseLabels[item.phase]}
+                          </p>
+                          <p className="mt-2 text-sm text-[color:var(--bone)]">{item.window}</p>
+                          <p className="mt-2 text-sm leading-relaxed text-[color:var(--mist)]">{item.cue}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </article>
+
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                      <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Practice suggestions</h4>
+                      <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[color:var(--bone)]">
+                        {monthAheadResult.reading.practiceSuggestions.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </article>
+
+                    <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                      <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Cautions</h4>
+                      <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[color:var(--bone)]">
+                        {monthAheadResult.reading.cautions.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </article>
+                  </div>
+
+                  <div className="rounded-2xl border border-[color:var(--gilt)]/45 bg-[color:var(--gilt)]/10 p-4">
+                    <p className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">Closing line</p>
+                    <p className="mt-2 font-ritual text-2xl text-[color:var(--bone)]">
+                      {monthAheadResult.reading.closingLine}
+                    </p>
+                  </div>
+
+                  <details className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                    <summary className="cursor-pointer text-xs uppercase tracking-[0.26em] text-[color:var(--mist)]">
+                      Show computed sky events
+                    </summary>
+                    <div className="mt-4 space-y-4 text-sm text-[color:var(--mist)]">
+                      <div>
+                        <h5 className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gilt)]">Lunar stages</h5>
+                        <ul className="mt-2 space-y-1">
+                          {monthAheadResult.lunarStages.map((event) => (
+                            <li key={`${event.phase}-${event.timestampUtc}`}>
+                              {lunarPhaseLabels[event.phase]} · {formatUtcDate(event.timestampUtc)} · orb {event.orb.toFixed(3)}°
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h5 className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gilt)]">Major sky shifts</h5>
+                        <ul className="mt-2 space-y-1">
+                          {monthAheadResult.skyShifts.map((event) => (
+                            <li key={`${event.eventType}-${event.planet}-${event.timestampUtc}`}>
+                              {sentenceCase(event.planet)} · {sentenceCase(event.eventType.replace(/([A-Z])/g, " $1").trim())} ·{" "}
+                              {formatUtcDate(event.timestampUtc)}
+                              {event.transitHouse ? ` · House ${event.transitHouse}` : ""}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h5 className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gilt)]">Chart contacts</h5>
+                        <ul className="mt-2 space-y-1">
+                          {monthAheadResult.transitContacts.map((event) => (
+                            <li key={`${event.transitPlanet}-${event.natalPoint}-${event.aspect}-${event.timestampUtc}`}>
+                              {sentenceCase(event.transitPlanet)} {event.aspect} {sentenceCase(event.natalPoint)} ·{" "}
+                              {formatUtcDate(event.timestampUtc)}
+                              {event.transitHouse ? ` · House ${event.transitHouse}` : ""}
+                              {` · orb ${event.orb.toFixed(3)}°`}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </details>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    {lettersIsExternal ? (
+                      <a
+                        href={lettersHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent("astro_month_ahead_cta_click", { target: "substack" })}
+                        className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/12 px-5 py-3 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                      >
+                        Receive Astrology Letters
+                      </a>
+                    ) : (
+                      <Link
+                        href={lettersHref}
+                        onClick={() => trackEvent("astro_month_ahead_cta_click", { target: "letters" })}
+                        className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/12 px-5 py-3 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                      >
+                        Receive Astrology Letters
+                      </Link>
+                    )}
+                    <p className="text-xs leading-relaxed text-[color:var(--mist)]">
+                      Return next month for a new reading or receive future astrology notes as this path deepens.
+                    </p>
+                  </div>
+
+                  <p className="text-xs leading-relaxed text-[color:var(--mist)]">
+                    {monthAheadResult.reading.disclaimer}
+                  </p>
+                </div>
+              ) : null}
+            </section>
+
             <PlanetaryArc points={result.chart.points} />
             <SharePanel chart={result.chart} />
 
@@ -429,7 +768,10 @@ export function NatalChartWidget() {
             </div>
 
             <details className="astro-reveal rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
-              <summary className="cursor-pointer text-xs uppercase tracking-[0.26em] text-[color:var(--mist)]">
+              <summary
+                className="cursor-pointer text-xs uppercase tracking-[0.26em] text-[color:var(--mist)]"
+                onClick={() => trackEvent("astro_chart_details_open", { surface: "natal" })}
+              >
                 Show chart details
               </summary>
 

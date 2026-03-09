@@ -1,6 +1,7 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
 import { chartRouter } from "./routes/chart";
+import { transitRouter } from "./routes/transits";
 
 export const app = express();
 
@@ -23,3 +24,4 @@ app.get("/healthz", (_req, res) => {
 });
 
 app.use("/chart", chartRateLimit, chartRouter);
+app.use("/transits", chartRateLimit, transitRouter);
