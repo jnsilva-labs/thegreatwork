@@ -13,7 +13,7 @@ export default function GreatWorkPage() {
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">
       <div className="mx-auto flex max-w-6xl flex-col gap-16">
-        <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
           <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
               Hermetic Library
@@ -28,10 +28,17 @@ export default function GreatWorkPage() {
               ))}
             </div>
           </div>
-          <div className="relative flex items-center justify-center">
-            <div className="relative flex items-center justify-center rounded-full border border-[color:var(--copper)]/40 bg-[color:var(--char)]/50 p-10">
-              <div className="violet-aura" aria-hidden="true" />
-              <Ouroboros className="h-56 w-56 text-[color:var(--bone)] sm:h-64 sm:w-64" />
+          <div className="space-y-4 lg:pt-8">
+            <div className="editorial-panel rounded-[2rem] p-6">
+              <p className="editorial-quote text-[color:var(--bone)]">
+                The work does not begin in brilliance. It begins where matter yields and the old form darkens.
+              </p>
+            </div>
+            <div className="relative flex items-center justify-center">
+              <div className="editorial-panel relative flex items-center justify-center rounded-[2rem] p-10">
+                <div className="violet-aura" aria-hidden="true" />
+                <Ouroboros className="h-56 w-56 text-[color:var(--bone)] sm:h-64 sm:w-64" />
+              </div>
             </div>
           </div>
         </section>
@@ -41,28 +48,34 @@ export default function GreatWorkPage() {
             <span className="h-px w-12 bg-[color:var(--copper)]" />
             The Work in Four Colors
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {greatWork.stages.map((stage) => (
+          <div className="space-y-6">
+            {greatWork.stages.map((stage, index) => (
               <article
                 key={stage.id}
-                className="rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/40 p-6"
+                className="editorial-panel rounded-[2rem] p-6 sm:p-8"
               >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-ritual text-2xl">{stage.title}</h3>
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: stage.tone }}
-                    aria-hidden="true"
-                  />
+                <div className={`grid gap-6 lg:grid-cols-[0.28fr_0.72fr] ${index % 2 === 1 ? "lg:[&>*:first-child]:order-2 lg:[&>*:last-child]:order-1" : ""}`}>
+                  <div className="space-y-4">
+                    <p className="font-ritual text-5xl text-[color:var(--gilt)]">{["I", "II", "III", "IV"][index]}</p>
+                    <div className="h-px w-20 bg-[color:var(--copper)]/25" />
+                    <span
+                      className="block h-2.5 w-16 rounded-full"
+                      style={{ backgroundColor: stage.tone }}
+                      aria-hidden="true"
+                    />
+                    <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--mist)]">
+                      {stage.keynotes.join(" · ")}
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-ritual text-3xl sm:text-4xl">{stage.title}</h3>
+                    <div className="space-y-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+                      {stage.description.map((line) => (
+                        <p key={line}>{line}</p>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-4 space-y-3 text-sm text-[color:var(--mist)]">
-                  {stage.description.map((line) => (
-                    <p key={line}>{line}</p>
-                  ))}
-                </div>
-                <p className="mt-4 text-xs uppercase tracking-[0.35em] text-[color:var(--mist)]">
-                  Keynotes: {stage.keynotes.join(" · ")}
-                </p>
               </article>
             ))}
           </div>
@@ -77,7 +90,7 @@ export default function GreatWorkPage() {
             {greatWork.glossary.map((item) => (
               <article
                 key={item.term}
-                className="rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--obsidian)]/50 p-5"
+                className="editorial-panel rounded-[1.7rem] p-5"
               >
                 <h3 className="font-ritual text-xl">{item.term}</h3>
                 <p className="mt-3 text-sm text-[color:var(--mist)]">{item.definition}</p>
@@ -97,7 +110,7 @@ export default function GreatWorkPage() {
                 key={item.id}
                 type="button"
                 onClick={() => setActiveGlyph(item.id)}
-                className="group flex flex-col items-center gap-4 rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/40 p-5 text-left transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                className="editorial-panel group flex flex-col items-center gap-4 rounded-[1.7rem] p-5 text-left transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[color:var(--copper)]/40 text-[color:var(--gilt)] transition group-hover:text-[color:var(--bone)]">
                   <AlchemyGlyph id={item.id} className="h-10 w-10" />
@@ -152,7 +165,7 @@ export default function GreatWorkPage() {
           onClick={() => setActiveGlyph(null)}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/90 p-6"
+            className="editorial-panel w-full max-w-md rounded-[2rem] p-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">

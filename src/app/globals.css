@@ -300,6 +300,77 @@ body {
   animation: aura-pulse 8s ease-in-out infinite;
 }
 
+.editorial-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--copper) 38%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--char) 82%, transparent) 0%, color-mix(in srgb, var(--obsidian) 86%, transparent) 100%),
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--gilt) 18%, transparent), transparent 42%),
+    radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--bone) 8%, transparent), transparent 34%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--bone) 4%, transparent),
+    0 24px 60px rgba(5, 5, 9, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+.editorial-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--bone) 5%, transparent), transparent 28%),
+    linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--gilt) 6%, transparent) 100%);
+  pointer-events: none;
+}
+
+.editorial-panel::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border: 1px solid color-mix(in srgb, var(--copper) 14%, transparent);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.editorial-quote {
+  font-family: var(--font-ritual-serif), "Times New Roman", serif;
+  font-size: clamp(1.7rem, 3vw, 3.4rem);
+  line-height: 1.03;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+
+.vellum-smoke {
+  position: relative;
+}
+
+.vellum-smoke::before {
+  content: "";
+  position: absolute;
+  inset: -12% -6%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(232, 227, 216, 0.08), transparent 34%),
+    radial-gradient(circle at 70% 55%, rgba(184, 155, 94, 0.08), transparent 42%);
+  filter: blur(28px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.etched-divider {
+  position: relative;
+}
+
+.etched-divider::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -12px;
+  width: min(140px, 42%);
+  height: 1px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gilt) 70%, transparent), transparent);
+}
+
 @keyframes aura-pulse {
   0% {
     transform: scale(0.96);

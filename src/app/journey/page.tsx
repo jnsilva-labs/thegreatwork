@@ -149,19 +149,34 @@ export default function JourneyPage() {
   return (
     <div className="min-h-screen px-6 py-16 text-[color:var(--bone)] sm:px-10 lg:px-20">
       <div className="mx-auto max-w-6xl space-y-10">
-        <header className="space-y-5">
-          <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
-            {journeySessionIntro.eyebrow}
-          </p>
-          <h1 className="font-ritual text-4xl sm:text-6xl">{journeySessionIntro.title}</h1>
-          <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-            {journeySessionIntro.body}
-          </p>
+        <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
+          <div className="space-y-5">
+            <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
+              {journeySessionIntro.eyebrow}
+            </p>
+            <h1 className="font-ritual text-4xl sm:text-6xl">{journeySessionIntro.title}</h1>
+            <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+              {journeySessionIntro.body}
+            </p>
+          </div>
+          <div className="space-y-4 lg:pt-8">
+            <div className="editorial-panel rounded-[2rem] p-6">
+              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Invocation</p>
+              <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+                Enter slowly. The aim is not to consume seven principles in one sitting, but to leave with one steadier breath and one truer perception.
+              </p>
+            </div>
+            <div className="editorial-panel rounded-[2rem] p-6">
+              <p className="editorial-quote text-[color:var(--bone)]">
+                Stay until the form stops being decorative and begins to feel like a threshold.
+              </p>
+            </div>
+          </div>
         </header>
 
         <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
           <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-            <section className="rounded-[2rem] border border-[color:var(--copper)]/35 bg-[color:var(--char)]/55 p-6">
+            <section className="editorial-panel rounded-[2rem] p-6">
               <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Arrival</p>
               <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
                 {journeySessionIntro.arrivalLine}
@@ -194,7 +209,7 @@ export default function JourneyPage() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/50 p-6">
+            <section className="editorial-panel rounded-[2rem] p-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
@@ -227,7 +242,7 @@ export default function JourneyPage() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-[color:var(--copper)]/25 bg-[color:var(--char)]/40 p-6">
+            <section className="editorial-panel rounded-[2rem] p-6">
               <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Ritual flow</p>
               <ol className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
                 <li>1. Settle the breath and soften the eyes.</li>
@@ -239,7 +254,7 @@ export default function JourneyPage() {
           </aside>
 
           <section className="space-y-6">
-            <div className="rounded-[2rem] border border-[color:var(--copper)]/30 bg-[color:var(--obsidian)]/45 p-4 sm:p-5">
+            <div className="editorial-panel vellum-smoke rounded-[2rem] p-4 sm:p-5">
               {activeChapter && activeLines ? (
                 <GalleryViewer
                   lines={activeLines}
@@ -269,7 +284,7 @@ export default function JourneyPage() {
               </div>
             </div>
 
-            <article className="rounded-[2rem] border border-[color:var(--copper)]/35 bg-[color:var(--char)]/55 p-6 sm:p-8">
+            <article className="editorial-panel rounded-[2rem] p-6 sm:p-8">
               {!sessionStarted ? (
                 <div className="space-y-5">
                   <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Begin</p>
@@ -299,7 +314,7 @@ export default function JourneyPage() {
                     </span>
                     {activeEntry.principle.title}
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-3 etched-divider pb-2">
                     <h2 className="font-ritual text-3xl sm:text-4xl">
                       {activeEntry.meditation?.meditationTitle ?? activeEntry.principle.axiom}
                     </h2>
@@ -321,13 +336,13 @@ export default function JourneyPage() {
                     ))}
                   </div>
                   <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
-                    <section className="rounded-2xl border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/45 p-5">
+                    <section className="editorial-panel rounded-[1.6rem] p-5">
                       <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Reflection</p>
                       <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
                         {activeEntry.meditation?.reflectionPrompt}
                       </p>
                     </section>
-                    <section className="rounded-2xl border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/45 p-5">
+                    <section className="editorial-panel rounded-[1.6rem] p-5">
                       <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Carry this forward</p>
                       <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
                         {activeEntry.meditation?.integrationLine}
@@ -358,7 +373,7 @@ export default function JourneyPage() {
             </div>
 
             {isComplete ? (
-              <section className="rounded-[2rem] border border-[color:var(--copper)]/30 bg-[color:var(--obsidian)]/50 p-6 sm:p-8">
+              <section className="editorial-panel rounded-[2rem] p-6 sm:p-8">
                 <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Integration</p>
                 <h2 className="mt-3 font-ritual text-3xl">{journeySessionIntro.completionTitle}</h2>
                 <p className="mt-4 max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">

@@ -78,48 +78,67 @@ export default function Home() {
       <main className="relative z-10">
         {/* Hero — not scroll-tracked */}
         <section className="min-h-screen px-6 py-24 sm:px-10 lg:px-20">
-          <div className="mx-auto flex min-h-[70vh] max-w-5xl flex-col justify-center gap-10">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
-              <span className="h-px w-12 bg-[color:var(--copper)]" />
-              A Digital Temple
-            </div>
-            <h1 className="font-ritual text-4xl leading-tight text-[color:var(--bone)] sm:text-6xl lg:text-7xl">
-              {hero.title}
-            </h1>
-            <p className="max-w-2xl text-sm uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[color:var(--gilt)]">
-              {hero.subtitle}
-            </p>
-            <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-              {hero.body[0]}
-            </p>
-            <p className="max-w-3xl text-sm uppercase tracking-[0.18em] text-[color:var(--mist)] sm:tracking-[0.28em]">
-              For the spiritually curious, the disciplined seeker, and the serious student of the esoteric arts.
-            </p>
-            <div className="grid gap-4 lg:grid-cols-3">
-              {pathDoors.map((door) => (
-                <article
-                  key={door.title}
-                  className="rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/45 p-5 backdrop-blur-sm"
-                >
-                  <h2 className="font-ritual text-2xl text-[color:var(--bone)]">
-                    {door.title}
-                  </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
-                    {door.body}
+          <div className="mx-auto flex min-h-[78vh] max-w-6xl flex-col justify-center gap-12">
+            <div className="grid gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:items-start">
+              <div className="space-y-7">
+                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
+                  <span className="h-px w-12 bg-[color:var(--copper)]" />
+                  A Digital Temple
+                </div>
+                <h1 className="font-ritual text-5xl leading-[0.94] text-[color:var(--bone)] sm:text-6xl lg:text-8xl">
+                  {hero.title}
+                </h1>
+                <p className="max-w-2xl text-sm uppercase tracking-[0.24em] sm:tracking-[0.35em] text-[color:var(--gilt)]">
+                  {hero.subtitle}
+                </p>
+                <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+                  {hero.body[0]}
+                </p>
+                <div className="editorial-panel max-w-3xl rounded-[2rem] p-6 sm:p-7">
+                  <p className="editorial-quote max-w-2xl text-[color:var(--bone)]">
+                    You are already made of what you seek.
                   </p>
-                  <TrackedLink
-                    href={door.href}
-                    location="home:hero-door"
-                    label={door.label}
-                    variant={door.title}
-                    className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.3em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
-                  >
-                    {door.label}
-                  </TrackedLink>
-                </article>
-              ))}
+                  <p className="mt-5 max-w-2xl text-sm uppercase tracking-[0.22em] text-[color:var(--mist)] sm:tracking-[0.3em]">
+                    For the spiritually curious, the disciplined seeker, and the serious student of the esoteric arts.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-5 lg:pt-10">
+                <div className="editorial-panel rounded-[2rem] p-6">
+                  <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Opening invocation</p>
+                  <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+                    Enter as you would enter a quiet library, a workshop, and a mirror at once. The archive opens by practice, not by ornament.
+                  </p>
+                </div>
+                <div className="grid gap-4">
+                  {pathDoors.map((door) => (
+                    <article
+                      key={door.title}
+                      className="editorial-panel rounded-[1.8rem] p-5 backdrop-blur-sm"
+                    >
+                      <h2 className="font-ritual text-2xl text-[color:var(--bone)]">
+                        {door.title}
+                      </h2>
+                      <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
+                        {door.body}
+                      </p>
+                      <TrackedLink
+                        href={door.href}
+                        location="home:hero-door"
+                        label={door.label}
+                        variant={door.title}
+                        className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.3em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                      >
+                        {door.label}
+                      </TrackedLink>
+                    </article>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-3">
+
+            <div className="flex flex-wrap items-center gap-3">
               <TrackedLink
                 href="/study"
                 location="home:hero-secondary"
@@ -138,9 +157,12 @@ export default function Home() {
               >
                 Read the Letters
               </TrackedLink>
+              <p className="ml-auto hidden text-xs uppercase tracking-[0.34em] text-[color:var(--mist)] lg:block">
+                Scroll to explore
+              </p>
             </div>
-            {/* Scroll indicator */}
-            <div className="mt-8 animate-pulse-slow text-center text-xs uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[color:var(--mist)]">
+
+            <div className="animate-pulse-slow text-center text-xs uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[color:var(--mist)] lg:hidden">
               Scroll to explore
             </div>
           </div>
