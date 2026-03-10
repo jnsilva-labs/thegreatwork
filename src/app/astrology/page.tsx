@@ -136,9 +136,7 @@ export default function AstrologyPage() {
           </div>
         </section>
 
-        <ZodiacWheel />
-
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
+        <div className="grid gap-6 pt-2 lg:grid-cols-[1fr_0.95fr]">
           <article className="rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--char)]/45 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Sample reading frame</p>
             <h2 className="mt-3 font-ritual text-2xl">What a reading should do</h2>
@@ -181,76 +179,6 @@ export default function AstrologyPage() {
           tertiaryLabel="Explore The Path"
         />
       </div>
-    </div>
-  );
-}
-
-function ZodiacWheel() {
-  const signs = [
-    "\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D",
-    "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653"
-  ];
-
-  return (
-    <div className="flex justify-center py-8">
-      <svg
-        viewBox="0 0 200 200"
-        className="h-48 w-48 text-[color:var(--copper)] opacity-40 sm:h-56 sm:w-56"
-        aria-hidden="true"
-      >
-        <circle
-          cx="100"
-          cy="100"
-          r="90"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="0.5"
-        />
-        <circle
-          cx="100"
-          cy="100"
-          r="70"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="0.5"
-        />
-        {signs.map((sign, i) => {
-          const angle = (i * 30 - 90) * (Math.PI / 180);
-          const x = 100 + 80 * Math.cos(angle);
-          const y = 100 + 80 * Math.sin(angle);
-          return (
-            <text
-              key={i}
-              x={x}
-              y={y}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill="currentColor"
-              fontSize="14"
-            >
-              {sign}
-            </text>
-          );
-        })}
-        {Array.from({ length: 12 }, (_, i) => {
-          const angle = (i * 30 - 90) * (Math.PI / 180);
-          const x1 = 100 + 70 * Math.cos(angle);
-          const y1 = 100 + 70 * Math.sin(angle);
-          const x2 = 100 + 90 * Math.cos(angle);
-          const y2 = 100 + 90 * Math.sin(angle);
-          return (
-            <line
-              key={i}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="currentColor"
-              strokeWidth="0.5"
-            />
-          );
-        })}
-      </svg>
     </div>
   );
 }
