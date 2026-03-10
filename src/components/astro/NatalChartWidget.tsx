@@ -169,6 +169,15 @@ export function NatalChartWidget() {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "";
   const turnstileEnabled = Boolean(turnstileSiteKey);
 
+  const resetVerification = (message?: string) => {
+    setAstroAccessVerified(false);
+    setTurnstileToken(null);
+    setTurnstileResetKey((value) => value + 1);
+    if (message) {
+      setMonthAheadError(message);
+    }
+  };
+
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -192,6 +201,7 @@ export function NatalChartWidget() {
     try {
       const response = await fetch("/api/astro/natal", {
         method: "POST",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json"
         },
@@ -218,6 +228,15 @@ export function NatalChartWidget() {
             ? String(payload.error ?? fallback)
             : fallback;
 
+        if (
+          typeof payload === "object" &&
+          payload &&
+          "code" in payload &&
+          (payload.code === "TURNSTILE_REQUIRED" || payload.code === "TURNSTILE_FAILED")
+        ) {
+          setAstroAccessVerified(false);
+        }
+
         throw new Error(message);
       }
 
@@ -238,8 +257,7 @@ export function NatalChartWidget() {
           ? submitError.message
           : "Unable to reveal the pattern right now. Please try again."
       );
-      setTurnstileToken(null);
-      setTurnstileResetKey((value) => value + 1);
+      resetVerification();
       trackEvent("astro_natal_error", {
         houseSystem,
         timeUnknown
@@ -267,6 +285,7 @@ export function NatalChartWidget() {
     try {
       const response = await fetch("/api/astro/month-ahead", {
         method: "POST",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json"
         },
@@ -288,6 +307,15 @@ export function NatalChartWidget() {
             ? String(payload.error ?? fallback)
             : fallback;
 
+        if (
+          typeof payload === "object" &&
+          payload &&
+          "code" in payload &&
+          (payload.code === "TURNSTILE_REQUIRED" || payload.code === "TURNSTILE_FAILED")
+        ) {
+          resetVerification("Verification expired. Please complete the check again to read the month ahead.");
+        }
+
         throw new Error(message);
       }
 
@@ -301,13 +329,16 @@ export function NatalChartWidget() {
         highlights: (payload as AstroMonthAheadReadingResponse).highlights.length
       });
     } catch (monthAheadRequestError) {
-      setMonthAheadError(
-        monthAheadRequestError instanceof Error
+      setMonthAheadError((current) =>
+        current ??
+        (monthAheadRequestError instanceof Error
           ? monthAheadRequestError.message
-          : "Unable to interpret the month ahead right now. Please try again."
+          : "Unable to interpret the month ahead right now. Please try again.")
       );
-      setTurnstileToken(null);
-      setTurnstileResetKey((value) => value + 1);
+      if (monthAheadRequestError instanceof Error && !monthAheadRequestError.message.includes("Verification")) {
+        setTurnstileToken(null);
+        setTurnstileResetKey((value) => value + 1);
+      }
       setMonthAheadStatus("Month-ahead reading failed.");
       trackEvent("astro_month_ahead_error", {
         timeUnknown: result.meta.timeUnknown
