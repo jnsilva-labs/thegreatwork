@@ -17,6 +17,8 @@ type GalleryViewerProps = {
   lines: LineSet;
   cameraMode: CameraMode;
   debugForceVisible?: boolean;
+  containerClassName?: string;
+  forceStillness?: boolean;
   particleSize: number;
   particleAlpha: number;
   particleDensity: number;
@@ -31,6 +33,8 @@ export function GalleryViewer({
   lines,
   cameraMode,
   debugForceVisible,
+  containerClassName,
+  forceStillness = false,
   particleSize,
   particleAlpha,
   particleDensity,
@@ -40,11 +44,12 @@ export function GalleryViewer({
   boundsRadius,
   fitKey,
 }: GalleryViewerProps) {
-  const stillnessMode = useHermeticStore((state) => state.stillnessMode);
+  const storeStillnessMode = useHermeticStore((state) => state.stillnessMode);
   const clarity = useHermeticStore((state) => state.clarity);
   const qualityTier = useHermeticStore((state) => state.qualityTier);
   const reducedMotion = usePrefersReducedMotion();
   const [dpr, setDpr] = useState<[number, number]>([1, 1.5]);
+  const stillnessMode = forceStillness || storeStillnessMode;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -60,7 +65,11 @@ export function GalleryViewer({
   }, []);
 
   return (
-    <div className="pointer-events-auto relative h-[70vh] w-full rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]/60">
+    <div
+      className={`pointer-events-auto relative w-full rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]/60 ${
+        containerClassName ?? "h-[70vh]"
+      }`}
+    >
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45, near: 0.1, far: 50 }}
         dpr={dpr}
