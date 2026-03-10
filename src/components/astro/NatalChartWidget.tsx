@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import type { AstroMonthAheadReadingResponse, AstroNatalResponse } from "@/lib/astro/types";
 import { trackEvent } from "@/lib/analytics/track";
+import { TurnstileWidget } from "./TurnstileWidget";
 import { PlanetaryArc } from "./PlanetaryArc";
 import { SharePanel } from "./share/SharePanel";
 
@@ -93,6 +94,9 @@ export function NatalChartWidget() {
   const [monthAheadStatus, setMonthAheadStatus] = useState("");
   const [monthAheadResult, setMonthAheadResult] = useState<AstroMonthAheadReadingResponse | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "done" | "failed">("idle");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+  const [astroAccessVerified, setAstroAccessVerified] = useState(false);
 
   const resultRef = useRef<HTMLDivElement | null>(null);
   const pageViewTrackedRef = useRef(false);
@@ -162,9 +166,16 @@ export function NatalChartWidget() {
   const lettersHref = process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim() || "/letters";
   const lettersIsExternal = lettersHref.startsWith("https://") || lettersHref.startsWith("http://");
   const houseSystemDescription = houseSystemDescriptions[houseSystem];
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "";
+  const turnstileEnabled = Boolean(turnstileSiteKey);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (turnstileEnabled && !astroAccessVerified && !turnstileToken) {
+      setError("Please complete the verification check before generating a reading.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -190,6 +201,7 @@ export function NatalChartWidget() {
           birthTime: birthTime || undefined,
           timeUnknown,
           birthPlace,
+          turnstileToken: astroAccessVerified ? undefined : turnstileToken ?? undefined,
           houseSystem,
           zodiac: "tropical"
         })
@@ -211,6 +223,9 @@ export function NatalChartWidget() {
 
       setResult(payload as AstroNatalResponse);
       setStatusMessage("Reading complete.");
+      setAstroAccessVerified(true);
+      setTurnstileToken(null);
+      setTurnstileResetKey((value) => value + 1);
       trackEvent("astro_natal_success", {
         houseSystem,
         timeUnknown
@@ -223,6 +238,8 @@ export function NatalChartWidget() {
           ? submitError.message
           : "Unable to reveal the pattern right now. Please try again."
       );
+      setTurnstileToken(null);
+      setTurnstileResetKey((value) => value + 1);
       trackEvent("astro_natal_error", {
         houseSystem,
         timeUnknown
@@ -234,6 +251,11 @@ export function NatalChartWidget() {
 
   const onRequestMonthAhead = async () => {
     if (!result) return;
+
+    if (turnstileEnabled && !astroAccessVerified && !turnstileToken) {
+      setMonthAheadError("Please complete the verification check before reading the month ahead.");
+      return;
+    }
 
     setMonthAheadLoading(true);
     setMonthAheadError(null);
@@ -250,7 +272,8 @@ export function NatalChartWidget() {
         },
         body: JSON.stringify({
           chart: result.chart,
-          timeUnknown: result.meta.timeUnknown
+          timeUnknown: result.meta.timeUnknown,
+          turnstileToken: astroAccessVerified ? undefined : turnstileToken ?? undefined
         })
       });
 
@@ -270,6 +293,9 @@ export function NatalChartWidget() {
 
       setMonthAheadResult(payload as AstroMonthAheadReadingResponse);
       setMonthAheadStatus("Month-ahead reading complete.");
+      setAstroAccessVerified(true);
+      setTurnstileToken(null);
+      setTurnstileResetKey((value) => value + 1);
       trackEvent("astro_month_ahead_success", {
         timeUnknown: result.meta.timeUnknown,
         highlights: (payload as AstroMonthAheadReadingResponse).highlights.length
@@ -280,6 +306,8 @@ export function NatalChartWidget() {
           ? monthAheadRequestError.message
           : "Unable to interpret the month ahead right now. Please try again."
       );
+      setTurnstileToken(null);
+      setTurnstileResetKey((value) => value + 1);
       setMonthAheadStatus("Month-ahead reading failed.");
       trackEvent("astro_month_ahead_error", {
         timeUnknown: result.meta.timeUnknown
@@ -395,6 +423,24 @@ export function NatalChartWidget() {
               </select>
               <p className="text-xs leading-relaxed text-[color:var(--mist)]">{houseSystemDescription}</p>
             </label>
+
+            {turnstileEnabled && !astroAccessVerified ? (
+              <div className="space-y-2 sm:col-span-2">
+                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--mist)]">
+                  Verification
+                </p>
+                <div className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                  <TurnstileWidget
+                    siteKey={turnstileSiteKey}
+                    resetKey={turnstileResetKey}
+                    onVerify={setTurnstileToken}
+                  />
+                  <p className="mt-3 text-xs leading-relaxed text-[color:var(--mist)]">
+                    This keeps the public astrology tool usable without opening the API to automated abuse.
+                  </p>
+                </div>
+              </div>
+            ) : null}
 
             <div className="sm:col-span-2 flex flex-wrap items-center gap-3 pt-1">
               <button

@@ -7,6 +7,13 @@ import {
   type AstroChart,
   type AstroServiceRequest
 } from "@/lib/astro/types";
+import {
+  astroProtectionEnabled,
+  astroProtectionRequired,
+  hasAstroSession,
+  setAstroSession,
+  verifyTurnstileToken
+} from "@/lib/astro/protection";
 import { requestNatalReading } from "@/lib/openai/respond";
 import { deriveBigThreeFromChart, derivePlacementFacts } from "@/lib/astro/derive";
 
@@ -148,6 +155,51 @@ export async function POST(request: NextRequest) {
   }
 
   const input = parsedInput.data;
+  const protectionSatisfiedByCookie = hasAstroSession(request);
+  let shouldIssueAstroSession = false;
+
+  if (!protectionSatisfiedByCookie && astroProtectionRequired()) {
+    if (!astroProtectionEnabled()) {
+      return jsonError(
+        "PROTECTION_UNAVAILABLE",
+        "Astrology verification is not configured on the server.",
+        503
+      );
+    }
+
+    if (!input.turnstileToken) {
+      return jsonError(
+        "TURNSTILE_REQUIRED",
+        "Please complete the verification check before generating a reading.",
+        400
+      );
+    }
+
+    try {
+      const verification = await verifyTurnstileToken({
+        token: input.turnstileToken,
+        ip: ip === "unknown" ? undefined : ip,
+        userAgent: request.headers.get("user-agent")
+      });
+
+      if (!verification.success) {
+        return jsonError(
+          "TURNSTILE_FAILED",
+          "Verification failed. Please try again.",
+          403,
+          verification.errorCodes
+        );
+      }
+
+      shouldIssueAstroSession = true;
+    } catch {
+      return jsonError(
+        "TURNSTILE_UNAVAILABLE",
+        "Verification service is temporarily unavailable. Please try again.",
+        503
+      );
+    }
+  }
 
   let geocodeMs = 0;
   let conversionMs = 0;
@@ -244,7 +296,7 @@ export async function POST(request: NextRequest) {
       timeUnknown: input.timeUnknown
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       chart,
       reading,
       meta: {
@@ -253,6 +305,12 @@ export async function POST(request: NextRequest) {
         zodiac: input.zodiac
       }
     });
+
+    if (shouldIssueAstroSession) {
+      setAstroSession(response);
+    }
+
+    return response;
   } catch (error) {
     const totalMs = performance.now() - routeStart;
     const message = error instanceof Error ? error.message : "Unexpected error";

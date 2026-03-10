@@ -8,6 +8,13 @@ import {
 } from "@/lib/astro/types";
 import { deriveBigThreeFromChart, derivePlacementFacts } from "@/lib/astro/derive";
 import { resolveTransitHouse } from "@/lib/astro/houses";
+import {
+  astroProtectionEnabled,
+  astroProtectionRequired,
+  hasAstroSession,
+  setAstroSession,
+  verifyTurnstileToken
+} from "@/lib/astro/protection";
 import { requestMonthAheadReading } from "@/lib/openai/respond";
 
 export const runtime = "nodejs";
@@ -206,6 +213,52 @@ export async function POST(request: NextRequest) {
   }
 
   const input = parsedInput.data;
+  const protectionSatisfiedByCookie = hasAstroSession(request);
+  let shouldIssueAstroSession = false;
+
+  if (!protectionSatisfiedByCookie && astroProtectionRequired()) {
+    if (!astroProtectionEnabled()) {
+      return jsonError(
+        "PROTECTION_UNAVAILABLE",
+        "Astrology verification is not configured on the server.",
+        503
+      );
+    }
+
+    if (!input.turnstileToken) {
+      return jsonError(
+        "TURNSTILE_REQUIRED",
+        "Please complete the verification check before reading the month ahead.",
+        400
+      );
+    }
+
+    try {
+      const verification = await verifyTurnstileToken({
+        token: input.turnstileToken,
+        ip: ip === "unknown" ? undefined : ip,
+        userAgent: request.headers.get("user-agent")
+      });
+
+      if (!verification.success) {
+        return jsonError(
+          "TURNSTILE_FAILED",
+          "Verification failed. Please try again.",
+          403,
+          verification.errorCodes
+        );
+      }
+
+      shouldIssueAstroSession = true;
+    } catch {
+      return jsonError(
+        "TURNSTILE_UNAVAILABLE",
+        "Verification service is temporarily unavailable. Please try again.",
+        503
+      );
+    }
+  }
+
   const chart = sanitizeChartForTransit(input.chart, input.timeUnknown);
   const houseSystem = resolveHouseSystemFromChart(chart);
   const canonicalBigThree = deriveBigThreeFromChart(chart, input.timeUnknown);
@@ -286,7 +339,13 @@ export async function POST(request: NextRequest) {
       highlights: enrichedPayload.highlights.length
     });
 
-    return NextResponse.json(validatedResponse.data);
+    const response = NextResponse.json(validatedResponse.data);
+
+    if (shouldIssueAstroSession) {
+      setAstroSession(response);
+    }
+
+    return response;
   } catch (error) {
     const totalMs = performance.now() - routeStart;
     const message = error instanceof Error ? error.message : "Unexpected error";

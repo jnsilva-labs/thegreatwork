@@ -15,6 +15,7 @@ export const natalInputSchema = z
       .optional(),
     timeUnknown: z.boolean(),
     birthPlace: z.string().trim().min(2).max(180),
+    turnstileToken: z.string().trim().min(1).max(2048).optional(),
     houseSystem: z.enum(["wholeSign", "placidus"]),
     zodiac: z.literal("tropical")
   })
@@ -126,6 +127,7 @@ export const astroMonthAheadRequestSchema = z
   .object({
     chart: astroChartSchema,
     timeUnknown: z.boolean(),
+    turnstileToken: z.string().trim().min(1).max(2048).optional(),
     startDateUtc: z.string().datetime({ offset: true }).optional()
   })
   .strict();
