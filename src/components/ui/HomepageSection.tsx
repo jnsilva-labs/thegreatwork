@@ -7,6 +7,7 @@ import type { HomepageSectionItem } from "@/data/homepage";
 type HomepageSectionProps = {
   id: string;
   index: number;
+  sectionType?: string;
   title: string;
   subtitle?: string;
   body: string[];
@@ -20,11 +21,10 @@ type HomepageSectionProps = {
 export function HomepageSection({
   id,
   index,
+  sectionType,
   title,
   subtitle,
   body,
-  quote,
-  quoteSource,
   cta,
   items,
   children,
@@ -32,54 +32,44 @@ export function HomepageSection({
   const progress = useHermeticStore(
     (state) => state.progressByChapter[index] ?? 0
   );
-  const opacity = 0.35 + progress * 0.65;
-  const translate = (1 - progress) * 20;
-  const sectionNumeral = ["I", "II", "III", "IV", "V", "VI", "VII"][index] ?? String(index + 1);
-  const railFirst = index % 2 === 0;
+  const opacity = 0.3 + progress * 0.7;
+  const translate = (1 - progress) * 28;
+  const titleTranslate = (1 - progress) * 18;
+  const quoteTranslate = (1 - progress) * 36;
+  const atmosphereClass = sectionType ? `home-atmosphere--${sectionType}` : "home-atmosphere--paradox";
+  const motion = getSectionMotion(sectionType, progress, translate);
 
   return (
     <section id={id} className="px-6 py-20 sm:px-10 sm:py-28 lg:px-20">
       <div
-        className="mx-auto max-w-6xl border-t border-[color:var(--copper)]/30 pt-10 transition"
-        style={{ opacity, transform: `translateY(${translate}px)` }}
+        className="home-section mx-auto max-w-5xl border-t border-[color:var(--copper)]/30 pt-10 transition"
+        style={{ opacity, transform: motion.container }}
       >
-        <div className="grid gap-10 lg:grid-cols-[0.34fr_0.66fr] lg:gap-16">
-          <aside className={`${railFirst ? "lg:order-1" : "lg:order-2"} space-y-5`}>
-            <div className="editorial-panel rounded-[2rem] p-6">
-              <div className="flex items-center gap-4">
-                <span className="font-ritual text-3xl text-[color:var(--gilt)]">{sectionNumeral}</span>
-                <div className="h-px flex-1 bg-[color:var(--copper)]/25" />
-              </div>
-              {subtitle ? (
-                <p className="mt-6 text-xs uppercase tracking-[0.34em] text-[color:var(--gilt)]">
-                  {subtitle}
-                </p>
-              ) : null}
-              {quote ? (
-                <blockquote className="mt-5 space-y-3">
-                  <p className="editorial-quote text-[color:var(--bone)]">{quote}</p>
-                  {quoteSource ? (
-                    <footer className="text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">
-                      {quoteSource}
-                    </footer>
-                  ) : null}
-                </blockquote>
-              ) : null}
-            </div>
-          </aside>
+        <div
+          className={`home-atmosphere ${atmosphereClass}`}
+          aria-hidden="true"
+          style={{ opacity: motion.atmosphereOpacity, transform: motion.atmosphereTransform }}
+        />
+        <div className="grid gap-8 lg:grid-cols-[0.92fr_0.08fr]">
+          <div className="max-w-3xl space-y-8">
+            <h2
+              className="font-ritual text-3xl leading-tight text-[color:var(--bone)] sm:text-4xl lg:text-5xl transition"
+              style={{ transform: motion.title ?? `translateY(${titleTranslate}px)` }}
+            >
+              {title}
+            </h2>
 
-          <div className={`${railFirst ? "lg:order-2" : "lg:order-1"} space-y-8`}>
-            <div className="space-y-4">
-              <h2 className="font-ritual text-3xl leading-tight text-[color:var(--bone)] sm:text-4xl lg:text-5xl">
-                {title}
-              </h2>
-            </div>
+            {subtitle && (
+              <p className="text-sm uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[color:var(--gilt)]">
+                {subtitle}
+              </p>
+            )}
 
             <div className="space-y-5">
               {body.map((paragraph, i) => (
                 <p
                   key={i}
-                  className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg"
+                  className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg"
                 >
                   {paragraph}
                 </p>
@@ -87,16 +77,16 @@ export function HomepageSection({
             </div>
 
             {items && items.length > 0 && (
-              <div className="grid gap-4 pt-2 sm:grid-cols-2">
+              <div className="space-y-4 pt-2">
                 {items.map((item, i) => (
                   <div
                     key={i}
-                    className="editorial-panel rounded-[1.6rem] p-5"
+                    className="border-l-2 border-[color:var(--copper)]/35 py-2 pl-4 transition hover:border-[color:var(--gilt)]/55 sm:pl-5"
                   >
-                    <h3 className="text-sm font-medium uppercase tracking-[0.24em] sm:tracking-[0.3em] text-[color:var(--bone)]">
+                    <h3 className="text-sm font-medium uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[color:var(--bone)]">
                       {item.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
+                    <p className="mt-1 text-sm leading-relaxed text-[color:var(--mist)]">
                       {item.description}
                     </p>
                   </div>
@@ -104,10 +94,10 @@ export function HomepageSection({
               </div>
             )}
 
-            {children ? <div className="pt-2">{children}</div> : null}
+            {children && <div className="pt-2">{children}</div>}
 
-            {cta ? (
-              <div className="pt-3">
+            {cta && (
+              <div className="pt-2">
                 <TrackedLink
                   href={cta.href}
                   location={`homepage_section:${id}`}
@@ -118,10 +108,85 @@ export function HomepageSection({
                   {cta.label}
                 </TrackedLink>
               </div>
-            ) : null}
+            )}
+          </div>
+
+            <div className="hidden lg:block">
+              <div
+                className="home-glow-rail sticky top-32 pt-8 text-right"
+                style={{ transform: motion.rail ?? `translateY(${quoteTranslate}px)` }}
+              >
+                <span className="font-ritual text-3xl text-[color:var(--gilt)]/72">
+                  {["I", "II", "III", "IV", "V", "VI", "VII"][index] ?? String(index + 1)}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
+}
+
+function getSectionMotion(sectionType: string | undefined, progress: number, translate: number) {
+  const baseScale = 0.985 + progress * 0.015;
+
+  switch (sectionType) {
+    case "alchemy":
+      return {
+        container: `translateY(${translate}px) scale(${baseScale}) rotate(${(1 - progress) * -0.45}deg)`,
+        title: `translateY(${(1 - progress) * 20}px)`,
+        rail: `translateY(${(1 - progress) * 34}px) rotate(${(1 - progress) * 2}deg)`,
+        atmosphereOpacity: 0.42 + progress * 0.42,
+        atmosphereTransform: `scale(${0.96 + progress * 0.06})`
+      };
+    case "divination":
+      return {
+        container: `translate3d(${(1 - progress) * 8}px, ${translate}px, 0)`,
+        title: `translate3d(${(1 - progress) * 14}px, ${(1 - progress) * 16}px, 0)`,
+        rail: `translateY(${(1 - progress) * 30}px)`,
+        atmosphereOpacity: 0.38 + progress * 0.38,
+        atmosphereTransform: `translateX(${(1 - progress) * 16}px) scale(${0.98 + progress * 0.04})`
+      };
+    case "astrology":
+      return {
+        container: `translate3d(${(1 - progress) * -8}px, ${translate}px, 0) scale(${baseScale})`,
+        title: `translate3d(${(1 - progress) * -10}px, ${(1 - progress) * 14}px, 0)`,
+        rail: `translateY(${(1 - progress) * 28}px)`,
+        atmosphereOpacity: 0.34 + progress * 0.46,
+        atmosphereTransform: `translateY(${(1 - progress) * -12}px) scale(${0.97 + progress * 0.05})`
+      };
+    case "geometry":
+      return {
+        container: `translateY(${translate}px) scale(${0.97 + progress * 0.03})`,
+        title: `translateY(${(1 - progress) * 16}px) scale(${0.985 + progress * 0.015})`,
+        rail: `translateY(${(1 - progress) * 36}px)`,
+        atmosphereOpacity: 0.4 + progress * 0.42,
+        atmosphereTransform: `scale(${0.92 + progress * 0.08}) rotate(${(1 - progress) * 2.2}deg)`
+      };
+    case "principles":
+      return {
+        container: `translateY(${translate}px)`,
+        title: `translateY(${(1 - progress) * 18}px)`,
+        rail: `translateY(${(1 - progress) * 32}px)`,
+        atmosphereOpacity: 0.3 + progress * 0.4,
+        atmosphereTransform: `translateY(${(1 - progress) * 10}px)`
+      };
+    case "community":
+      return {
+        container: `translateY(${translate}px) scale(${0.99 + progress * 0.01})`,
+        title: `translateY(${(1 - progress) * 14}px)`,
+        rail: `translateY(${(1 - progress) * 24}px)`,
+        atmosphereOpacity: 0.34 + progress * 0.34,
+        atmosphereTransform: `scale(${0.99 + progress * 0.03})`
+      };
+    case "paradox":
+    default:
+      return {
+        container: `translateY(${translate}px) scale(${baseScale})`,
+        title: `translateY(${(1 - progress) * 18}px)`,
+        rail: `translateY(${(1 - progress) * 36}px)`,
+        atmosphereOpacity: 0.36 + progress * 0.4,
+        atmosphereTransform: `scale(${0.98 + progress * 0.04})`
+      };
+  }
 }
