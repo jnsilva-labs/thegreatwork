@@ -98,7 +98,7 @@ export const homepageSections: HomepageSection[] = [
       "That readiness looks different for everyone. Sometimes it arrives as a question you cannot stop asking. Sometimes as a stillness after something falls apart. The traditions gathered here were built by people who reached that threshold and left instructions for whoever came next.",
       "Awareness Paradox gathers these scattered instruments into a single place. Think of it as a workshop, a library, and a mirror. The tools are ancient. The invitation is yours.",
     ],
-    cta: undefined,
+    cta: { label: "Start Here", href: "/start-here" },
   },
 
   /* ── Alchemy ── */
@@ -147,7 +147,7 @@ export const homepageSections: HomepageSection[] = [
       "The Golden Dawn wove the seventy-eight cards into a web of correspondence connecting Kabbalah, astrology, alchemy, and sacred geometry. Each card became a node in a living map of experience.",
       "Pull a card. Sit with what surfaces. The reading does not predict. It illuminates.",
     ],
-    cta: { label: "Pull a Card", href: "/tarot" },
+    cta: { label: "Get a Tarot Reading", href: "/tarot" },
   },
 
   /* ── Astrology ── */
@@ -160,7 +160,7 @@ export const homepageSections: HomepageSection[] = [
       "The Emerald Tablet of Hermes opens with a declaration: \"That which is below is like that which is above, and that which is above is like that which is below, to do the miracles of one only thing.\" The Arabic original says from, not like. You are not a reflection of the cosmos. You are from the same source.",
       "In Hermetic cosmology, the soul descends through seven planetary spheres to arrive on earth, gathering qualities at each stage. Your natal chart is a record of that passage. Ptolemy, writing in the second century, treated astrology as natural philosophy: the study of how celestial patterns correspond to earthly life through the bonds of sympatheia.",
     ],
-    cta: { label: "Read Your Stars", href: "/astrology" },
+    cta: { label: "Begin with the Big Three", href: "/astrology" },
   },
 
   /* ── Sacred Geometry ── */
@@ -203,7 +203,7 @@ export const homepageSections: HomepageSection[] = [
     body: [
       "Awareness Paradox is a living project. New tools, new writings, and new explorations arrive as they ripen. If any of this resonates, stay close. The Corpus Hermeticum says that Mind \"is present with holy men and good, the pure and merciful,\" and that its presence becomes an aid. Perhaps the same is true of good company.",
     ],
-    cta: undefined,
+    cta: { label: "Join the Weekly Letters", href: "/letters" },
   },
 ];
 

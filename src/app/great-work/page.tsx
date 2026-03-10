@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { greatWork } from "@/data/greatWork";
 import { Ouroboros } from "@/components/Ouroboros";
 import { AlchemyGlyph } from "@/components/AlchemyGlyph";
@@ -131,6 +132,16 @@ export default function GreatWorkPage() {
             ))}
           </ul>
         </section>
+
+        <EmailCtaCard
+          title="Build the Hermetic foundation first"
+          body="If you are new to alchemy, start with the free Hermetic Principles Starter Guide, then return to the Great Work with a clearer symbolic framework."
+          source="great-work-page"
+          interests={["beginner-hermetic"]}
+          variant="compact"
+          secondaryHref="/guides/hermetic-principles-starter-guide"
+          secondaryLabel="Get the Guide"
+        />
       </div>
 
       {glyph && (

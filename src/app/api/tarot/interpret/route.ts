@@ -21,6 +21,10 @@ interface InterpretationRequestBody {
   cards?: DrawnCard[];
 }
 
+export const runtime = 'nodejs';
+
+const GEMINI_TIMEOUT_MS = 15000;
+
 function getSharedApiKey() {
   return process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 }
@@ -67,31 +71,60 @@ export async function POST(request: Request) {
 
   const prompt = buildPrompt({ question, intention, spread, cards });
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(sharedApiKey)}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        system_instruction: {
-          role: 'system',
-          parts: [{ text: SYSTEM_INSTRUCTION }],
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(sharedApiKey)}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: prompt }],
+        signal: controller.signal,
+        body: JSON.stringify({
+          system_instruction: {
+            role: 'system',
+            parts: [{ text: SYSTEM_INSTRUCTION }],
           },
-        ],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.8,
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.8,
+          },
+        }),
+      },
+    );
+  } catch (error) {
+    clearTimeout(timer);
+
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return NextResponse.json(
+        {
+          code: 'SHARED_REQUEST_TIMEOUT',
+          error: 'Shared Gemini request timed out.',
         },
-      }),
-    },
-  );
+        { status: 504 },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        code: 'SHARED_REQUEST_FAILED',
+        error: 'Failed to reach Gemini service.',
+      },
+      { status: 502 },
+    );
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!response.ok) {
     const detail = await response.text();
@@ -128,7 +161,18 @@ export async function POST(request: Request) {
     );
   }
 
-  const payload = (await response.json()) as GeminiResponse;
+  let payload: GeminiResponse;
+  try {
+    payload = (await response.json()) as GeminiResponse;
+  } catch {
+    return NextResponse.json(
+      {
+        code: 'BAD_RESPONSE_FORMAT',
+        error: 'Gemini returned invalid JSON.',
+      },
+      { status: 502 },
+    );
+  }
   const text = payload.candidates
     ?.at(0)
     ?.content?.parts?.map((part) => part.text ?? '')

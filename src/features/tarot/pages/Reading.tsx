@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, ArrowLeft, ChevronLeft, ChevronRight, Eye, Loader2, Save, Sparkles, X } from '../icons';
 import { DEFAULT_DECK, SPREADS } from '../constants';
@@ -281,11 +282,20 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
             <div className="md:w-1/2 h-1/2 md:h-full bg-void-950 relative flex items-center justify-center p-12 border-r border-void-800">
               <div className="absolute inset-0 bg-sacred-geo opacity-5"></div>
-              <img
-                src={selectedCard.imageUrl}
-                alt={selectedCard.name}
-                className={`max-h-full max-w-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-sm border-8 border-void-900 ${selectedCard.isReversed ? 'rotate-180' : ''}`}
-              />
+              {selectedCard.imageUrl ? (
+                <Image
+                  src={selectedCard.imageUrl}
+                  alt={selectedCard.name}
+                  width={560}
+                  height={900}
+                  sizes="(max-width: 768px) 90vw, 42vw"
+                  className={`max-h-full max-w-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-sm border-8 border-void-900 ${selectedCard.isReversed ? 'rotate-180' : ''}`}
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center rounded-sm border border-void-800 bg-void-900 text-slate-500">
+                  Image unavailable
+                </div>
+              )}
 
               <div className="absolute inset-x-0 bottom-6 flex justify-center gap-12 md:hidden">
                 <button onClick={handlePrevCard} className="text-white disabled:opacity-20" disabled={drawnCards.indexOf(selectedCard) === 0}>

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { useState } from 'react';
 import { DrawnCard } from '../types';
 import { ImageOff } from '../icons';
@@ -75,12 +76,13 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
              <div className={`relative w-full h-full flex flex-col ${card.isReversed ? 'rotate-180' : ''}`}>
                {/* Image Container */}
                <div className="relative flex-1 overflow-hidden bg-void-900 flex items-center justify-center">
-                  {!imgError ? (
-                    <img 
-                      src={card.imageUrl} 
-                      alt={card.name} 
-                      className="w-full h-full object-cover" 
-                      loading="lazy"
+                  {!imgError && card.imageUrl ? (
+                    <Image
+                      src={card.imageUrl}
+                      alt={card.name}
+                      fill
+                      sizes="(max-width: 768px) 320px, 480px"
+                      className="w-full h-full object-cover"
                       onError={() => setImgError(true)}
                     />
                   ) : (

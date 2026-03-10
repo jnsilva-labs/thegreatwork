@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { useState } from 'react';
 import { ArrowLeft, Calendar, Search } from '../icons';
 import { Reading, TarotView } from '../types';
@@ -58,7 +59,18 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
                   {reading.cards.map((card, index) => (
                     <div key={`${reading.id}-${index}`} className="flex-shrink-0 w-16 h-24 bg-slate-800 rounded border border-slate-700 overflow-hidden relative">
-                      <img src={card.imageUrl} className="w-full h-full object-cover opacity-50" alt={card.name} />
+                      {card.imageUrl ? (
+                        <Image
+                          src={card.imageUrl}
+                          alt={card.name}
+                          width={64}
+                          height={96}
+                          sizes="64px"
+                          className="w-full h-full object-cover opacity-50"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-slate-900 opacity-60" aria-hidden="true" />
+                      )}
                       {card.isReversed && <div className="absolute inset-0 flex items-center justify-center text-[8px] text-red-300 font-bold bg-black/20">REV</div>}
                     </div>
                   ))}

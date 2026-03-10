@@ -1,5 +1,13 @@
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { GEOMETRY } from "@/data/geometryCatalog";
 import { PlateSVG } from "@/components/PlateSVG";
+
+export const metadata = buildPageMetadata({
+  title: "Dev Plates",
+  path: "/dev/plates",
+  description: "Development-only registry view for sacred geometry plates.",
+  noIndex: true,
+});
 
 export default function DevPlatesPage() {
   if (process.env.NODE_ENV === "production") {

@@ -1,0 +1,76 @@
+/* Ebook print styles */
+
+.ebook-container {
+  max-width: 8.5in;
+  margin: 0 auto;
+}
+
+.ebook-page {
+  width: 8.5in;
+  min-height: 11in;
+  padding: 0.75in 0.85in;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg);
+  color: var(--fg);
+  box-sizing: border-box;
+}
+
+.ebook-page + .ebook-page {
+  border-top: 1px solid var(--copper);
+}
+
+/* Print rules */
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 0;
+  }
+
+  html, body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Hide all site chrome */
+  header, nav, footer, [data-codex-chrome] {
+    display: none !important;
+  }
+
+  /* Remove the pt-20 spacing from root layout */
+  .pt-20 {
+    padding-top: 0 !important;
+  }
+
+  .ebook-container {
+    max-width: none;
+  }
+
+  .ebook-page {
+    page-break-after: always;
+    page-break-inside: avoid;
+    border: none !important;
+    height: 11in;
+    min-height: 11in;
+    max-height: 11in;
+  }
+
+  .ebook-page:last-child {
+    page-break-after: auto;
+  }
+
+  /* Remove screen-only UI */
+  .ebook-screen-only {
+    display: none !important;
+  }
+}
+
+/* Screen-only: add visual separation between pages */
+@media screen {
+  .ebook-page {
+    margin-bottom: 2rem;
+    border-radius: 4px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  }
+}

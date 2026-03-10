@@ -1,10 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { WebGLGuard } from "@/components/ui/WebGLGuard";
 import { FallbackEngraving } from "@/components/ui/FallbackEngraving";
-import { RitualCanvas } from "@/components/scene/RitualCanvas";
 import { PlateSVG } from "@/components/PlateSVG";
 import { ripleyScrollPanels } from "@/data/ripleyScroll";
 import { getRipleyPreset } from "@/lib/scene/ripleyPresets";
@@ -17,6 +17,11 @@ import {
   start,
   stop,
 } from "@/lib/audio/engine";
+
+const RitualCanvas = dynamic(
+  () => import("@/components/scene/RitualCanvas").then((mod) => mod.RitualCanvas),
+  { ssr: false }
+);
 
 const romanNumerals = [
   "I",
