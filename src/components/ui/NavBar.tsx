@@ -10,7 +10,6 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 const navLinks = [
   { href: "/start-here", label: "Start Here" },
-  { href: "/", label: "Home" },
   { href: "/great-work", label: "The Great Work" },
   { href: "/tarot", label: "Tarot" },
   { href: "/astrology", label: "Astrology" },
@@ -19,8 +18,7 @@ const navLinks = [
 ];
 
 export function NavBar() {
-  const [controlsOpen, setControlsOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const showUi = useUiStore((state) => state.showUi);
@@ -59,6 +57,17 @@ export function NavBar() {
     return () => window.clearTimeout(id);
   }, [prefersReducedMotion]);
 
+  useEffect(() => {
+    if (!panelOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setPanelOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [panelOpen]);
+
   const handleAudioToggle = async () => {
     if (soundPlaying) {
       stop();
@@ -72,19 +81,6 @@ export function NavBar() {
     start(soundPreset);
     setSoundEnabled(true);
     setSoundPlaying(true);
-  };
-
-  const openControls = () => {
-    if (typeof window !== "undefined") {
-      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-      if (isDesktop) {
-        setControlsOpen((prev) => !prev);
-      } else {
-        setMobileOpen(true);
-      }
-      return;
-    }
-    setControlsOpen((prev) => !prev);
   };
 
   const handleAnimateToggle = () => {
@@ -102,13 +98,23 @@ export function NavBar() {
 
   return (
     <header className="pointer-events-auto fixed left-0 right-0 top-0 z-40">
-      <div className="mx-auto flex items-center justify-between gap-4 border-b border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]/70 px-6 py-4 backdrop-blur-md sm:px-10 lg:px-20">
-        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
-          <span className="h-px w-10 bg-[color:var(--copper)]" />
-          Awareness Paradox
-        </div>
+      <div className="mx-auto flex items-center justify-between gap-4 border-b border-[color:var(--copper)]/28 bg-[color:var(--obsidian)]/68 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-10">
+        <TrackedLink
+          href="/"
+          location="nav:brand"
+          label="Awareness Paradox"
+          variant="brand"
+          className="group flex min-h-[44px] items-center gap-3 text-[0.68rem] uppercase tracking-[0.26em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
+        >
+          <span className="h-px w-8 bg-[color:var(--copper)] transition group-hover:bg-[color:var(--gilt)]" />
+          <span className="leading-[1.15] sm:tracking-[0.34em]">
+            Awareness
+            <br />
+            Paradox
+          </span>
+        </TrackedLink>
 
-        <nav className="hidden items-center gap-6 text-[0.65rem] uppercase tracking-[0.35em] text-[color:var(--mist)] lg:flex">
+        <nav className="hidden items-center gap-4 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--mist)] xl:flex">
           {navLinks.map((link) => (
             <TrackedLink
               key={link.href}
@@ -116,27 +122,27 @@ export function NavBar() {
               location="nav:desktop"
               label={link.label}
               variant="nav"
-              className="transition hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+              className="inline-flex min-h-[44px] items-center px-2 py-2 transition hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             >
               {link.label}
             </TrackedLink>
           ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
           <TrackedLink
             href="/guides/hermetic-principles-starter-guide"
-            location="nav:desktop"
+            location="nav:utility"
             label="Free Guide"
             variant="guide"
-            className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 px-4 py-2 text-[0.6rem] tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+            className="hidden min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 px-4 py-2 text-[0.6rem] uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] sm:inline-flex"
           >
             Free Guide
           </TrackedLink>
-        </nav>
-
-        <div className="relative flex items-center gap-2 text-[0.6rem] uppercase tracking-[0.35em]">
           <button
             type="button"
             onClick={() => void handleAudioToggle()}
-            className="rounded-full border border-[color:var(--copper)]/60 p-2 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/55 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             aria-label={soundPlaying ? "Mute sound" : "Play sound"}
             title={soundPlaying ? "Sound on" : "Sound muted"}
           >
@@ -144,41 +150,103 @@ export function NavBar() {
           </button>
           <button
             type="button"
-            onClick={openControls}
-            className="hidden rounded-full border border-[color:var(--copper)]/60 p-2 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] lg:inline-flex"
-            aria-label="Open controls"
-            title="Controls"
-          >
-            <ControlsIcon />
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/60 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] lg:hidden"
+            onClick={() => setPanelOpen(true)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/55 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             aria-label="Open menu"
             title="Menu"
           >
             <MenuIcon />
           </button>
+        </div>
+      </div>
 
-          {controlsOpen && (
-            <div className="absolute right-0 top-12 hidden w-72 rounded-2xl border border-[color:var(--copper)]/50 bg-[color:var(--char)]/95 p-4 text-[0.55rem] uppercase tracking-[0.32em] text-[color:var(--mist)] shadow-2xl lg:block">
-              <div className="flex items-center justify-between">
-                <span>Controls</span>
-                <button
-                  type="button"
-                  onClick={() => setControlsOpen(false)}
-                  className="text-[0.55rem] tracking-[0.32em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
-                >
-                  Close
-                </button>
-              </div>
-              <div className="mt-4 space-y-4">
+      {panelOpen ? (
+        <div className="fixed inset-0 z-50">
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="absolute inset-0 bg-[color:var(--obsidian)]/78 backdrop-blur-sm"
+            onClick={() => setPanelOpen(false)}
+          />
+          <aside className="absolute inset-x-0 bottom-0 top-0 overflow-y-auto border-l border-[color:var(--copper)]/30 bg-[color:var(--char)]/96 px-5 pb-10 pt-6 text-[0.68rem] uppercase tracking-[0.26em] text-[color:var(--mist)] sm:left-auto sm:max-w-[27rem] sm:px-6">
+            <div className="flex items-center justify-between">
+              <TrackedLink
+                href="/"
+                location="nav:panel"
+                label="Awareness Paradox Home"
+                variant="brand"
+                onClick={() => setPanelOpen(false)}
+                className="flex min-h-[44px] items-center gap-3 text-[0.68rem] uppercase tracking-[0.28em] text-[color:var(--bone)]"
+              >
+                <span className="h-px w-8 bg-[color:var(--copper)]" />
+                <span className="leading-[1.15]">
+                  Awareness
+                  <br />
+                  Paradox
+                </span>
+              </TrackedLink>
+              <button
+                type="button"
+                onClick={() => setPanelOpen(false)}
+                className="min-h-[44px] px-2 text-[0.62rem] tracking-[0.28em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="mt-8 space-y-8">
+              <section className="space-y-3">
+                <p className="text-[0.58rem] tracking-[0.34em] text-[color:var(--gilt)]">Navigate</p>
+                <div className="space-y-2">
+                  {navLinks.map((link) => (
+                    <TrackedLink
+                      key={link.href}
+                      href={link.href}
+                      location="nav:panel"
+                      label={link.label}
+                      variant="nav"
+                      onClick={() => setPanelOpen(false)}
+                      className="flex min-h-[48px] items-center rounded-full border border-[color:var(--copper)]/42 px-4 text-[0.65rem] tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                    >
+                      {link.label}
+                    </TrackedLink>
+                  ))}
+                </div>
+              </section>
+
+              <section className="space-y-3">
+                <p className="text-[0.58rem] tracking-[0.34em] text-[color:var(--gilt)]">Quick actions</p>
+                <div className="flex flex-wrap gap-3">
+                  <TrackedLink
+                    href="/guides/hermetic-principles-starter-guide"
+                    location="nav:panel"
+                    label="Free Guide"
+                    variant="guide"
+                    onClick={() => setPanelOpen(false)}
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-4 py-2 text-[0.6rem] tracking-[0.24em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                  >
+                    Free Guide
+                  </TrackedLink>
+                  <TrackedLink
+                    href="/letters"
+                    location="nav:panel"
+                    label="Weekly Letters"
+                    variant="letters"
+                    onClick={() => setPanelOpen(false)}
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/45 px-4 py-2 text-[0.6rem] tracking-[0.24em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                  >
+                    Weekly Letters
+                  </TrackedLink>
+                </div>
+              </section>
+
+              <section className="space-y-4 rounded-[1.8rem] border border-[color:var(--copper)]/35 bg-[color:var(--obsidian)]/55 p-5">
+                <p className="text-[0.58rem] tracking-[0.34em] text-[color:var(--gilt)]">Atmosphere controls</p>
                 <ControlRow label="Theme">
                   <select
                     value={theme}
                     onChange={(event) => setTheme(event.target.value as typeof theme)}
-                    className="w-full rounded-full border border-[color:var(--copper)]/60 bg-transparent px-3 py-2 text-[0.6rem] uppercase tracking-[0.3em] text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                    className="w-full rounded-full border border-[color:var(--copper)]/55 bg-transparent px-3 py-3 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
                     aria-label="Theme"
                   >
                     <option value="obsidian">Obsidian</option>
@@ -186,7 +254,7 @@ export function NavBar() {
                     <option value="crimson">Crimson</option>
                   </select>
                 </ControlRow>
-                <ControlRow label={`Quality: ${qualityLabel}`}>
+                <ControlRow label={`Quality ${qualityLabel}`}>
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -217,16 +285,18 @@ export function NavBar() {
                     </button>
                   </div>
                 </ControlRow>
-                <ControlRow label="Animate">
-                  <button type="button" onClick={handleAnimateToggle} className={controlToggleClass(!stillness)}>
-                    {stillness ? "Off" : "On"}
-                  </button>
-                </ControlRow>
-                <ControlRow label="HUD">
-                  <button type="button" onClick={toggleUi} className={controlToggleClass(showUi)}>
-                    {showUi ? "On" : "Off"}
-                  </button>
-                </ControlRow>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <ControlRow label="Animate">
+                    <button type="button" onClick={handleAnimateToggle} className={controlToggleClass(!stillness)}>
+                      {stillness ? "Off" : "On"}
+                    </button>
+                  </ControlRow>
+                  <ControlRow label="HUD">
+                    <button type="button" onClick={toggleUi} className={controlToggleClass(showUi)}>
+                      {showUi ? "On" : "Off"}
+                    </button>
+                  </ControlRow>
+                </div>
                 <ControlRow label="Volume">
                   <input
                     type="range"
@@ -243,133 +313,11 @@ export function NavBar() {
                     aria-label="Sound volume"
                   />
                 </ControlRow>
-              </div>
+              </section>
             </div>
-          )}
+          </aside>
         </div>
-      </div>
-
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-[color:var(--obsidian)]/75 lg:hidden"
-          onClick={() => setMobileOpen(false)}
-        >
-          <div
-            className="fixed bottom-0 left-0 right-0 rounded-t-3xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/95 px-6 pb-8 pt-6 text-[0.7rem] uppercase tracking-[0.32em] text-[color:var(--mist)]"
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => {
-              if (event.key === "Escape") {
-                setMobileOpen(false);
-              }
-            }}
-            tabIndex={-1}
-          >
-            <div className="flex items-center justify-between">
-              <span>Menu</span>
-              <button
-                type="button"
-                onClick={() => setMobileOpen(false)}
-                className="text-[0.65rem] tracking-[0.32em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
-              >
-                Close
-              </button>
-            </div>
-            <div className="mt-6 space-y-6">
-              <div className="space-y-3">
-                {navLinks.map((link) => (
-                  <TrackedLink
-                    key={link.href}
-                    href={link.href}
-                    location="nav:mobile"
-                    label={link.label}
-                    variant="nav"
-                    onClick={() => setMobileOpen(false)}
-                    className="block rounded-full border border-[color:var(--copper)]/60 px-4 py-3 text-center text-[0.65rem] tracking-[0.32em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
-                  >
-                    {link.label}
-                  </TrackedLink>
-                ))}
-              </div>
-              <details className="rounded-2xl border border-[color:var(--copper)]/50 p-4" open>
-                <summary className="cursor-pointer text-[0.65rem] tracking-[0.32em] text-[color:var(--bone)]">
-                  Controls
-                </summary>
-                <div className="mt-4 space-y-4">
-                  <ControlRow label="Theme">
-                    <select
-                      value={theme}
-                      onChange={(event) => setTheme(event.target.value as typeof theme)}
-                      className="w-full rounded-full border border-[color:var(--copper)]/60 bg-transparent px-3 py-2 text-[0.6rem] uppercase tracking-[0.3em] text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
-                      aria-label="Theme"
-                    >
-                      <option value="obsidian">Obsidian</option>
-                      <option value="abyssal">Abyssal</option>
-                      <option value="crimson">Crimson</option>
-                    </select>
-                  </ControlRow>
-                  <ControlRow label={`Quality: ${qualityLabel}`}>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setAutoQuality(true)}
-                        className={controlToggleClass(autoQuality)}
-                      >
-                        Auto
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAutoQuality(false);
-                          setQuality("high");
-                        }}
-                        className={controlToggleClass(!autoQuality && qualityTier !== "low")}
-                      >
-                        High
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAutoQuality(false);
-                          setQuality("low");
-                        }}
-                        className={controlToggleClass(!autoQuality && qualityTier === "low")}
-                      >
-                        Low
-                      </button>
-                    </div>
-                  </ControlRow>
-                  <ControlRow label="Animate">
-                    <button type="button" onClick={handleAnimateToggle} className={controlToggleClass(!stillness)}>
-                      {stillness ? "Off" : "On"}
-                    </button>
-                  </ControlRow>
-                  <ControlRow label="HUD">
-                    <button type="button" onClick={toggleUi} className={controlToggleClass(showUi)}>
-                      {showUi ? "On" : "Off"}
-                    </button>
-                  </ControlRow>
-                  <ControlRow label="Volume">
-                    <input
-                      type="range"
-                      min={0}
-                      max={0.4}
-                      step={0.01}
-                      value={soundVolume}
-                      onChange={(event) => {
-                        const next = Number(event.target.value);
-                        setSoundVolume(next);
-                        setVolume(next);
-                      }}
-                      className="h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--copper)]/40"
-                      aria-label="Sound volume"
-                    />
-                  </ControlRow>
-                </div>
-              </details>
-            </div>
-          </div>
-        </div>
-      )}
+      ) : null}
     </header>
   );
 }
@@ -377,7 +325,7 @@ export function NavBar() {
 function ControlRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <div className="text-[0.55rem] uppercase tracking-[0.32em] text-[color:var(--mist)]">
+      <div className="text-[0.55rem] uppercase tracking-[0.28em] text-[color:var(--mist)]">
         {label}
       </div>
       <div>{children}</div>
@@ -386,7 +334,7 @@ function ControlRow({ label, children }: { label: string; children: React.ReactN
 }
 
 function controlToggleClass(active: boolean) {
-  return `rounded-full border px-3 py-2 text-[0.55rem] uppercase tracking-[0.32em] transition ${
+  return `rounded-full border px-3 py-2 text-[0.58rem] uppercase tracking-[0.24em] transition ${
     active
       ? "border-[color:var(--gilt)] text-[color:var(--bone)]"
       : "border-[color:var(--copper)]/60 text-[color:var(--mist)] hover:border-[color:var(--gilt)]"
@@ -427,22 +375,6 @@ function SoundOffIcon() {
         strokeWidth="1.2"
         strokeLinecap="round"
       />
-    </svg>
-  );
-}
-
-function ControlsIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3 4h10M3 8h10M3 12h10"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-      />
-      <circle cx="6" cy="4" r="1.2" fill="currentColor" />
-      <circle cx="10" cy="8" r="1.2" fill="currentColor" />
-      <circle cx="5" cy="12" r="1.2" fill="currentColor" />
     </svg>
   );
 }

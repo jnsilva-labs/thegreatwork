@@ -1,4 +1,5 @@
 import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { getSubstackUrl } from "@/lib/substack";
 
 type EmailCtaCardProps = {
   title: string;
@@ -27,7 +28,7 @@ export function EmailCtaCard(props: EmailCtaCardProps) {
     source,
     variant = "full",
     eyebrow = "Free Guide",
-    primaryHref = process.env.NEXT_PUBLIC_SUBSTACK_URL ?? "/letters",
+    primaryHref = getSubstackUrl(),
     primaryLabel = "Subscribe on Substack",
     ctaNote = "Subscribe on Substack to receive the Starter Guide link in your welcome email.",
     alreadySubscribedHref = null,

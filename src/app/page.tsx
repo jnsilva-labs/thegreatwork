@@ -10,6 +10,7 @@ import { WebGLGuard } from "@/components/ui/WebGLGuard";
 import { FallbackEngraving } from "@/components/ui/FallbackEngraving";
 import { AudioLayer } from "@/components/ui/AudioLayer";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import { HeroSigil } from "@/components/ui/HeroSigil";
 import { homepageSections, homepageSlugs, trackedSections } from "@/data/homepage";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { buildWebPageSchema } from "@/lib/seo/schema";
@@ -26,8 +27,8 @@ const pathDoors = [
   },
   {
     title: "I Want a Reading",
-    body: "Enter through direct experience with tarot now, and astrology as it opens to the public.",
-    href: "/tarot",
+    body: "Enter through direct experience with tarot or astrology and let the symbolic language meet you through a live reading.",
+    href: "/astrology",
     label: "Get a Reading",
   },
   {
@@ -77,31 +78,35 @@ export default function Home() {
 
       <main className="relative z-10">
         {/* Hero — not scroll-tracked */}
-        <section className="min-h-screen px-6 py-24 sm:px-10 lg:px-20">
-          <div className="mx-auto flex min-h-[70vh] max-w-5xl flex-col justify-center gap-10">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
+        <section className="relative min-h-screen overflow-hidden px-6 py-24 sm:px-10 lg:px-20">
+          <div className="hero-sigil-wrap absolute inset-x-0 top-20 z-0 flex justify-center lg:inset-y-0 lg:right-[-10%] lg:left-auto lg:items-center lg:justify-end">
+            <HeroSigil />
+          </div>
+          <div className="relative z-10 mx-auto flex min-h-[72vh] max-w-5xl flex-col justify-center gap-8 sm:gap-9">
+            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.34em] text-[color:var(--mist)] sm:tracking-[0.4em]">
               <span className="h-px w-12 bg-[color:var(--copper)]" />
               A Digital Temple
             </div>
-            <h1 className="font-ritual text-4xl leading-tight text-[color:var(--bone)] sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl font-ritual text-[3.8rem] leading-[0.94] text-[color:var(--bone)] sm:text-[5.2rem] lg:text-[5.8rem]">
               {hero.title}
             </h1>
-            <p className="max-w-2xl text-sm uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[color:var(--gilt)]">
+            <p className="max-w-2xl text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] sm:text-sm sm:tracking-[0.35em]">
               {hero.subtitle}
             </p>
-            <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+            <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-[1.05rem]">
               {hero.body[0]}
             </p>
-            <p className="max-w-3xl text-sm uppercase tracking-[0.18em] text-[color:var(--mist)] sm:tracking-[0.28em]">
+            <p className="max-w-3xl text-xs uppercase tracking-[0.24em] text-[color:var(--mist)] sm:text-sm sm:tracking-[0.28em]">
               For the spiritually curious, the disciplined seeker, and the serious student of the esoteric arts.
             </p>
-            <div className="grid gap-4 lg:grid-cols-3">
-              {pathDoors.map((door) => (
+            <div className="grid max-w-4xl gap-3 md:grid-cols-3 lg:gap-4">
+              {pathDoors.map((door, index) => (
                 <article
                   key={door.title}
-                  className="home-door p-5"
+                  className="home-door p-4 sm:p-5"
+                  style={{ animationDelay: `${index * 130}ms` }}
                 >
-                  <h2 className="font-ritual text-2xl text-[color:var(--bone)]">
+                  <h2 className="font-ritual text-[2rem] leading-none text-[color:var(--bone)] sm:text-[2.1rem]">
                     {door.title}
                   </h2>
                   <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
@@ -112,7 +117,7 @@ export default function Home() {
                     location="home:hero-door"
                     label={door.label}
                     variant={door.title}
-                    className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.3em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                    className="mt-4 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-4 py-2 text-[0.65rem] uppercase tracking-[0.26em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
                   >
                     {door.label}
                   </TrackedLink>
@@ -140,7 +145,7 @@ export default function Home() {
               </TrackedLink>
             </div>
             {/* Scroll indicator */}
-            <div className="mt-8 animate-pulse-slow text-center text-xs uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[color:var(--mist)]">
+            <div className="hero-scroll-cue mt-8 text-center text-xs uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[color:var(--mist)]">
               Scroll to explore
             </div>
           </div>

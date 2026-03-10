@@ -3,7 +3,6 @@ import { SocialLinks } from "@/components/ui/SocialLinks";
 
 const footerLinks = [
   { href: "/start-here", label: "Start Here" },
-  { href: "/", label: "Home" },
   { href: "/study", label: "The Path" },
   { href: "/great-work", label: "The Great Work" },
   { href: "/tarot", label: "Tarot" },
@@ -20,10 +19,16 @@ export function Footer() {
         <div className="grid gap-8 sm:gap-10 sm:grid-cols-3">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-[color:var(--mist)]">
+            <TrackedLink
+              href="/"
+              location="footer"
+              label="Awareness Paradox"
+              variant="footer-brand"
+              className="flex min-h-[44px] items-center gap-3 text-xs uppercase tracking-[0.3em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)] sm:tracking-[0.4em]"
+            >
               <span className="h-px w-8 bg-[color:var(--copper)]" />
               Awareness Paradox
-            </div>
+            </TrackedLink>
             <FlowerOfLifeEmblem />
           </div>
 

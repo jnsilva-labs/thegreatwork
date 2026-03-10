@@ -33,9 +33,9 @@ export function HomepageSection({
     (state) => state.progressByChapter[index] ?? 0
   );
   const opacity = 0.3 + progress * 0.7;
-  const translate = (1 - progress) * 28;
-  const titleTranslate = (1 - progress) * 18;
-  const quoteTranslate = (1 - progress) * 36;
+  const translate = (1 - progress) * 48;
+  const titleTranslate = (1 - progress) * 28;
+  const quoteTranslate = (1 - progress) * 44;
   const atmosphereClass = sectionType ? `home-atmosphere--${sectionType}` : "home-atmosphere--paradox";
   const motion = getSectionMotion(sectionType, progress, translate);
 
@@ -53,7 +53,7 @@ export function HomepageSection({
         <div className="grid gap-8 lg:grid-cols-[0.92fr_0.08fr]">
           <div className="max-w-3xl space-y-8">
             <h2
-              className="font-ritual text-3xl leading-tight text-[color:var(--bone)] sm:text-4xl lg:text-5xl transition"
+              className="home-section-title font-ritual text-3xl leading-tight text-[color:var(--bone)] sm:text-4xl lg:text-5xl transition"
               style={{ transform: motion.title ?? `translateY(${titleTranslate}px)` }}
             >
               {title}

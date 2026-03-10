@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
+import { getSubstackUrl, isExternalHref } from "@/lib/substack";
 
 export const metadata: Metadata = {
   title: "Start Here | Awareness Paradox",
@@ -56,12 +57,8 @@ const readingOrder = [
 ];
 
 export default function StartHerePage() {
-  const envSubstackUrl = process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim();
-  const substackUrl =
-    envSubstackUrl && envSubstackUrl.length > 0
-      ? envSubstackUrl
-      : "https://substack.com/@awarenessparadox";
-  const isExternal = substackUrl.startsWith("https://") || substackUrl.startsWith("http://");
+  const substackUrl = getSubstackUrl();
+  const isExternal = isExternalHref(substackUrl);
 
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">

@@ -79,8 +79,8 @@ export default function AstrologyPage() {
               source-aware interpretation, practical reflection, and a more serious Hermetic frame for chart work.
             </p>
           </div>
-          <div className="space-y-4 lg:pt-8">
-            <div className="editorial-panel rounded-[2rem] p-6">
+          <div className="space-y-5 lg:pt-6">
+            <div className="rounded-2xl border border-[color:var(--copper)]/28 bg-[color:var(--char)]/35 p-6">
               <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">What this section is for</p>
               <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
                 {astrologyPromises.map((item) => (
@@ -88,8 +88,8 @@ export default function AstrologyPage() {
                 ))}
               </ul>
             </div>
-            <div className="editorial-panel rounded-[2rem] p-6">
-              <p className="editorial-quote text-[color:var(--bone)]">
+            <div className="rounded-2xl border border-[color:var(--copper)]/18 bg-[color:var(--obsidian)]/28 p-6">
+              <p className="font-ritual text-3xl leading-tight text-[color:var(--bone)] sm:text-[2.6rem]">
                 A chart is not a cage. It is a sky-written way of noticing how you enter time.
               </p>
             </div>
@@ -97,7 +97,7 @@ export default function AstrologyPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <article className="editorial-panel rounded-[2rem] p-6">
+          <article className="rounded-2xl border border-[color:var(--copper)]/28 bg-[color:var(--char)]/36 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Lineage</p>
             <div className="mt-4 space-y-5">
               <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
@@ -115,7 +115,7 @@ export default function AstrologyPage() {
             </div>
           </article>
 
-          <article className="editorial-panel rounded-[2rem] p-6">
+          <article className="rounded-2xl border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/34 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">What it is not</p>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
               {astrologyBoundaries.map((item) => (
@@ -134,7 +134,7 @@ export default function AstrologyPage() {
             {bigThree.map((item) => (
               <article
                 key={item.title}
-                className="editorial-panel rounded-[1.8rem] p-6"
+                className="rounded-2xl border border-[color:var(--copper)]/24 bg-[color:var(--char)]/28 p-5 sm:p-6"
               >
                 <h2 className="font-ritual text-2xl text-[color:var(--bone)]">{item.title}</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">{item.body}</p>
@@ -144,7 +144,7 @@ export default function AstrologyPage() {
         </section>
 
         <div className="grid gap-6 pt-2 lg:grid-cols-[1fr_0.95fr]">
-          <article className="editorial-panel rounded-[2rem] p-6">
+          <article className="rounded-2xl border border-[color:var(--copper)]/26 bg-[color:var(--char)]/34 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Sample reading frame</p>
             <h2 className="mt-3 font-ritual text-2xl">What a reading should do</h2>
             <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)]">
@@ -158,7 +158,7 @@ export default function AstrologyPage() {
             </p>
           </article>
 
-          <article className="editorial-panel rounded-[2rem] p-5 sm:p-8">
+          <article className="rounded-2xl border border-[color:var(--copper)]/22 bg-[color:var(--obsidian)]/32 p-5 sm:p-8">
             <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--gilt)]">Public Reading Standard</p>
             <div className="mt-3 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
               <p>Birth data is geocoded and converted into time-aware chart data before interpretation begins.</p>

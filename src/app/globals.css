@@ -375,15 +375,17 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--copper) 36%, transparent);
+  border: 1px solid color-mix(in srgb, var(--copper) 26%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--char) 52%, transparent) 0%, color-mix(in srgb, var(--obsidian) 64%, transparent) 100%);
-  backdrop-filter: blur(8px);
+    linear-gradient(180deg, color-mix(in srgb, var(--char) 34%, transparent) 0%, color-mix(in srgb, var(--obsidian) 52%, transparent) 100%);
+  backdrop-filter: blur(5px);
   transition:
     border-color 220ms ease,
     background-color 220ms ease,
     transform 320ms ease,
-    box-shadow 320ms ease;
+    box-shadow 320ms ease,
+    opacity 500ms ease;
+  animation: home-door-rise 1s ease both;
 }
 
 .home-door::before {
@@ -391,15 +393,15 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--gilt) 14%, transparent), transparent 38%);
-  opacity: 0.7;
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--gilt) 12%, transparent), transparent 38%);
+  opacity: 0.55;
   pointer-events: none;
 }
 
 .home-door:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--gilt) 46%, transparent);
-  box-shadow: 0 18px 40px rgba(5, 5, 10, 0.22);
+  border-color: color-mix(in srgb, var(--gilt) 42%, transparent);
+  box-shadow: 0 12px 28px rgba(5, 5, 10, 0.16);
 }
 
 .home-section {
@@ -411,8 +413,9 @@ body {
   position: absolute;
   inset: -6% -8%;
   opacity: 0.9;
-  filter: blur(18px);
+  filter: blur(22px);
   mix-blend-mode: screen;
+  animation: atmosphere-drift 14s ease-in-out infinite;
 }
 
 .home-atmosphere--paradox {
@@ -462,6 +465,111 @@ body {
   opacity: 0.82;
 }
 
+.hero-sigil-wrap {
+  opacity: 0.88;
+}
+
+.hero-sigil-shell {
+  position: relative;
+  width: min(72vw, 42rem);
+  aspect-ratio: 1;
+}
+
+.hero-sigil-glow {
+  position: absolute;
+  inset: 10%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 52% 48%, color-mix(in srgb, var(--gilt) 20%, transparent), transparent 36%),
+    radial-gradient(circle at 42% 56%, color-mix(in srgb, var(--bone) 10%, transparent), transparent 42%);
+  filter: blur(28px);
+  opacity: 0.8;
+  animation: hero-sigil-breathe 8s ease-in-out infinite;
+}
+
+.hero-sigil {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--gilt) 16%, transparent));
+}
+
+.hero-sigil__drift {
+  transform-origin: 50% 50%;
+  animation: hero-sigil-drift 26s linear infinite;
+}
+
+.hero-sigil__halo,
+.hero-sigil__ring {
+  stroke: color-mix(in srgb, var(--gilt) 54%, var(--bone) 46%);
+  stroke-width: 1;
+  opacity: 0.48;
+  vector-effect: non-scaling-stroke;
+}
+
+.hero-sigil__halo {
+  opacity: 0.22;
+}
+
+.hero-sigil__halo--inner {
+  opacity: 0.3;
+}
+
+.hero-sigil__flower {
+  transform-origin: 50% 50%;
+  animation: hero-flower-open 9s ease-in-out infinite;
+}
+
+.hero-sigil__orbit {
+  transform-origin: 50% 50%;
+  animation: hero-orbit 18s linear infinite;
+}
+
+.hero-sigil__node {
+  fill: color-mix(in srgb, var(--gilt) 72%, var(--bone) 28%);
+  opacity: 0.75;
+  animation: hero-node-pulse 4.5s ease-in-out infinite;
+}
+
+.hero-scroll-cue {
+  animation: cue-rise 3.4s ease-in-out infinite;
+}
+
+.great-work-stage {
+  position: relative;
+  border-top: 1px solid color-mix(in srgb, var(--copper) 26%, transparent);
+}
+
+.great-work-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: min(24vw, 180px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--gilt) 8%, transparent), transparent 70%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.fallback-engraving-shell {
+  box-shadow: 0 20px 60px rgba(5, 5, 10, 0.18);
+}
+
+.fallback-engraving {
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--gilt) 12%, transparent));
+}
+
+.fallback-engraving__flower {
+  transform-origin: 50% 50%;
+  animation: hero-flower-open 10s ease-in-out infinite;
+}
+
+.fallback-engraving__frame {
+  transform-origin: 50% 50%;
+  animation: hero-sigil-drift 28s linear infinite;
+}
+
 @keyframes aura-pulse {
   0% {
     transform: scale(0.96);
@@ -474,6 +582,108 @@ body {
   100% {
     transform: scale(0.98);
     opacity: 0.6;
+  }
+}
+
+@keyframes hero-flower-open {
+  0% {
+    transform: scale(0.86);
+    opacity: 0.28;
+  }
+  28% {
+    transform: scale(1);
+    opacity: 0.62;
+  }
+  70% {
+    transform: scale(1.04);
+    opacity: 0.54;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0.3;
+  }
+}
+
+@keyframes hero-sigil-drift {
+  0% {
+    transform: rotate(0deg) scale(0.98);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.02);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.98);
+  }
+}
+
+@keyframes hero-sigil-breathe {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 0.82;
+  }
+  100% {
+    transform: scale(0.98);
+    opacity: 0.6;
+  }
+}
+
+@keyframes hero-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-node-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.88;
+    transform: scale(1.28);
+  }
+}
+
+@keyframes home-door-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes atmosphere-drift {
+  0% {
+    transform: translate3d(-1.5%, 0, 0) scale(0.98);
+  }
+  50% {
+    transform: translate3d(1.5%, -1%, 0) scale(1.02);
+  }
+  100% {
+    transform: translate3d(-1%, 0.8%, 0) scale(0.99);
+  }
+}
+
+@keyframes cue-rise {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 0.88;
   }
 }
 
@@ -513,6 +723,18 @@ body {
   .ouroboros-ring {
     transition: none;
   }
+  .home-door,
+  .home-atmosphere,
+  .hero-sigil-glow,
+  .hero-sigil__drift,
+  .hero-sigil__flower,
+  .hero-sigil__orbit,
+  .hero-sigil__node,
+  .hero-scroll-cue,
+  .fallback-engraving__flower,
+  .fallback-engraving__frame {
+    animation: none;
+  }
 }
 
 @keyframes sigil-draw {
@@ -533,4 +755,15 @@ body {
 :focus-visible {
   outline: 1px solid var(--gilt);
   outline-offset: 2px;
+}
+
+@media (max-width: 1023px) {
+  .hero-sigil-wrap {
+    top: 5.5rem;
+    opacity: 0.54;
+  }
+
+  .hero-sigil-shell {
+    width: min(90vw, 28rem);
+  }
 }

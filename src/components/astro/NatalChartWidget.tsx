@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import type { AstroMonthAheadReadingResponse, AstroNatalResponse } from "@/lib/astro/types";
 import { trackEvent } from "@/lib/analytics/track";
+import { getSubstackUrl, isExternalHref } from "@/lib/substack";
 import { TurnstileWidget } from "./TurnstileWidget";
 import { PlanetaryArc } from "./PlanetaryArc";
 import { SharePanel } from "./share/SharePanel";
@@ -163,8 +164,8 @@ export function NatalChartWidget() {
     ].join("\n");
   }, [result]);
 
-  const lettersHref = process.env.NEXT_PUBLIC_SUBSTACK_URL?.trim() || "/letters";
-  const lettersIsExternal = lettersHref.startsWith("https://") || lettersHref.startsWith("http://");
+  const lettersHref = getSubstackUrl();
+  const lettersIsExternal = isExternalHref(lettersHref);
   const houseSystemDescription = houseSystemDescriptions[houseSystem];
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "";
   const turnstileEnabled = Boolean(turnstileSiteKey);

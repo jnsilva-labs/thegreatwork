@@ -3,11 +3,12 @@ import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { buildCollectionPageSchema, buildWebPageSchema } from "@/lib/seo/schema";
+import { getSubstackUrl } from "@/lib/substack";
 
 const LETTERS_DESCRIPTION =
   "Weekly letters from Awareness Paradox: Hermetic principles, astrology for self-understanding, spiritual practice prompts, and guided next steps.";
 
-const SUBSTACK_URL = process.env.NEXT_PUBLIC_SUBSTACK_URL ?? "#";
+const SUBSTACK_URL = getSubstackUrl();
 
 const upcomingLetterThemes = [
   {
@@ -79,6 +80,8 @@ export default function LettersPage() {
           variant="compact"
           secondaryHref="/guides/hermetic-principles-starter-guide"
           secondaryLabel="Free Starter Guide"
+          tertiaryHref=""
+          tertiaryLabel=""
         />
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -94,13 +97,13 @@ export default function LettersPage() {
               <TrackedLink
                 href={SUBSTACK_URL}
                 location="letters:archive"
-                label={SUBSTACK_URL === "#" ? "Set Substack URL" : "Open Substack Archive"}
+                label="Open Substack Archive"
                 variant="archive"
-                target={SUBSTACK_URL === "#" ? undefined : "_blank"}
-                rel={SUBSTACK_URL === "#" ? undefined : "noopener noreferrer"}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-5 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
               >
-                {SUBSTACK_URL === "#" ? "Set Substack URL" : "Open Substack Archive"}
+                Open Substack Archive
               </TrackedLink>
             </div>
           </div>

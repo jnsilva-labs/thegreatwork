@@ -27,18 +27,15 @@ export default function GreatWorkPage() {
                 <p key={line}>{line}</p>
               ))}
             </div>
+            <p className="max-w-2xl border-l border-[color:var(--copper)]/28 pl-5 font-ritual text-2xl leading-tight text-[color:var(--bone)] sm:text-3xl">
+              The work does not begin in brilliance. It begins where matter yields and the old form darkens.
+            </p>
           </div>
-          <div className="space-y-4 lg:pt-8">
-            <div className="editorial-panel rounded-[2rem] p-6">
-              <p className="editorial-quote text-[color:var(--bone)]">
-                The work does not begin in brilliance. It begins where matter yields and the old form darkens.
-              </p>
-            </div>
-            <div className="relative flex items-center justify-center">
-              <div className="editorial-panel relative flex items-center justify-center rounded-[2rem] p-10">
-                <div className="violet-aura" aria-hidden="true" />
-                <Ouroboros className="h-56 w-56 text-[color:var(--bone)] sm:h-64 sm:w-64" />
-              </div>
+          <div className="relative flex items-center justify-center lg:pt-10">
+            <div className="relative flex items-center justify-center rounded-full border border-[color:var(--copper)]/28 bg-[color:var(--char)]/28 p-10">
+              <div className="violet-aura" aria-hidden="true" />
+              <Ouroboros className="h-56 w-56 text-[color:var(--bone)] sm:h-64 sm:w-64" />
+              <div className="pointer-events-none absolute inset-5 rounded-full border border-[color:var(--copper)]/15" />
             </div>
           </div>
         </section>
@@ -52,22 +49,21 @@ export default function GreatWorkPage() {
             {greatWork.stages.map((stage, index) => (
               <article
                 key={stage.id}
-                className="editorial-panel rounded-[2rem] p-6 sm:p-8"
+                className="great-work-stage py-8"
               >
-                <div className={`grid gap-6 lg:grid-cols-[0.28fr_0.72fr] ${index % 2 === 1 ? "lg:[&>*:first-child]:order-2 lg:[&>*:last-child]:order-1" : ""}`}>
-                  <div className="space-y-4">
-                    <p className="font-ritual text-5xl text-[color:var(--gilt)]">{["I", "II", "III", "IV"][index]}</p>
-                    <div className="h-px w-20 bg-[color:var(--copper)]/25" />
+                <div className={`grid gap-6 lg:grid-cols-[0.18fr_0.82fr] ${index % 2 === 1 ? "lg:[&>*:first-child]:order-2 lg:[&>*:last-child]:order-1" : ""}`}>
+                  <div className="space-y-4 lg:pt-1">
+                    <p className="font-ritual text-5xl text-[color:var(--gilt)]/86">{["I", "II", "III", "IV"][index]}</p>
                     <span
                       className="block h-2.5 w-16 rounded-full"
                       style={{ backgroundColor: stage.tone }}
                       aria-hidden="true"
                     />
-                    <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--mist)]">
-                      {stage.keynotes.join(" · ")}
-                    </p>
                   </div>
                   <div className="space-y-4">
+                    <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--gilt)]">
+                      {stage.keynotes.join(" · ")}
+                    </p>
                     <h3 className="font-ritual text-3xl sm:text-4xl">{stage.title}</h3>
                     <div className="space-y-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
                       {stage.description.map((line) => (
@@ -90,7 +86,7 @@ export default function GreatWorkPage() {
             {greatWork.glossary.map((item) => (
               <article
                 key={item.term}
-                className="editorial-panel rounded-[1.7rem] p-5"
+                className="rounded-2xl border border-[color:var(--copper)]/20 bg-[color:var(--char)]/18 p-5"
               >
                 <h3 className="font-ritual text-xl">{item.term}</h3>
                 <p className="mt-3 text-sm text-[color:var(--mist)]">{item.definition}</p>
@@ -110,7 +106,7 @@ export default function GreatWorkPage() {
                 key={item.id}
                 type="button"
                 onClick={() => setActiveGlyph(item.id)}
-                className="editorial-panel group flex flex-col items-center gap-4 rounded-[1.7rem] p-5 text-left transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                className="group flex flex-col items-center gap-4 rounded-2xl border border-[color:var(--copper)]/22 bg-[color:var(--char)]/18 p-5 text-left transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[color:var(--copper)]/40 text-[color:var(--gilt)] transition group-hover:text-[color:var(--bone)]">
                   <AlchemyGlyph id={item.id} className="h-10 w-10" />
@@ -165,7 +161,7 @@ export default function GreatWorkPage() {
           onClick={() => setActiveGlyph(null)}
         >
           <div
-            className="editorial-panel w-full max-w-md rounded-[2rem] p-6"
+            className="w-full max-w-md rounded-[2rem] border border-[color:var(--copper)]/26 bg-[color:var(--char)]/92 p-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
