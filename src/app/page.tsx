@@ -1,4 +1,6 @@
-import Link from "next/link";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { RitualCanvas } from "@/components/scene/RitualCanvas";
 import { ScrollOrchestrator } from "@/components/ui/ScrollOrchestrator";
 import { HomepageSection } from "@/components/ui/HomepageSection";
@@ -9,6 +11,45 @@ import { FallbackEngraving } from "@/components/ui/FallbackEngraving";
 import { AudioLayer } from "@/components/ui/AudioLayer";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { homepageSections, homepageSlugs, trackedSections } from "@/data/homepage";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildWebPageSchema } from "@/lib/seo/schema";
+
+const HOME_DESCRIPTION =
+  "A living archive of alchemy, tarot, astrology, sacred geometry, and Hermetic principles for reflective self-study and practical inner work.";
+
+const pathDoors = [
+  {
+    title: "I'm New Here",
+    body: "Start with a clear orientation, the Hermetic starter path, and the first practices that make the library usable.",
+    href: "/start-here",
+    label: "Begin Your Initiation",
+  },
+  {
+    title: "I Want a Reading",
+    body: "Enter through direct experience with tarot now, and astrology as it opens to the public.",
+    href: "/tarot",
+    label: "Get a Reading",
+  },
+  {
+    title: "I Want Serious Study",
+    body: "Follow a clearer map through the principles, alchemy, tarot, astrology, and source-grounded study without losing the thread.",
+    href: "/study",
+    label: "Walk The Path",
+  },
+];
+
+export const metadata = buildPageMetadata({
+  path: "/",
+  description: HOME_DESCRIPTION,
+  keywords: [
+    "hermetic principles",
+    "alchemy",
+    "tarot",
+    "astrology",
+    "sacred geometry",
+    "esoteric studies",
+  ],
+});
 
 export default function Home() {
   const hero = homepageSections[0];
@@ -25,6 +66,14 @@ export default function Home() {
       <AnnotationBar />
       <SigilLoader />
       <AudioLayer />
+      <JsonLd
+        id="home-webpage-schema"
+        data={buildWebPageSchema({
+          name: "Awareness Paradox",
+          path: "/",
+          description: HOME_DESCRIPTION,
+        })}
+      />
 
       <main className="relative z-10">
         {/* Hero — not scroll-tracked */}
@@ -43,19 +92,52 @@ export default function Home() {
             <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
               {hero.body[0]}
             </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link
-                href="/great-work"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+            <p className="max-w-3xl text-sm uppercase tracking-[0.18em] text-[color:var(--mist)] sm:tracking-[0.28em]">
+              For the spiritually curious, the disciplined seeker, and the serious student of the esoteric arts.
+            </p>
+            <div className="grid gap-4 lg:grid-cols-3">
+              {pathDoors.map((door) => (
+                <article
+                  key={door.title}
+                  className="rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/45 p-5 backdrop-blur-sm"
+                >
+                  <h2 className="font-ritual text-2xl text-[color:var(--bone)]">
+                    {door.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
+                    {door.body}
+                  </p>
+                  <TrackedLink
+                    href={door.href}
+                    location="home:hero-door"
+                    label={door.label}
+                    variant={door.title}
+                    className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.3em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                  >
+                    {door.label}
+                  </TrackedLink>
+                </article>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <TrackedLink
+                href="/study"
+                location="home:hero-secondary"
+                label="Explore The Path"
+                variant="secondary"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.26em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
               >
-                Begin the Journey
-              </Link>
-              <Link
-                href="/principles"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-5 py-3 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                Explore The Path
+              </TrackedLink>
+              <TrackedLink
+                href="/letters"
+                location="home:hero-secondary"
+                label="Read the Letters"
+                variant="secondary"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.26em] transition hover:border-[color:var(--gilt)]"
               >
-                Seven Principles
-              </Link>
+                Read the Letters
+              </TrackedLink>
             </div>
             {/* Scroll indicator */}
             <div className="mt-8 animate-pulse-slow text-center text-xs uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[color:var(--mist)]">
@@ -81,6 +163,25 @@ export default function Home() {
             )}
           </HomepageSection>
         ))}
+
+        <section className="px-6 py-12 sm:px-10 lg:px-20">
+          <div className="mx-auto max-w-5xl">
+            <EmailCtaCard
+              eyebrow="Seeker Path"
+              title="Begin with the 7 Hermetic Principles Starter Guide"
+              body="A beginner-friendly entry into Hermetic study, practical reflection prompts, and a guided next step into tarot, astrology, and the wider Awareness Paradox library."
+              source="homepage"
+              interests={["beginner-hermetic"]}
+              primaryLabel="Get the Starter Guide"
+              ctaNote="Subscribe on Substack and the guide link arrives through the welcome sequence with your next steps."
+              alreadySubscribedLabel="Already Subscribed? Open the Guide Link"
+              secondaryHref="/start-here"
+              secondaryLabel="Start Here"
+              tertiaryHref="/study"
+              tertiaryLabel="Explore The Path"
+            />
+          </div>
+        </section>
 
         <div className="h-[50vh] sm:h-[70vh]" aria-hidden="true" />
       </main>

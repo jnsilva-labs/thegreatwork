@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import { createEngine, setVolume, start, stop } from "@/lib/audio/engine";
@@ -9,6 +9,7 @@ import { getStoredTheme, useThemeStore } from "@/lib/themeStore";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 const navLinks = [
+  { href: "/start-here", label: "Start Here" },
   { href: "/", label: "Home" },
   { href: "/great-work", label: "The Great Work" },
   { href: "/tarot", label: "Tarot" },
@@ -109,14 +110,26 @@ export function NavBar() {
 
         <nav className="hidden items-center gap-6 text-[0.65rem] uppercase tracking-[0.35em] text-[color:var(--mist)] lg:flex">
           {navLinks.map((link) => (
-            <Link
+            <TrackedLink
               key={link.href}
               href={link.href}
+              location="nav:desktop"
+              label={link.label}
+              variant="nav"
               className="transition hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             >
               {link.label}
-            </Link>
+            </TrackedLink>
           ))}
+          <TrackedLink
+            href="/guides/hermetic-principles-starter-guide"
+            location="nav:desktop"
+            label="Free Guide"
+            variant="guide"
+            className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 px-4 py-2 text-[0.6rem] tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+          >
+            Free Guide
+          </TrackedLink>
         </nav>
 
         <div className="relative flex items-center gap-2 text-[0.6rem] uppercase tracking-[0.35em]">
@@ -264,14 +277,17 @@ export function NavBar() {
             <div className="mt-6 space-y-6">
               <div className="space-y-3">
                 {navLinks.map((link) => (
-                  <Link
+                  <TrackedLink
                     key={link.href}
                     href={link.href}
+                    location="nav:mobile"
+                    label={link.label}
+                    variant="nav"
                     onClick={() => setMobileOpen(false)}
                     className="block rounded-full border border-[color:var(--copper)]/60 px-4 py-3 text-center text-[0.65rem] tracking-[0.32em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
                   >
                     {link.label}
-                  </Link>
+                  </TrackedLink>
                 ))}
               </div>
               <details className="rounded-2xl border border-[color:var(--copper)]/50 p-4" open>

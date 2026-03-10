@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { PostHogProvider } from "@/components/analytics/PostHogProvider";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { CodexChrome } from "@/components/ui/CodexChrome";
 import { NavBar } from "@/components/ui/NavBar";
 import { Footer } from "@/components/ui/Footer";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/seo/schema";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Awareness Paradox",
-  description:
-    "Ancient wisdom for modern awakening. Explore alchemy, tarot, astrology, sacred geometry, and the Hermetic principles.",
-  metadataBase: new URL("https://awarenessparadox.com"),
+  ...buildPageMetadata({ path: "/" }),
+  metadataBase: new URL("https://www.awarenessparadox.com"),
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -17,26 +19,6 @@ export const metadata: Metadata = {
     ],
     shortcut: ["/favicon.ico"],
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
-  },
-  openGraph: {
-    title: "Awareness Paradox",
-    description:
-      "Ancient wisdom for modern awakening. Explore alchemy, tarot, astrology, sacred geometry, and the Hermetic principles.",
-    images: [
-      {
-        url: "/opengraph-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Awareness Paradox",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Awareness Paradox",
-    description:
-      "Ancient wisdom for modern awakening. Explore alchemy, tarot, astrology, sacred geometry, and the Hermetic principles.",
-    images: ["/twitter-image.png"],
   },
 };
 
@@ -62,10 +44,14 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <NavBar />
-        <CodexChrome />
-        <div className="relative z-10 pt-20">{children}</div>
-        <Footer />
+        <PostHogProvider>
+          <JsonLd id="website-schema" data={buildWebsiteSchema()} />
+          <JsonLd id="organization-schema" data={buildOrganizationSchema()} />
+          <NavBar />
+          <CodexChrome />
+          <div className="relative z-10 pt-20">{children}</div>
+          <Footer />
+        </PostHogProvider>
         <Analytics />
       </body>
     </html>

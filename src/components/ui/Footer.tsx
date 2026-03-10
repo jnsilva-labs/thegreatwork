@@ -1,13 +1,16 @@
-import Link from "next/link";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 
 const footerLinks = [
+  { href: "/start-here", label: "Start Here" },
   { href: "/", label: "Home" },
+  { href: "/study", label: "The Path" },
   { href: "/great-work", label: "The Great Work" },
   { href: "/tarot", label: "Tarot" },
   { href: "/astrology", label: "Astrology" },
   { href: "/gallery", label: "Sacred Geometry" },
   { href: "/principles", label: "Principles" },
+  { href: "/letters", label: "Letters" },
 ];
 
 export function Footer() {
@@ -32,12 +35,15 @@ export function Footer() {
             <ul className="space-y-1">
               {footerLinks.map((link) => (
                 <li key={link.href}>
-                  <Link
+                  <TrackedLink
                     href={link.href}
+                    location="footer"
+                    label={link.label}
+                    variant="footer-nav"
                     className="block py-2 text-xs uppercase tracking-[0.3em] text-[color:var(--mist)] transition-colors hover:text-[color:var(--bone)]"
                   >
                     {link.label}
-                  </Link>
+                  </TrackedLink>
                 </li>
               ))}
             </ul>

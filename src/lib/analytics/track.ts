@@ -1,5 +1,7 @@
 "use client";
 
+import posthog from "posthog-js";
+
 type EventProps = Record<string, string | number | boolean | null | undefined>;
 
 type AnalyticsWindow = Window & {
@@ -27,6 +29,10 @@ export const trackEvent = (eventName: string, props: EventProps = {}): void => {
 
   if (typeof analyticsWindow.gtag === "function") {
     analyticsWindow.gtag("event", eventName, props);
+  }
+
+  if (process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim()) {
+    posthog.capture(eventName, props);
   }
 
   window.dispatchEvent(

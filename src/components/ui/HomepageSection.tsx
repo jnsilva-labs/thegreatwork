@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import type { HomepageSectionItem } from "@/data/homepage";
 
@@ -86,12 +86,15 @@ export function HomepageSection({
         {/* CTA button */}
         {cta && (
           <div className="pt-2">
-            <Link
+            <TrackedLink
               href={cta.href}
+              location={`homepage_section:${id}`}
+              label={cta.label}
+              variant="section-cta"
               className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-6 py-3 text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             >
               {cta.label}
-            </Link>
+            </TrackedLink>
           </div>
         )}
       </div>
