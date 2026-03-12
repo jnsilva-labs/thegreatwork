@@ -16,10 +16,7 @@ const suitAccents = {
   pentacles: { border: 'rgba(214, 198, 165, 0.52)', wash: 'rgba(214, 198, 165, 0.08)', glyph: '◇', label: 'Pentacles' },
 } as const;
 
-const shouldBypassIllustration = (url?: string) => {
-  if (!url) return true;
-  return url.includes('sacred-texts.com/tarot/pkt/img');
-};
+const shouldBypassIllustration = (url?: string) => !url;
 
 export const TarotCardFace: React.FC<TarotCardFaceProps> = ({ card, className = '' }) => {
   const [imgError, setImgError] = useState(false);

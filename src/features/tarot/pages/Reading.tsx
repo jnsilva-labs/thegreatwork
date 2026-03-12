@@ -187,7 +187,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
             </div>
 
             {!interpretation && !apiKeyMissing && !apiError && (
-              <div className="fixed bottom-10 z-40 animate-fade-in">
+              <div className="sticky bottom-6 z-40 mt-4 flex justify-center animate-fade-in pb-2">
                 <button
                   onClick={triggerInterpretation}
                   disabled={isLoadingAI}
