@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { useUiStore } from "@/lib/uiStore";
@@ -23,6 +23,7 @@ export function NavBar() {
   const [panelOpen, setPanelOpen] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const pathname = usePathname();
+  const previousPathname = useRef(pathname);
 
   const showUi = useUiStore((state) => state.showUi);
   const toggleUi = useUiStore((state) => state.toggleUi);
@@ -73,10 +74,12 @@ export function NavBar() {
   }, [panelOpen]);
 
   useEffect(() => {
-    if (!panelOpen) return;
-    const closeId = window.setTimeout(() => setPanelOpen(false), 0);
-    return () => window.clearTimeout(closeId);
-  }, [pathname, panelOpen]);
+    if (previousPathname.current !== pathname) {
+      previousPathname.current = pathname;
+      const closeId = window.setTimeout(() => setPanelOpen(false), 0);
+      return () => window.clearTimeout(closeId);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     document.body.classList.toggle("nav-panel-open", panelOpen);
