@@ -1,16 +1,14 @@
-import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { RitualCanvas } from "@/components/scene/RitualCanvas";
 import { ScrollOrchestrator } from "@/components/ui/ScrollOrchestrator";
 import { HomepageSection } from "@/components/ui/HomepageSection";
 import { AnnotationBar } from "@/components/ui/AnnotationBar";
-import { SigilLoader } from "@/components/ui/SigilLoader";
 import { WebGLGuard } from "@/components/ui/WebGLGuard";
 import { FallbackEngraving } from "@/components/ui/FallbackEngraving";
 import { AudioLayer } from "@/components/ui/AudioLayer";
 import { SocialLinks } from "@/components/ui/SocialLinks";
-import { HeroSigil } from "@/components/ui/HeroSigil";
+import { HomepageHero } from "@/components/ui/HomepageHero";
 import { homepageSections, homepageSlugs, trackedSections } from "@/data/homepage";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { buildWebPageSchema } from "@/lib/seo/schema";
@@ -24,20 +22,26 @@ const pathDoors = [
     body: "Start with a clear orientation, the Hermetic starter path, and the first practices that make the library usable.",
     href: "/start-here",
     label: "Begin Your Initiation",
+    symbol: "◇",
+    accent: "teal",
   },
   {
     title: "I Want a Reading",
     body: "Enter through direct experience with tarot or astrology and let the symbolic language meet you through a live reading.",
     href: "/astrology",
     label: "Get a Reading",
+    symbol: "◎",
+    accent: "gold",
   },
   {
     title: "I Want Serious Study",
     body: "Follow a clearer map through the principles, alchemy, tarot, astrology, and source-grounded study without losing the thread.",
     href: "/study",
     label: "Walk The Path",
+    symbol: "⟐",
+    accent: "bone",
   },
-];
+] as const;
 
 export const metadata = buildPageMetadata({
   path: "/",
@@ -65,7 +69,6 @@ export default function Home() {
       <div className="scrim fixed inset-0 z-0" />
       <ScrollOrchestrator slugs={homepageSlugs} />
       <AnnotationBar />
-      <SigilLoader />
       <AudioLayer />
       <JsonLd
         id="home-webpage-schema"
@@ -77,79 +80,12 @@ export default function Home() {
       />
 
       <main className="relative z-10">
-        {/* Hero — not scroll-tracked */}
-        <section className="relative min-h-screen overflow-hidden px-6 py-24 sm:px-10 lg:px-20">
-          <div className="hero-sigil-wrap absolute inset-x-0 top-20 z-0 flex justify-center lg:inset-y-0 lg:right-[-10%] lg:left-auto lg:items-center lg:justify-end">
-            <HeroSigil />
-          </div>
-          <div className="relative z-10 mx-auto flex min-h-[72vh] max-w-5xl flex-col justify-center gap-8 sm:gap-9">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.34em] text-[color:var(--mist)] sm:tracking-[0.4em]">
-              <span className="h-px w-12 bg-[color:var(--copper)]" />
-              A Digital Temple
-            </div>
-            <h1 className="max-w-4xl font-ritual text-[3.8rem] leading-[0.94] text-[color:var(--bone)] sm:text-[5.2rem] lg:text-[5.8rem]">
-              {hero.title}
-            </h1>
-            <p className="max-w-2xl text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] sm:text-sm sm:tracking-[0.35em]">
-              {hero.subtitle}
-            </p>
-            <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-[1.05rem]">
-              {hero.body[0]}
-            </p>
-            <p className="max-w-3xl text-xs uppercase tracking-[0.24em] text-[color:var(--mist)] sm:text-sm sm:tracking-[0.28em]">
-              For the spiritually curious, the disciplined seeker, and the serious student of the esoteric arts.
-            </p>
-            <div className="grid max-w-4xl gap-3 md:grid-cols-3 lg:gap-4">
-              {pathDoors.map((door, index) => (
-                <article
-                  key={door.title}
-                  className="home-door p-4 sm:p-5"
-                  style={{ animationDelay: `${index * 130}ms` }}
-                >
-                  <h2 className="font-ritual text-[2rem] leading-none text-[color:var(--bone)] sm:text-[2.1rem]">
-                    {door.title}
-                  </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
-                    {door.body}
-                  </p>
-                  <TrackedLink
-                    href={door.href}
-                    location="home:hero-door"
-                    label={door.label}
-                    variant={door.title}
-                    className="mt-4 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)] px-4 py-2 text-[0.65rem] uppercase tracking-[0.26em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
-                  >
-                    {door.label}
-                  </TrackedLink>
-                </article>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <TrackedLink
-                href="/study"
-                location="home:hero-secondary"
-                label="Explore The Path"
-                variant="secondary"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.26em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
-              >
-                Explore The Path
-              </TrackedLink>
-              <TrackedLink
-                href="/letters"
-                location="home:hero-secondary"
-                label="Read the Letters"
-                variant="secondary"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.26em] transition hover:border-[color:var(--gilt)]"
-              >
-                Read the Letters
-              </TrackedLink>
-            </div>
-            {/* Scroll indicator */}
-            <div className="hero-scroll-cue mt-8 text-center text-xs uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[color:var(--mist)]">
-              Scroll to explore
-            </div>
-          </div>
-        </section>
+        <HomepageHero
+          title={hero.title}
+          subtitle={hero.subtitle ?? ""}
+          body={hero.body[0] ?? ""}
+          pathDoors={[...pathDoors]}
+        />
 
         {/* Tracked sections: paradox → alchemy → divination → astrology → geometry → principles → community */}
         {trackedSections.map((section, index) => (

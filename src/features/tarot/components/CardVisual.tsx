@@ -1,7 +1,8 @@
-import Image from 'next/image';
+'use client';
+
 import React, { useState } from 'react';
 import { DrawnCard } from '../types';
-import { ImageOff } from '../icons';
+import TarotCardFace from './TarotCardFace';
 
 interface CardVisualProps {
   card?: DrawnCard;
@@ -12,16 +13,16 @@ interface CardVisualProps {
 }
 
 const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size = 'md', className = '' }) => {
-  const [imgError, setImgError] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   // Responsive sizes: Mobile first, then md (desktop)
   // If className overrides width/height, these are fallback defaults.
   const sizeClasses = {
     // Celtic Cross / Dense layouts
-    sm: 'w-16 h-24 md:w-20 md:h-32 text-[8px]', 
+    sm: 'w-16 h-24 md:w-20 md:h-32 text-[11px]', 
     
     // Standard
-    md: 'w-24 h-36 md:w-32 md:h-52 text-[10px] md:text-xs',
+    md: 'w-24 h-36 md:w-32 md:h-52 text-[11px] md:text-sm',
     
     // Three Card spread
     lg: 'w-48 h-72 md:w-56 md:h-80 text-xs md:text-sm',
@@ -35,9 +36,11 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
   return (
     <div 
       onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       className={`relative perspective-1000 ${currentSizeClass} cursor-pointer group z-0 hover:z-10 transition-all duration-300`}
     >
-      <div className={`relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${isFaceUp ? 'rotate-y-180' : ''} group-hover:scale-[1.02] transition-all`}>
+      <div className={`relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${isFaceUp ? 'rotate-y-180' : ''} ${hovered ? 'scale-[1.02]' : ''}`}>
         
         {/* Back of Card - Sacred Geometry Design */}
         <div className="absolute w-full h-full backface-hidden rounded shadow-2xl bg-void-900 border border-alchemy-gold/30 flex items-center justify-center overflow-hidden">
@@ -69,41 +72,11 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
         </div>
 
         {/* Front of Card */}
-        <div 
-          className={`absolute w-full h-full backface-hidden rotate-y-180 rounded shadow-2xl overflow-hidden bg-void-950 border-[4px] border-slate-200`}
-        >
+        <div className="absolute w-full h-full backface-hidden rotate-y-180 rounded shadow-2xl overflow-hidden bg-void-950 border-[3px] border-[color:rgba(214,198,165,0.24)]">
            {card ? (
              <div className={`relative w-full h-full flex flex-col ${card.isReversed ? 'rotate-180' : ''}`}>
-               {/* Image Container */}
                <div className="relative flex-1 overflow-hidden bg-void-900 flex items-center justify-center">
-                  {!imgError && card.imageUrl ? (
-                    <Image
-                      src={card.imageUrl}
-                      alt={card.name}
-                      fill
-                      sizes="(max-width: 768px) 320px, 480px"
-                      className="w-full h-full object-cover"
-                      onError={() => setImgError(true)}
-                    />
-                  ) : (
-                    // Fallback for broken images
-                    <div className="flex flex-col items-center justify-center p-4 text-center space-y-2 h-full bg-void-900">
-                       <ImageOff size={24} className="text-void-700" />
-                       <div className="font-headers text-alchemy-gold text-lg">{card.name}</div>
-                       <div className="text-[10px] text-slate-500 uppercase tracking-widest">{card.suit}</div>
-                    </div>
-                  )}
-
-                  {/* Texture overlay for unity */}
-                  <div className="absolute inset-0 bg-paper opacity-20 mix-blend-multiply pointer-events-none"></div>
-                  
-                  {/* Subtle Border Inner */}
-                  <div className="absolute inset-0 border border-black/20 pointer-events-none"></div>
-                  
-                  {/* Reversed Indicator Overlay */}
-                  {card.isReversed && (
-                    <div className="absolute inset-0 bg-alchemy-red/10 mix-blend-multiply pointer-events-none"></div>
-                  )}
+                  <TarotCardFace card={card} />
                </div>
              </div>
            ) : (

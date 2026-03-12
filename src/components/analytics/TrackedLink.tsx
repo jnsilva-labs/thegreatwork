@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { MouseEventHandler, ReactNode } from "react";
+import type { CSSProperties, MouseEventHandler, ReactNode } from "react";
 import { trackEvent } from "@/lib/analytics/track";
 
 type TrackedLinkProps = {
@@ -14,6 +14,9 @@ type TrackedLinkProps = {
   target?: string;
   rel?: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
+  onMouseMove?: MouseEventHandler<HTMLAnchorElement>;
+  onMouseLeave?: MouseEventHandler<HTMLAnchorElement>;
+  style?: CSSProperties;
 };
 
 const isExternalHref = (href: string): boolean => {
@@ -29,7 +32,10 @@ export function TrackedLink({
   variant = "link",
   target,
   rel,
-  onClick
+  onClick,
+  onMouseMove,
+  onMouseLeave,
+  style,
 }: TrackedLinkProps) {
   const external = isExternalHref(href);
 
@@ -53,6 +59,9 @@ export function TrackedLink({
         rel={rel ?? "noopener noreferrer"}
         className={className}
         onClick={handleClick}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        style={style}
       >
         {children}
       </a>
@@ -60,7 +69,14 @@ export function TrackedLink({
   }
 
   return (
-    <Link href={href} className={className} onClick={handleClick}>
+    <Link
+      href={href}
+      className={className}
+      onClick={handleClick}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={style}
+    >
       {children}
     </Link>
   );

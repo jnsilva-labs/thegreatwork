@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import { createEngine, setVolume, start, stop } from "@/lib/audio/engine";
 import { getStoredTheme, useThemeStore } from "@/lib/themeStore";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { getSubstackUrl } from "@/lib/substack";
 
 const navLinks = [
   { href: "/start-here", label: "Start Here" },
@@ -20,6 +22,7 @@ const navLinks = [
 export function NavBar() {
   const [panelOpen, setPanelOpen] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const pathname = usePathname();
 
   const showUi = useUiStore((state) => state.showUi);
   const toggleUi = useUiStore((state) => state.toggleUi);
@@ -38,6 +41,7 @@ export function NavBar() {
   const setSoundVolume = useHermeticStore((state) => state.setSoundVolume);
   const theme = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
+  const substackUrl = getSubstackUrl();
 
   useEffect(() => {
     const stored = getStoredTheme();
@@ -66,6 +70,17 @@ export function NavBar() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  }, [panelOpen]);
+
+  useEffect(() => {
+    if (!panelOpen) return;
+    const closeId = window.setTimeout(() => setPanelOpen(false), 0);
+    return () => window.clearTimeout(closeId);
+  }, [pathname, panelOpen]);
+
+  useEffect(() => {
+    document.body.classList.toggle("nav-panel-open", panelOpen);
+    return () => document.body.classList.remove("nav-panel-open");
   }, [panelOpen]);
 
   const handleAudioToggle = async () => {
@@ -98,16 +113,16 @@ export function NavBar() {
 
   return (
     <header className="pointer-events-auto fixed left-0 right-0 top-0 z-40">
-      <div className="mx-auto flex items-center justify-between gap-4 border-b border-[color:var(--copper)]/28 bg-[color:var(--obsidian)]/68 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-10">
+      <div className="mx-auto flex items-center justify-between gap-3 border-b border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/62 px-4 py-3 backdrop-blur-md sm:px-6 lg:gap-4 lg:px-10">
         <TrackedLink
           href="/"
           location="nav:brand"
           label="Awareness Paradox"
           variant="brand"
-          className="group flex min-h-[44px] items-center gap-3 text-[0.68rem] uppercase tracking-[0.26em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
+          className="group flex min-h-[44px] items-center gap-3 text-[0.66rem] uppercase tracking-[0.22em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)] sm:text-[0.68rem] sm:tracking-[0.26em]"
         >
-          <span className="h-px w-8 bg-[color:var(--copper)] transition group-hover:bg-[color:var(--gilt)]" />
-          <span className="leading-[1.15] sm:tracking-[0.34em]">
+          <span className="h-px w-7 bg-[color:var(--copper)] transition group-hover:bg-[color:var(--gilt)] sm:w-8" />
+          <span className="leading-[1.08] sm:tracking-[0.34em]">
             Awareness
             <br />
             Paradox
@@ -122,7 +137,7 @@ export function NavBar() {
               location="nav:desktop"
               label={link.label}
               variant="nav"
-              className="inline-flex min-h-[44px] items-center px-2 py-2 transition hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+              className="nav-desktop-link inline-flex min-h-[44px] items-center px-2 py-2 transition hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             >
               {link.label}
             </TrackedLink>
@@ -168,7 +183,7 @@ export function NavBar() {
             className="absolute inset-0 bg-[color:var(--obsidian)]/78 backdrop-blur-sm"
             onClick={() => setPanelOpen(false)}
           />
-          <aside className="absolute inset-x-0 bottom-0 top-0 overflow-y-auto border-l border-[color:var(--copper)]/30 bg-[color:var(--char)]/96 px-5 pb-10 pt-6 text-[0.68rem] uppercase tracking-[0.26em] text-[color:var(--mist)] sm:left-auto sm:max-w-[27rem] sm:px-6">
+          <aside className="absolute inset-x-0 bottom-0 top-0 overflow-y-auto border-l border-[color:var(--copper)]/24 bg-[color:var(--char)]/94 px-5 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-[0.68rem] uppercase tracking-[0.26em] text-[color:var(--mist)] sm:left-auto sm:max-w-[27rem] sm:px-6">
             <div className="flex items-center justify-between">
               <TrackedLink
                 href="/"
@@ -194,7 +209,7 @@ export function NavBar() {
               </button>
             </div>
 
-            <div className="mt-8 space-y-8">
+            <div className="mt-8 space-y-7">
               <section className="space-y-3">
                 <p className="text-[0.58rem] tracking-[0.34em] text-[color:var(--gilt)]">Navigate</p>
                 <div className="space-y-2">
@@ -206,7 +221,7 @@ export function NavBar() {
                       label={link.label}
                       variant="nav"
                       onClick={() => setPanelOpen(false)}
-                      className="flex min-h-[48px] items-center rounded-full border border-[color:var(--copper)]/42 px-4 text-[0.65rem] tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                      className="flex min-h-[48px] items-center rounded-full border border-[color:var(--copper)]/32 bg-[color:var(--obsidian)]/30 px-4 text-[0.65rem] tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
                     >
                       {link.label}
                     </TrackedLink>
@@ -228,14 +243,16 @@ export function NavBar() {
                     Free Guide
                   </TrackedLink>
                   <TrackedLink
-                    href="/letters"
+                    href={substackUrl}
                     location="nav:panel"
-                    label="Weekly Letters"
+                    label="Open Substack"
                     variant="letters"
                     onClick={() => setPanelOpen(false)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/45 px-4 py-2 text-[0.6rem] tracking-[0.24em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
                   >
-                    Weekly Letters
+                    Open Substack
                   </TrackedLink>
                 </div>
               </section>

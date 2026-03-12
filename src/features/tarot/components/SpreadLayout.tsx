@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { DrawnCard, SpreadType } from '../types';
 import CardVisual from './CardVisual';
@@ -22,7 +24,7 @@ const CardWithLabel: React.FC<{ card?: DrawnCard; isFaceUp: boolean; onClick: ()
       {card && isFaceUp && (
         <div className="mt-3 text-center animate-fade-in max-w-[120px]">
           <div className="font-headers text-alchemy-gold text-sm leading-tight mb-1">{card.name}</div>
-          <div className="text-[9px] text-slate-500 uppercase tracking-widest leading-relaxed hidden md:block">
+          <div className="text-xs text-slate-400 uppercase tracking-[0.18em] leading-relaxed hidden md:block">
             {card.keywords.slice(0, 2).join(' • ')}
           </div>
         </div>
@@ -47,7 +49,7 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedCount,
              {revealedCount > 0 && (
                 <div className="text-center mt-2 space-y-2">
                    <div className="text-2xl md:text-3xl font-headers text-alchemy-gold">{cards[0].name}</div>
-                   <div className="text-[10px] md:text-xs text-slate-500 uppercase tracking-[0.2em]">{cards[0].keywords.join(' • ')}</div>
+                   <div className="text-xs md:text-sm text-slate-400 uppercase tracking-[0.18em]">{cards[0].keywords.join(' • ')}</div>
                 </div>
              )}
           </div>
@@ -65,7 +67,7 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedCount,
             className="flex flex-col items-center gap-2 animate-fade-in w-[30vw] max-w-[200px]" 
             style={{ animationDelay: `${idx * 200}ms` }}
           >
-            <span className="text-slate-500 text-[8px] md:text-[10px] uppercase tracking-[0.2em] mb-1 text-center h-4">
+            <span className="text-slate-400 text-[11px] md:text-xs uppercase tracking-[0.18em] mb-1 text-center h-4">
                {idx === 0 ? 'Context' : idx === 1 ? 'Focus' : 'Outcome'}
             </span>
             {/* 
@@ -134,7 +136,7 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedCount,
                         </div>
                         {/* Mobile-friendly label for Staff cards */}
                         <div className={`flex flex-col text-left transition-opacity duration-500 ${revealedCount > idx ? 'opacity-100' : 'opacity-0'}`}>
-                           <span className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">
+                           <span className="text-[11px] uppercase tracking-[0.18em] text-slate-400 mb-1">
                               {idx === 9 ? 'Outcome' : idx === 8 ? 'Hopes/Fears' : idx === 7 ? 'Environment' : 'Self'}
                            </span>
                            <span className="font-headers text-alchemy-gold text-sm">{cards[idx].name}</span>

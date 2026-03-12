@@ -11,6 +11,8 @@ import { useHermeticStore } from "@/lib/hermeticStore";
 import { AetherField } from "@/components/scene/AetherField";
 import { FractalVeil } from "@/components/scene/FractalVeil";
 
+const HOMEPAGE_HYBRID_SCENE = true;
+
 type SceneShellProps = {
   reducedMotion: boolean;
 };
@@ -21,8 +23,10 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
   const activeChapter = useHermeticStore((state) => state.activeChapter);
   const progressByChapter = useHermeticStore((state) => state.progressByChapter);
   const overallProgress = useHermeticStore((state) => state.scrollProgress);
+  const heroProgress = useHermeticStore((state) => state.heroProgress);
   const pointer = useHermeticStore((state) => state.pointer);
   const shift = useHermeticStore((state) => state.shift);
+  const activeAlchemyStage = useHermeticStore((state) => state.activeAlchemyStage);
   const cameraOverride = useHermeticStore((state) => state.cameraOverride);
   const lineOpacityScale = useHermeticStore((state) => state.lineOpacityScale);
   const lineRadiusScale = useHermeticStore((state) => state.lineRadiusScale);
@@ -44,17 +48,25 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
     const group = groupRef.current;
     if (!group) return;
 
+    const settle = 1 - overallProgress * 0.85;
     const targetX = pointer.x * 0.15;
     const targetY = pointer.y * 0.12;
+    const horizontalDrift = MathUtils.lerp(-0.2, 0.65, overallProgress);
+    const breathe = reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.8) * 0.02;
 
     group.rotation.y = MathUtils.lerp(group.rotation.y, targetX, 0.08);
     group.rotation.x = MathUtils.lerp(group.rotation.x, targetY, 0.08);
-    group.position.x = MathUtils.lerp(group.position.x, state.pointer.x * 0.4, 0.05);
+    group.position.x = MathUtils.lerp(
+      group.position.x,
+      state.pointer.x * 0.24 + horizontalDrift,
+      0.05
+    );
     group.position.y = MathUtils.lerp(group.position.y, state.pointer.y * 0.2, 0.05);
     group.position.z = MathUtils.lerp(group.position.z, -0.4 + overallProgress * 0.8, 0.05);
+    group.scale.setScalar(MathUtils.lerp(group.scale.x, 1 + breathe, 0.08));
 
     if (!reducedMotion) {
-      group.rotation.z += delta * 0.03;
+      group.rotation.z += delta * 0.03 * settle;
     }
 
     const currentTarget = cameraTargets[activeChapter] ?? cameraTargets[0];
@@ -96,7 +108,13 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
         <VellumPlane />
         <FractalVeil />
         <AetherField reducedMotion={reducedMotion} />
-        <SigilCore reducedMotion={reducedMotion} />
+        <SigilCore
+          reducedMotion={reducedMotion}
+          scrollProgress={overallProgress}
+          heroProgress={heroProgress}
+          activeAlchemyStage={activeAlchemyStage}
+          hybrid={HOMEPAGE_HYBRID_SCENE}
+        />
         <SacredGeometrySigil
           reducedMotion={reducedMotion}
           chapterIndex={activeChapter}

@@ -26,6 +26,8 @@ type HermeticState = {
   shift: number;
   intensity: number;
   clarity: number;
+  heroProgress: number;
+  activeAlchemyStage: number;
   lineOpacityScale: number;
   lineRadiusScale: number;
   particleScale: number;
@@ -58,6 +60,8 @@ export const useHermeticStore = create<HermeticState>((set) => ({
   shift: 0,
   intensity: 0.6,
   clarity: 0.5,
+  heroProgress: 0,
+  activeAlchemyStage: 0,
   lineOpacityScale: 1,
   lineRadiusScale: 1,
   particleScale: 1,

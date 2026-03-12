@@ -9,6 +9,10 @@ export type JourneyMeditation = {
     | "gender";
   meditationTitle: string;
   breathCue: string;
+  breathPattern: readonly {
+    label: string;
+    seconds: number;
+  }[];
   focusLine: string;
   meditationBody: [string, string];
   reflectionPrompt: string;
@@ -20,6 +24,11 @@ export const journeyMeditations: JourneyMeditation[] = [
     slug: "mentalism",
     meditationTitle: "Rest in the field before the thought.",
     breathCue: "Breathe in for four, rest for four, breathe out for six.",
+    breathPattern: [
+      { label: "Inhale", seconds: 4 },
+      { label: "Rest", seconds: 4 },
+      { label: "Exhale", seconds: 6 },
+    ],
     focusLine: "Notice the space in which experience appears before you name what is happening.",
     meditationBody: [
       "Let the mind soften from its habit of grabbing at every passing image. Thoughts will continue to arise. You do not need to stop them. Simply notice that they are moving through a wider field of awareness that was already here before the thought arrived.",
@@ -32,6 +41,10 @@ export const journeyMeditations: JourneyMeditation[] = [
     slug: "correspondence",
     meditationTitle: "See the pattern within the pattern.",
     breathCue: "Breathe evenly and let the inhale and exhale match in length.",
+    breathPattern: [
+      { label: "Inhale", seconds: 4 },
+      { label: "Exhale", seconds: 4 },
+    ],
     focusLine: "As the geometry mirrors itself, let your attention notice where the same movement repeats in your own life.",
     meditationBody: [
       "The mind often thinks meaning must be hidden somewhere far away. Yet the same form returns at many scales. A habit in speech can echo a habit in relationship. A gesture of the body can reveal a gesture of the soul. The small is not separate from the great.",
@@ -44,6 +57,11 @@ export const journeyMeditations: JourneyMeditation[] = [
     slug: "vibration",
     meditationTitle: "Listen for the rhythm beneath the surface.",
     breathCue: "Let the breath move softly, as if you are listening more than controlling.",
+    breathPattern: [
+      { label: "Inhale", seconds: 4 },
+      { label: "Rest", seconds: 2 },
+      { label: "Exhale", seconds: 4 },
+    ],
     focusLine: "Feel the body as a living field of motion rather than a fixed object.",
     meditationBody: [
       "Nothing in you is truly static. Breath moves, blood moves, feeling moves, thought moves. Even stillness is alive with subtle vibration. The aim here is not excitement. It is sensitivity: the kind that notices when your inner rhythm is rushed, scattered, or gathered.",
@@ -56,6 +74,10 @@ export const journeyMeditations: JourneyMeditation[] = [
     slug: "polarity",
     meditationTitle: "Hold the whole scale, not only one edge.",
     breathCue: "Inhale through the nose, exhale slowly through the mouth, and soften the shoulders.",
+    breathPattern: [
+      { label: "Inhale", seconds: 4 },
+      { label: "Exhale", seconds: 6 },
+    ],
     focusLine: "The form turns between apparent opposites without breaking its nature.",
     meditationBody: [
       "The mind likes to divide experience into fixed camps: success and failure, light and dark, clarity and confusion. Yet most of life moves by degree. What feels like contradiction may actually be one living scale seen from different ends.",
@@ -68,6 +90,10 @@ export const journeyMeditations: JourneyMeditation[] = [
     slug: "rhythm",
     meditationTitle: "Trust the wisdom of return.",
     breathCue: "Let the inhale rise naturally and the exhale lengthen without force.",
+    breathPattern: [
+      { label: "Inhale", seconds: 4 },
+      { label: "Exhale", seconds: 5 },
+    ],
     focusLine: "Notice the gentle swing: forward and back, rise and return.",
     meditationBody: [
       "Every life moves in tides. There are seasons of effort, seasons of waiting, seasons of loss, seasons of renewal. Suffering deepens when we treat one season as though it should last forever. Rhythm reminds us that experience moves.",
@@ -80,6 +106,10 @@ export const journeyMeditations: JourneyMeditation[] = [
     slug: "cause-effect",
     meditationTitle: "Notice what each small act sets in motion.",
     breathCue: "Breathe low into the belly and let each exhale land fully.",
+    breathPattern: [
+      { label: "Inhale", seconds: 4 },
+      { label: "Exhale", seconds: 6 },
+    ],
     focusLine: "Each line appears because another line prepared the way.",
     meditationBody: [
       "A life is shaped less by grand declarations than by repeated causes. A tone of voice, a habit of avoidance, a moment of care, a single patient action: all of these enter the stream and continue beyond the instant in which they began.",
@@ -92,6 +122,10 @@ export const journeyMeditations: JourneyMeditation[] = [
     slug: "gender",
     meditationTitle: "Let receiving and directing work together.",
     breathCue: "Inhale as receiving, exhale as offering.",
+    breathPattern: [
+      { label: "Receive", seconds: 4 },
+      { label: "Offer", seconds: 4 },
+    ],
     focusLine: "The pattern comes alive where structure and openness meet.",
     meditationBody: [
       "Some moments ask for shape, decision, and direction. Others ask for listening, waiting, and yielding. Difficulty arises when we cling to only one mode. Creation becomes fuller when firmness and receptivity support each other instead of competing.",

@@ -14,7 +14,7 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer className="relative z-10 border-t border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]">
+    <footer className="footer-shell relative z-10 border-t border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]">
       <div className="mx-auto max-w-5xl px-6 py-12 sm:px-10 lg:px-20">
         <div className="grid gap-8 sm:gap-10 sm:grid-cols-3">
           {/* Brand */}
@@ -37,7 +37,7 @@ export function Footer() {
             <div className="text-[0.65rem] sm:text-[0.55rem] uppercase tracking-[0.4em] text-[color:var(--mist)]">
               Explore
             </div>
-            <ul className="space-y-1">
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:block sm:space-y-1">
               {footerLinks.map((link) => (
                 <li key={link.href}>
                   <TrackedLink
@@ -63,7 +63,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-[color:var(--copper)]/20 pt-6 text-center text-[0.55rem] uppercase tracking-[0.4em] text-[color:var(--mist)]">
+        <div className="mt-10 border-t border-[color:var(--copper)]/20 pt-6 pb-[max(0rem,env(safe-area-inset-bottom))] text-center text-[0.55rem] uppercase tracking-[0.4em] text-[color:var(--mist)]">
           &copy; {new Date().getFullYear()} Awareness Paradox
         </div>
       </div>

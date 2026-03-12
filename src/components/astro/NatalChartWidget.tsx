@@ -364,11 +364,11 @@ export function NatalChartWidget() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-8 px-4 pb-14 pt-6 sm:px-6 lg:px-8">
-      <section className="relative overflow-hidden rounded-3xl border border-[color:var(--copper)]/45 bg-[color:var(--char)]/70 p-5 shadow-2xl backdrop-blur-md sm:p-7">
+    <div className="mx-auto w-full max-w-5xl space-y-6 pb-12 pt-2">
+      <section className="relative overflow-hidden rounded-[1.65rem] border border-[color:var(--copper)]/38 bg-[color:var(--char)]/62 p-4 shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-7">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(184,155,94,0.2),transparent_58%),radial-gradient(circle_at_88%_4%,rgba(232,227,216,0.12),transparent_46%)]" />
-        <div className="pointer-events-none absolute -right-16 top-10 h-44 w-44 rounded-full border border-[color:var(--gilt)]/30" />
-        <div className="pointer-events-none absolute -right-10 top-16 h-32 w-32 animate-spin-slow rounded-full border border-dashed border-[color:var(--gilt)]/40" />
+        <div className="pointer-events-none absolute -right-14 top-8 hidden h-40 w-40 rounded-full border border-[color:var(--gilt)]/26 sm:block" />
+        <div className="pointer-events-none absolute -right-8 top-14 hidden h-28 w-28 animate-spin-slow rounded-full border border-dashed border-[color:var(--gilt)]/36 sm:block" />
 
         <div className="relative space-y-5">
           <div className="space-y-2">
@@ -427,7 +427,7 @@ export function NatalChartWidget() {
               />
             </label>
 
-            <label className="flex items-center gap-3 rounded-xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 px-3 py-2 text-sm sm:col-span-2">
+            <label className="flex items-center gap-3 rounded-xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 px-3 py-2.5 text-sm sm:col-span-2">
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-[color:var(--gilt)]"
@@ -461,7 +461,7 @@ export function NatalChartWidget() {
                 <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--mist)]">
                   Verification
                 </p>
-                <div className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                <div className="rounded-xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-3 sm:rounded-2xl sm:p-4">
                   <TurnstileWidget
                     siteKey={turnstileSiteKey}
                     resetKey={turnstileResetKey}
@@ -474,7 +474,7 @@ export function NatalChartWidget() {
               </div>
             ) : null}
 
-            <div className="sm:col-span-2 flex flex-wrap items-center gap-3 pt-1">
+            <div className="flex flex-col items-start gap-3 pt-1 sm:col-span-2 sm:flex-row sm:flex-wrap sm:items-center">
               <button
                 type="submit"
                 disabled={loading}
@@ -501,7 +501,7 @@ export function NatalChartWidget() {
       </section>
 
       {result ? (
-        <section ref={resultRef} className="relative overflow-hidden rounded-3xl border border-[color:var(--copper)]/45 bg-[color:var(--char)]/62 p-5 shadow-2xl backdrop-blur-md sm:p-8">
+        <section ref={resultRef} className="relative overflow-hidden rounded-[1.65rem] border border-[color:var(--copper)]/40 bg-[color:var(--char)]/58 p-4 shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-8">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(184,155,94,0.16),transparent_52%),radial-gradient(circle_at_80%_0%,rgba(232,227,216,0.08),transparent_42%)]" />
           <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_50%_50%,rgba(184,155,94,0.2)_1px,transparent_1px)] [background-size:26px_26px]" />
 
@@ -513,15 +513,15 @@ export function NatalChartWidget() {
             </div>
 
             <div className="astro-reveal grid gap-3 sm:grid-cols-3">
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--mist)]">Sun</p>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--bone)]">{result.reading.bigThree.sun}</p>
               </article>
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--mist)]">Moon</p>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--bone)]">{result.reading.bigThree.moon}</p>
               </article>
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--mist)]">Rising</p>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--bone)]">
                   {result.reading.bigThree.rising ?? "(birth time needed)"}
@@ -529,7 +529,7 @@ export function NatalChartWidget() {
               </article>
             </div>
 
-            <div className="astro-reveal rounded-2xl border border-[color:var(--gilt)]/45 bg-[linear-gradient(180deg,rgba(184,155,94,0.14),rgba(184,155,94,0.04))] p-4 sm:p-5">
+            <div className="astro-reveal rounded-xl border border-[color:var(--gilt)]/40 bg-[linear-gradient(180deg,rgba(184,155,94,0.12),rgba(184,155,94,0.03))] p-4 sm:rounded-2xl sm:p-5">
               <p className="text-[10px] uppercase tracking-[0.33em] text-[color:var(--gilt)]">The Paradox</p>
               <p className="mt-2 text-sm text-[color:var(--bone)]">
                 <strong>Tension:</strong> {result.reading.paradox.tension}
@@ -539,8 +539,8 @@ export function NatalChartWidget() {
               </p>
             </div>
 
-            <div className="astro-reveal grid gap-4 md:grid-cols-3">
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+            <div className="astro-reveal grid gap-3 md:grid-cols-3">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Core Themes</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[color:var(--bone)]">
                   {result.reading.coreThemes.map((item) => (
@@ -549,7 +549,7 @@ export function NatalChartWidget() {
                 </ul>
               </article>
 
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Strengths</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[color:var(--bone)]">
                   {result.reading.strengths.map((item) => (
@@ -558,7 +558,7 @@ export function NatalChartWidget() {
                 </ul>
               </article>
 
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Growth Edges</h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-[color:var(--bone)]">
                   {result.reading.shadows.map((item) => (
@@ -568,18 +568,18 @@ export function NatalChartWidget() {
               </article>
             </div>
 
-            <div className="astro-reveal grid gap-4 md:grid-cols-2">
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+            <div className="astro-reveal grid gap-3 md:grid-cols-2">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Relationships</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--bone)]">{result.reading.relationships}</p>
               </article>
-              <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+              <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
                 <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Career Calling</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--bone)]">{result.reading.careerCalling}</p>
               </article>
             </div>
 
-            <div className="astro-reveal rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+            <div className="astro-reveal rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
               <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Growth Keys</h3>
               <ul className="mt-3 space-y-2">
                 {result.reading.growthKeys.map((key) => (
@@ -593,12 +593,12 @@ export function NatalChartWidget() {
               </ul>
             </div>
 
-            <div className="astro-reveal rounded-2xl border border-[color:var(--gilt)]/45 bg-[color:var(--gilt)]/10 p-4">
+            <div className="astro-reveal rounded-xl border border-[color:var(--gilt)]/40 bg-[color:var(--gilt)]/10 p-3.5 sm:rounded-2xl sm:p-4">
               <p className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">Mantra</p>
               <p className="mt-2 font-ritual text-2xl text-[color:var(--bone)]">{result.reading.mantra}</p>
             </div>
 
-            <div className="astro-reveal rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+            <div className="astro-reveal rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-3.5 sm:rounded-2xl sm:p-4">
               <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">How this reading is formed</h3>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[color:var(--mist)]">
                 <li>- Birthplace is geocoded into coordinates and timezone before the chart is calculated.</li>
@@ -607,8 +607,8 @@ export function NatalChartWidget() {
               </ul>
             </div>
 
-            <section className="astro-reveal rounded-2xl border border-[color:var(--gilt)]/40 bg-[linear-gradient(180deg,rgba(184,155,94,0.12),rgba(184,155,94,0.03))] p-4 sm:p-5">
-              <div className="flex flex-wrap items-start justify-between gap-4">
+            <section className="astro-reveal rounded-xl border border-[color:var(--gilt)]/40 bg-[linear-gradient(180deg,rgba(184,155,94,0.12),rgba(184,155,94,0.03))] p-4 sm:rounded-2xl sm:p-5">
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                 <div className="max-w-2xl space-y-2">
                   <p className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">See the Month Ahead</p>
                   <h3 className="font-ritual text-2xl text-[color:var(--bone)] sm:text-3xl">
@@ -625,7 +625,7 @@ export function NatalChartWidget() {
                   type="button"
                   onClick={onRequestMonthAhead}
                   disabled={monthAheadLoading}
-                  className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 px-5 py-3 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/25 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="min-h-[44px] w-full rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 px-5 py-3 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/25 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                 >
                   {monthAheadLoading
                     ? "Reading the Sky..."
@@ -656,7 +656,7 @@ export function NatalChartWidget() {
 
               {monthAheadResult ? (
                 <div className="mt-6 space-y-5">
-                  <div className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4 sm:p-5">
+                  <div className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl sm:p-5">
                     <p className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Month-ahead reading</p>
                     <h4 className="mt-2 font-ritual text-2xl text-[color:var(--bone)]">{monthAheadResult.reading.title}</h4>
                     <p className="mt-2 text-xs uppercase tracking-[0.22em] text-[color:var(--gilt)]">
@@ -672,7 +672,7 @@ export function NatalChartWidget() {
                     </p>
                   </div>
 
-                  <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                  <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl">
                     <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Major themes</h4>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {monthAheadResult.reading.majorThemes.map((item) => (
@@ -686,7 +686,7 @@ export function NatalChartWidget() {
                     </div>
                   </article>
 
-                  <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                  <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl">
                     <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Transit highlights</h4>
                     <div className="mt-3 space-y-3">
                       {monthAheadResult.reading.transitHighlights.map((item) => (
@@ -702,7 +702,7 @@ export function NatalChartWidget() {
                     </div>
                   </article>
 
-                  <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                  <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl">
                     <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Lunar rhythm</h4>
                     <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                       {monthAheadResult.reading.lunarStages.map((item) => (
@@ -720,8 +720,8 @@ export function NatalChartWidget() {
                     </div>
                   </article>
 
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl">
                       <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Practice suggestions</h4>
                       <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[color:var(--bone)]">
                         {monthAheadResult.reading.practiceSuggestions.map((item) => (
@@ -730,7 +730,7 @@ export function NatalChartWidget() {
                       </ul>
                     </article>
 
-                    <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                    <article className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl">
                       <h4 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Cautions</h4>
                       <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[color:var(--bone)]">
                         {monthAheadResult.reading.cautions.map((item) => (
@@ -740,14 +740,14 @@ export function NatalChartWidget() {
                     </article>
                   </div>
 
-                  <div className="rounded-2xl border border-[color:var(--gilt)]/45 bg-[color:var(--gilt)]/10 p-4">
+                  <div className="rounded-xl border border-[color:var(--gilt)]/40 bg-[color:var(--gilt)]/10 p-4 sm:rounded-2xl">
                     <p className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">Closing line</p>
                     <p className="mt-2 font-ritual text-2xl text-[color:var(--bone)]">
                       {monthAheadResult.reading.closingLine}
                     </p>
                   </div>
 
-                  <details className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+                  <details className="rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl">
                     <summary className="cursor-pointer text-xs uppercase tracking-[0.26em] text-[color:var(--mist)]">
                       Show computed sky events
                     </summary>
@@ -845,7 +845,7 @@ export function NatalChartWidget() {
               </span>
             </div>
 
-            <details className="astro-reveal rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4">
+            <details className="astro-reveal rounded-xl border border-[color:var(--copper)]/32 bg-[color:var(--bg)]/50 p-4 sm:rounded-2xl">
               <summary
                 className="cursor-pointer text-xs uppercase tracking-[0.26em] text-[color:var(--mist)]"
                 onClick={() => trackEvent("astro_chart_details_open", { surface: "natal" })}

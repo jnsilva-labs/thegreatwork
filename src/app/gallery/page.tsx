@@ -35,39 +35,47 @@ export default function GalleryPage() {
             itemPaths: GEOMETRY.map((plate) => `/gallery/${plate.slug}`),
           })}
         />
-        <header className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
-            Sacred Geometry Gallery
-          </p>
-          <h1 className="font-ritual text-5xl sm:text-6xl">Geometry Plates</h1>
-          <p className="max-w-2xl text-base text-[color:var(--mist)] sm:text-lg">
-            A curated cabinet of geometric constructions rendered as engraved plates and
-            living linework.
-          </p>
-          <div className="max-w-3xl space-y-4 text-sm text-[color:var(--mist)] sm:text-base">
-            <p>
-              For centuries, these forms were treated as instruments, not decoration.
-              Artisans set them into temples and cathedrals, scholars drafted them into
-              treatises, and initiatory schools used them to train attention, memory, and
-              proportion. Geometry was a way to study order with the eyes and the hands at
-              the same time.
+        <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
+          <div className="space-y-4">
+            <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
+              Sacred Geometry Gallery
             </p>
-            <p>
-              Spend a few minutes with each plate and let your pacing slow down. Follow the
-              repetitions, intersections, and expansions until the pattern becomes familiar.
-              That practice can settle mental noise, improve spatial clarity, and sharpen
-              your sense of relationship across scales, from your own body to the larger
-              structures of nature.
+            <h1 className="font-ritual text-5xl sm:text-6xl">Geometry Plates</h1>
+            <p className="max-w-2xl text-base text-[color:var(--mist)] sm:text-lg">
+              A curated cabinet of geometric constructions rendered as engraved plates and
+              living linework.
+            </p>
+          </div>
+          <div className="border-l border-[color:var(--copper)]/24 pl-6">
+            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">How to look</p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+              Spend a few minutes with one plate at a time. Let the repetitions, crossings, and expansions
+              settle into the eye until the form starts to feel less decorative and more intelligible.
             </p>
           </div>
         </header>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="max-w-3xl space-y-4 text-sm text-[color:var(--mist)] sm:text-base">
+          <p>
+            For centuries, these forms were treated as instruments, not decoration.
+            Artisans set them into temples and cathedrals, scholars drafted them into
+            treatises, and initiatory schools used them to train attention, memory, and
+            proportion. Geometry was a way to study order with the eyes and the hands at
+            the same time.
+          </p>
+          <p>
+            Follow one plate slowly. That practice can settle mental noise, improve spatial clarity,
+            and sharpen your sense of relationship across scales, from your own body to the larger
+            structures of nature.
+          </p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {GEOMETRY.map((plate) => (
             <Link
               key={plate.slug}
               href={`/gallery/${plate.slug}`}
-              className="group rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/50 p-5 transition hover:border-[color:var(--gilt)]"
+              className="group rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/22 p-5 transition hover:border-[color:var(--gilt)]"
             >
               <div className="aspect-[4/3] overflow-hidden rounded-xl border border-[color:var(--copper)]/30 bg-[color:var(--obsidian)]/60">
                 <PlateSVG
@@ -76,15 +84,18 @@ export default function GalleryPage() {
                   className="h-full w-full opacity-90 transition group-hover:opacity-100"
                 />
               </div>
-              <div className="mt-4 space-y-2">
+              <div className="mt-4 space-y-3">
                 <h2 className="font-ritual text-2xl">{plate.title}</h2>
-                <p className="text-sm text-[color:var(--mist)]">{plate.caption}</p>
+                <p className="text-sm leading-relaxed text-[color:var(--mist)]">{plate.caption}</p>
+                <span className="inline-flex min-h-[40px] items-center rounded-full border border-[color:var(--copper)]/28 px-3 py-2 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--gilt)] transition group-hover:border-[color:var(--gilt)] group-hover:text-[color:var(--bone)]">
+                  Open plate
+                </span>
               </div>
             </Link>
           ))}
         </div>
 
-        <section className="rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--char)]/40 p-6">
+        <section className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/18 p-6">
           <h2 className="font-ritual text-2xl">Continue the Study</h2>
           <p className="mt-2 max-w-3xl text-sm text-[color:var(--mist)] sm:text-base">
             Geometry on this site is paired with Hermetic principles and symbolic practice.

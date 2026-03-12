@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getSubstackUrl, isExternalHref } from "@/lib/substack";
 
 const STUDY_DESCRIPTION =
   "The path through Awareness Paradox: a clear study map for seekers, students, and practitioners moving through tarot, astrology, alchemy, sacred geometry, and the Hermetic principles.";
@@ -119,45 +120,60 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function StudyPage() {
+  const substackUrl = getSubstackUrl();
+  const isExternal = isExternalHref(substackUrl);
+
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">
       <div className="mx-auto max-w-6xl space-y-10">
-        <header className="space-y-5">
-          <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">Study Map</p>
-          <h1 className="font-ritual text-4xl sm:text-6xl">The Path</h1>
-          <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-            Every tradition on this site points back to the same work: learning how to see more clearly,
-            live more honestly, and stay with transformation long enough for it to become wisdom. This
-            page is the clearest map through that terrain.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <TrackedLink
-              href="/start-here"
-              location="study:header"
-              label="Start Here"
-              variant="primary"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
-            >
-              Start Here
-            </TrackedLink>
-            <TrackedLink
-              href="/journey"
-              location="study:header"
-              label="Open the Journey"
-              variant="secondary"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
-            >
-              Open the Journey
-            </TrackedLink>
-            <TrackedLink
-              href="/letters"
-              location="study:header"
-              label="Read the Letters"
-              variant="secondary"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
-            >
-              Read the Letters
-            </TrackedLink>
+        <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
+          <div className="space-y-5">
+            <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">Study Map</p>
+            <h1 className="font-ritual text-4xl sm:text-6xl">The Path</h1>
+            <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+              Every tradition on this site points back to the same work: learning how to see more clearly,
+              live more honestly, and stay with transformation long enough for it to become wisdom. This
+              page is the clearest map through that terrain.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <TrackedLink
+                href="/start-here"
+                location="study:header"
+                label="Start Here"
+                variant="primary"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+              >
+                Start Here
+              </TrackedLink>
+              <TrackedLink
+                href="/journey"
+                location="study:header"
+                label="Open the Journey"
+                variant="secondary"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              >
+                Open the Journey
+              </TrackedLink>
+              <TrackedLink
+                href={substackUrl}
+                location="study:header"
+                label="Subscribe on Substack"
+                variant="secondary"
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              >
+                Subscribe on Substack
+              </TrackedLink>
+            </div>
+          </div>
+
+          <div className="border-l border-[color:var(--copper)]/24 pl-6">
+            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Reading stance</p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+              Use this map to move more slowly, not faster. The point is not to consume every path, but to find the
+              one that is asking for your attention now.
+            </p>
           </div>
         </header>
 
@@ -166,11 +182,11 @@ export default function StudyPage() {
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Three entry modes</p>
             <h2 className="mt-2 font-ritual text-3xl">One library, three ways to walk it</h2>
           </div>
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-5 lg:grid-cols-3">
             {audiencePaths.map((path) => (
               <article
                 key={path.title}
-                className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--char)]/45 p-6"
+                className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6"
               >
                 <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">{path.subtitle}</p>
                 <h2 className="mt-4 font-ritual text-2xl">{path.title}</h2>
@@ -197,11 +213,11 @@ export default function StudyPage() {
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Disciplines</p>
             <h2 className="mt-2 font-ritual text-3xl">How the traditions fit together</h2>
           </div>
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             {disciplines.map((discipline) => (
               <article
                 key={discipline.title}
-                className="rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--obsidian)]/55 p-6"
+                className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/18 p-6"
               >
                 <h2 className="font-ritual text-2xl">{discipline.title}</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">{discipline.body}</p>
@@ -228,7 +244,7 @@ export default function StudyPage() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--char)]/45 p-6">
+          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Suggested sequence</p>
             <h2 className="mt-3 font-ritual text-2xl">If you want the clearest progression</h2>
             <ol className="mt-4 space-y-4 text-sm leading-relaxed text-[color:var(--mist)]">
@@ -237,7 +253,7 @@ export default function StudyPage() {
                   key={step.title}
                   className="border-b border-[color:var(--copper)]/15 pb-4 last:border-b-0 last:pb-0"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div>
                     <div>
                       <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)]">
                         Step {index + 1}
@@ -250,7 +266,7 @@ export default function StudyPage() {
                       location="study:sequence"
                       label={`Open ${step.title}`}
                       variant="open"
-                      className="shrink-0 text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition hover:text-[color:var(--bone)]"
+                      className="mt-4 inline-flex min-h-[40px] items-center rounded-full border border-[color:var(--copper)]/28 px-3 py-2 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
                     >
                       Open
                     </TrackedLink>
@@ -260,7 +276,7 @@ export default function StudyPage() {
             </ol>
           </article>
 
-          <article className="rounded-2xl border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/50 p-6">
+          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/16 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Use it well</p>
             <h2 className="mt-3 font-ritual text-2xl">A calmer way to move through the site</h2>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">

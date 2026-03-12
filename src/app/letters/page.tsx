@@ -60,16 +60,39 @@ export default function LettersPage() {
           })}
         />
 
-        <header className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
-            Newsletter & Archive
-          </p>
-          <h1 className="font-ritual text-4xl sm:text-6xl">Weekly Letters</h1>
-          <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-            Weekly essays, practices, and guided pathways into Hermetic study and astrology for
-            self-understanding. These letters are designed to deepen practice, not just deliver
-            content.
-          </p>
+        <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
+          <div className="space-y-4">
+            <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
+              Newsletter & Archive
+            </p>
+            <h1 className="font-ritual text-4xl sm:text-6xl">Weekly Letters</h1>
+            <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+              Weekly essays, practices, and guided pathways into Hermetic study and astrology for
+              self-understanding. These letters are designed to deepen practice, not just deliver
+              content.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <TrackedLink
+                href={SUBSTACK_URL}
+                location="letters:header"
+                label="Open Substack Archive"
+                variant="archive"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-5 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+              >
+                Open Substack Archive
+              </TrackedLink>
+            </div>
+          </div>
+
+          <div className="border-l border-[color:var(--copper)]/24 pl-6">
+            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">What they do</p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+              The letters are the slowest way through the site. Each one should return you to one practice,
+              one page, or one question worth staying with.
+            </p>
+          </div>
         </header>
 
         <EmailCtaCard
@@ -85,7 +108,7 @@ export default function LettersPage() {
         />
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-4 rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--char)]/45 p-6">
+          <div className="space-y-4 rounded-[1.6rem] border border-[color:var(--copper)]/22 bg-[color:var(--obsidian)]/22 p-6">
             <h2 className="font-ritual text-2xl">What the letters cover</h2>
             <ul className="space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
               <li>— Hermetic principles in plain language and real-life application</li>
@@ -108,7 +131,7 @@ export default function LettersPage() {
             </div>
           </div>
 
-          <div className="space-y-4 rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--obsidian)]/50 p-6">
+          <div className="space-y-4 rounded-[1.6rem] border border-[color:var(--copper)]/18 bg-[color:var(--obsidian)]/16 p-6">
             <h2 className="font-ritual text-2xl">Coming letters</h2>
             <div className="space-y-4">
               {upcomingLetterThemes.map((item) => (

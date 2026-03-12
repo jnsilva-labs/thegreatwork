@@ -2,7 +2,7 @@
 
 export function FallbackEngraving() {
   return (
-    <div className="fixed inset-0 z-10 flex items-center justify-center">
+    <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center">
       <div className="fallback-engraving-shell rounded-full border border-[color:var(--copper)]/32 bg-[color:var(--char)]/54 p-8 backdrop-blur-sm sm:p-10">
         <svg viewBox="0 0 600 600" className="fallback-engraving h-72 w-72 text-[color:var(--gilt)] sm:h-80 sm:w-80">
           <g className="fallback-engraving__flower" fill="none" stroke="currentColor" strokeWidth="1.2" opacity="0.7">

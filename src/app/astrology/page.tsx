@@ -43,8 +43,8 @@ export const metadata = buildPageMetadata({
 
 export default function AstrologyPage() {
   return (
-    <div className="min-h-screen px-6 py-24 sm:px-10 lg:px-20">
-      <div className="mx-auto max-w-5xl space-y-10">
+    <div className="min-h-screen px-6 py-18 sm:px-10 sm:py-22 lg:px-20">
+      <div className="mx-auto max-w-5xl space-y-14">
         <JsonLd
           id="astrology-webpage-schema"
           data={buildWebPageSchema({
@@ -53,88 +53,86 @@ export default function AstrologyPage() {
             description: ASTROLOGY_DESCRIPTION,
           })}
         />
-        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
-          <span className="h-px w-12 bg-[color:var(--copper)]" />
-          The Cosmic Sympathy
+        <div className="space-y-5">
+          <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
+            <span className="h-px w-12 bg-[color:var(--copper)]" />
+            The Cosmic Sympathy
+          </div>
+
+          <h1 className="max-w-4xl font-ritual text-4xl leading-tight text-[color:var(--bone)] sm:text-5xl lg:text-6xl">
+            As Above, So Below
+          </h1>
+
+          <p className="text-sm uppercase tracking-[0.2em] text-[color:var(--gilt)] sm:tracking-[0.35em]">
+            That which is below is from that which is above
+          </p>
         </div>
 
-        <h1 className="font-ritual text-4xl leading-tight text-[color:var(--bone)] sm:text-5xl lg:text-6xl">
-          As Above, So Below
-        </h1>
+        <section className="space-y-8">
+          <div className="grid gap-8 lg:grid-cols-[1.16fr_0.84fr] lg:items-start">
+            <div className="space-y-5">
+              <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+                Astrology here is a language of correspondence. It is a way of studying patterns, timing,
+                temperament, and symbolic atmosphere without collapsing into fatalism. The chart does not imprison
+                the self. It gives the self a map.
+              </p>
+              <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+                If you are new, begin with the big three and the idea that a natal chart is a symbolic record
+                of your first moment in the world. If you already know the language, this section will grow toward
+                source-aware interpretation, practical reflection, and a more serious Hermetic frame for chart work.
+              </p>
+            </div>
 
-        <p className="text-sm uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[color:var(--gilt)]">
-          That which is below is from that which is above
-        </p>
-
-        <div className="grid gap-8 lg:grid-cols-[1.12fr_0.88fr] lg:items-start">
-          <div className="space-y-5">
-            <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-              Astrology here is a language of correspondence. It is a way of studying patterns, timing,
-              temperament, and symbolic atmosphere without collapsing into fatalism. The chart does not imprison
-              the self. It gives the self a map.
-            </p>
-            <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-              If you are new, begin with the big three and the idea that a natal chart is a symbolic record
-              of your first moment in the world. If you already know the language, this section will grow toward
-              source-aware interpretation, practical reflection, and a more serious Hermetic frame for chart work.
-            </p>
+            <div className="space-y-4 border-t border-[color:var(--copper)]/18 pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Orientation</p>
+              <div className="space-y-4 text-sm leading-relaxed text-[color:var(--mist)]">
+                <p>
+                  Grounded, symbolic self-observation rather than deterministic forecasting. History,
+                  language, and practice held together in one place.
+                </p>
+                <p>
+                  Not fear-based transit content, prediction theater, or a replacement for therapy,
+                  medical care, or practical decision-making.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="space-y-5 lg:pt-6">
-            <div className="rounded-2xl border border-[color:var(--copper)]/28 bg-[color:var(--char)]/35 p-6">
+
+          <p className="max-w-3xl border-l border-[color:var(--copper)]/24 pl-5 font-ritual text-2xl leading-tight text-[color:var(--bone)] sm:text-3xl">
+            A chart is not a cage. It is a sky-written way of noticing how you enter time.
+          </p>
+
+          <div className="grid gap-6 text-sm leading-relaxed text-[color:var(--mist)] md:grid-cols-2">
+            <div className="space-y-3 border-t border-[color:var(--copper)]/14 pt-4">
               <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">What this section is for</p>
-              <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
+              <ul className="space-y-2">
                 {astrologyPromises.map((item) => (
                   <li key={item}>- {item}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl border border-[color:var(--copper)]/18 bg-[color:var(--obsidian)]/28 p-6">
-              <p className="font-ritual text-3xl leading-tight text-[color:var(--bone)] sm:text-[2.6rem]">
-                A chart is not a cage. It is a sky-written way of noticing how you enter time.
-              </p>
+
+            <div className="space-y-3 border-t border-[color:var(--copper)]/14 pt-4">
+              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">What it is not</p>
+              <ul className="space-y-2">
+                {astrologyBoundaries.map((item) => (
+                  <li key={item}>- {item}</li>
+                ))}
+              </ul>
             </div>
           </div>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <article className="rounded-2xl border border-[color:var(--copper)]/28 bg-[color:var(--char)]/36 p-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Lineage</p>
-            <div className="mt-4 space-y-5">
-              <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-                Astrology began as careful sky watching in ancient Mesopotamia, where priests recorded eclipses,
-                planetary motions, and unusual alignments as signs tied to seasons, kingship, and civic life.
-                In Egypt, temple astronomer-priests refined calendar systems and star lore, then Greek thinkers
-                gathered these traditions into a more systematic language of zodiac signs, aspects, and houses.
-              </p>
-              <p className="max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-                By the Hellenistic era, astrology became part of natural philosophy, and Ptolemy treated it as the
-                study of celestial influence within an ordered cosmos. Through Arabic scholarship and the Latin West,
-                those methods were preserved, translated, and expanded across the medieval and Renaissance periods,
-                shaping medicine, agriculture, court timing, and personal natal practice for centuries.
-              </p>
-            </div>
-          </article>
-
-          <article className="rounded-2xl border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/34 p-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">What it is not</p>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
-              {astrologyBoundaries.map((item) => (
-                <li key={item}>- {item}</li>
-              ))}
-            </ul>
-          </article>
-        </div>
+        </section>
 
         <section className="space-y-4">
           <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
             <span className="h-px w-12 bg-[color:var(--copper)]" />
-            Start with the big three
+            The big three
           </div>
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {bigThree.map((item) => (
               <article
                 key={item.title}
-                className="rounded-2xl border border-[color:var(--copper)]/24 bg-[color:var(--char)]/28 p-5 sm:p-6"
+                className="rounded-2xl border border-[color:var(--copper)]/18 bg-[color:var(--char)]/16 p-5"
               >
                 <h2 className="font-ritual text-2xl text-[color:var(--bone)]">{item.title}</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">{item.body}</p>
@@ -143,31 +141,43 @@ export default function AstrologyPage() {
           </div>
         </section>
 
-        <div className="grid gap-6 pt-2 lg:grid-cols-[1fr_0.95fr]">
-          <article className="rounded-2xl border border-[color:var(--copper)]/26 bg-[color:var(--char)]/34 p-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Sample reading frame</p>
-            <h2 className="mt-3 font-ritual text-2xl">What a reading should do</h2>
-            <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)]">
-              A useful reading should name tensions, capacities, and rhythms without pretending to close the
-              future. It should help you ask better questions: what feels overactive, what feels starved,
-              what pattern repeats, and what season of work you are entering now.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
-              The public natal oracle below is shaped around that standard: less prediction, more orientation;
-              less spectacle, more symbolic accuracy.
-            </p>
-          </article>
-
-          <article className="rounded-2xl border border-[color:var(--copper)]/22 bg-[color:var(--obsidian)]/32 p-5 sm:p-8">
-            <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--gilt)]">Public Reading Standard</p>
-            <div className="mt-3 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
-              <p>Birth data is geocoded and converted into time-aware chart data before interpretation begins.</p>
-              <p>If your birth time is unknown, houses and rising-based claims are removed on purpose.</p>
-              <p>The reading is written as symbolic guidance for reflection, not deterministic prediction.</p>
+        <section className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+          <article className="space-y-4 border-t border-[color:var(--copper)]/16 pt-5">
+            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Lineage</p>
+            <div className="space-y-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+              <p>
+                Astrology began as careful sky watching in ancient Mesopotamia, where priests recorded eclipses,
+                planetary motions, and unusual alignments as signs tied to seasons, kingship, and civic life.
+                In Egypt, temple astronomer-priests refined calendar systems and star lore, then Greek thinkers
+                gathered these traditions into a more systematic language of zodiac signs, aspects, and houses.
+              </p>
+              <p>
+                By the Hellenistic era, astrology became part of natural philosophy, and Ptolemy treated it as the
+                study of celestial influence within an ordered cosmos. Through Arabic scholarship and the Latin West,
+                those methods were preserved, translated, and expanded across the medieval and Renaissance periods,
+                shaping medicine, agriculture, court timing, and personal natal practice for centuries.
+              </p>
             </div>
           </article>
-        </div>
 
+          <article className="space-y-4 border-t border-[color:var(--copper)]/16 pt-5">
+            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Reading standard</p>
+            <div className="space-y-4 text-sm leading-relaxed text-[color:var(--mist)]">
+              <p>
+                A useful reading should name tensions, capacities, and rhythms without pretending to close the
+                future. It should help you ask better questions about pattern, pressure, and timing.
+              </p>
+              <p>
+                Birth data is geocoded and converted into time-aware chart data before interpretation begins.
+                If your birth time is unknown, houses and rising-based claims are removed on purpose.
+              </p>
+              <p>
+                The public natal oracle below is shaped around that standard: less prediction, more orientation;
+                less spectacle, more symbolic accuracy.
+              </p>
+            </div>
+          </article>
+        </section>
         <NatalChartWidget />
 
         <EmailCtaCard

@@ -1,54 +1,67 @@
 "use client";
 
+import Lenis from "lenis";
 import { useEffect, useRef } from "react";
-import { useChapterNavigation } from "@/lib/useChapterNavigation";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { useHermeticStore } from "@/lib/hermeticStore";
+import { useUiStore } from "@/lib/uiStore";
 
 type SectionMeasure = {
+  id: string;
   top: number;
   height: number;
 };
 
 type ScrollOrchestratorProps = {
-  slugs?: string[];
+  slugs: string[];
 };
 
-export function ScrollOrchestrator({ slugs: propSlugs }: ScrollOrchestratorProps) {
+declare global {
+  interface Window {
+    __AP_LENIS__?: Lenis;
+  }
+}
+
+export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
   const measuresRef = useRef<SectionMeasure[]>([]);
+  const heroMeasureRef = useRef<SectionMeasure | null>(null);
+  const lenisRef = useRef<Lenis | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const activeChapterRef = useRef(0);
   const setState = useHermeticStore((state) => state.setState);
-  const { goToChapter, slugs: defaultSlugs } = useChapterNavigation();
-  const slugs = propSlugs ?? defaultSlugs;
+  const reducedMotion = usePrefersReducedMotion();
+  const stillness = useUiStore((state) => state.stillness);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const measureSections = () => {
-      measuresRef.current = slugs
-        .map((id) => {
-          const el = document.getElementById(id);
-          if (!el) return null;
-          const rect = el.getBoundingClientRect();
-          return {
-            top: rect.top + window.scrollY,
-            height: rect.height,
-          };
-        })
-        .filter(Boolean) as SectionMeasure[];
+    const motionDisabled = reducedMotion || stillness;
 
-      updateScroll();
+    const measure = () => {
+      heroMeasureRef.current = measureElement("hero");
+      measuresRef.current = slugs
+        .map((id) => measureElement(id))
+        .filter(Boolean) as SectionMeasure[];
     };
 
-    let ticking = false;
-    let lastChapter = 0;
-    const updateScroll = () => {
+    const updateScrollState = (scrollY: number) => {
       const viewportHeight = window.innerHeight || 1;
-      const scrollY = window.scrollY || 0;
-      const scrollMax = Math.max(document.body.scrollHeight - viewportHeight, 1);
+      const scrollMax = Math.max(
+        document.documentElement.scrollHeight - viewportHeight,
+        1
+      );
       const overallProgress = clamp(scrollY / scrollMax);
+      const heroMeasure = heroMeasureRef.current;
+      const heroProgress = heroMeasure
+        ? clamp(
+            (scrollY - heroMeasure.top) /
+              Math.max(heroMeasure.height - viewportHeight * 0.2, 1)
+          )
+        : 0;
 
       const progressByChapter = measuresRef.current.map(({ top, height }) => {
-        const start = top - viewportHeight * 0.45;
-        const end = top + height - viewportHeight * 0.3;
+        const start = top - viewportHeight * 0.85;
+        const end = top + height - viewportHeight * 0.15;
         return clamp((scrollY - start) / Math.max(end - start, 1));
       });
 
@@ -57,38 +70,30 @@ export function ScrollOrchestrator({ slugs: propSlugs }: ScrollOrchestratorProps
           value > arr[bestIndex] ? index : bestIndex,
         0
       );
-
       const shift = progressByChapter[activeChapter] ?? 0;
       const stillnessMode = useHermeticStore.getState().stillnessMode;
-      const clarity = stillnessMode ? 0.9 : 0.6 + overallProgress * 0.2;
-      const intensity = stillnessMode ? 0.4 : 0.7 - overallProgress * 0.2;
+      const clarity = stillnessMode ? 0.9 : 0.58 + overallProgress * 0.26;
+      const intensity = stillnessMode ? 0.4 : 0.82 - overallProgress * 0.28;
 
       setState({
         scrollProgress: overallProgress,
+        heroProgress,
         activeChapter,
         principleId: activeChapter + 1,
         progressByChapter,
+        activeAlchemyStage: deriveAlchemyStage(progressByChapter[1] ?? 0),
         shift,
         clarity,
         intensity,
       });
 
-      if (activeChapter !== lastChapter) {
+      if (activeChapter !== activeChapterRef.current) {
         const slug = slugs[activeChapter];
         if (slug) {
           window.history.replaceState(null, "", `#${slug}`);
         }
-        lastChapter = activeChapter;
+        activeChapterRef.current = activeChapter;
       }
-    };
-
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        updateScroll();
-        ticking = false;
-      });
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -97,19 +102,34 @@ export function ScrollOrchestrator({ slugs: propSlugs }: ScrollOrchestratorProps
       setState({ pointer: { x, y } });
     };
 
+    const scrollToChapter = (index: number) => {
+      const slug = slugs[index];
+      const element = slug ? document.getElementById(slug) : null;
+      if (!element) return;
+
+      if (lenisRef.current && !motionDisabled) {
+        lenisRef.current.scrollTo(element, {
+          offset: -48,
+          duration: 1.2,
+          lerp: 0.08,
+        });
+        return;
+      }
+
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Space") {
         setState({ stillnessMode: true, clarity: 0.95, intensity: 0.35 });
       }
       if (event.key === "ArrowRight") {
-        goToChapter(
+        scrollToChapter(
           Math.min(useHermeticStore.getState().activeChapter + 1, slugs.length - 1)
         );
       }
       if (event.key === "ArrowLeft") {
-        goToChapter(
-          Math.max(useHermeticStore.getState().activeChapter - 1, 0)
-        );
+        scrollToChapter(Math.max(useHermeticStore.getState().activeChapter - 1, 0));
       }
     };
 
@@ -118,15 +138,67 @@ export function ScrollOrchestrator({ slugs: propSlugs }: ScrollOrchestratorProps
         const scrollProgress = useHermeticStore.getState().scrollProgress;
         setState({
           stillnessMode: false,
-          clarity: 0.6 + scrollProgress * 0.2,
-          intensity: 0.7 - scrollProgress * 0.2,
+          clarity: 0.58 + scrollProgress * 0.26,
+          intensity: 0.82 - scrollProgress * 0.28,
         });
       }
     };
 
-    measureSections();
-    window.addEventListener("resize", measureSections);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const onResize = () => {
+      measure();
+      const scrollY = lenisRef.current?.scroll ?? window.scrollY ?? 0;
+      updateScrollState(scrollY);
+    };
+
+    measure();
+
+    if (!motionDisabled) {
+      const lenis = new Lenis({
+        duration: 1.2,
+        lerp: 0.08,
+        smoothWheel: true,
+        wheelMultiplier: 0.92,
+        touchMultiplier: 1.1,
+      });
+      lenisRef.current = lenis;
+      window.__AP_LENIS__ = lenis;
+
+      lenis.on("scroll", ({ scroll }) => {
+        updateScrollState(scroll);
+      });
+
+      const raf = (time: number) => {
+        lenis.raf(time);
+        rafRef.current = window.requestAnimationFrame(raf);
+      };
+      rafRef.current = window.requestAnimationFrame(raf);
+      updateScrollState(lenis.scroll);
+    } else {
+      const onScroll = () => updateScrollState(window.scrollY || 0);
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+
+      window.addEventListener("resize", onResize);
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+
+      const initialHash = window.location.hash.replace("#", "");
+      const hashIndex = slugs.indexOf(initialHash);
+      if (hashIndex >= 0) {
+        window.setTimeout(() => scrollToChapter(hashIndex), 40);
+      }
+
+      return () => {
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onResize);
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keyup", onKeyUp);
+      };
+    }
+
+    window.addEventListener("resize", onResize);
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
@@ -134,21 +206,44 @@ export function ScrollOrchestrator({ slugs: propSlugs }: ScrollOrchestratorProps
     const initialHash = window.location.hash.replace("#", "");
     const hashIndex = slugs.indexOf(initialHash);
     if (hashIndex >= 0) {
-      setTimeout(() => goToChapter(hashIndex), 40);
+      window.setTimeout(() => scrollToChapter(hashIndex), 40);
     }
 
     return () => {
-      window.removeEventListener("resize", measureSections);
-      window.removeEventListener("scroll", onScroll);
+      if (rafRef.current) {
+        window.cancelAnimationFrame(rafRef.current);
+      }
+      lenisRef.current?.destroy();
+      lenisRef.current = null;
+      delete window.__AP_LENIS__;
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [goToChapter, setState, slugs]);
+  }, [reducedMotion, setState, slugs, stillness]);
 
   return null;
 }
 
 function clamp(value: number) {
   return Math.min(1, Math.max(0, value));
+}
+
+function measureElement(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const rect = el.getBoundingClientRect();
+  return {
+    id,
+    top: rect.top + window.scrollY,
+    height: rect.height,
+  };
+}
+
+function deriveAlchemyStage(progress: number) {
+  if (progress < 0.25) return 0;
+  if (progress < 0.5) return 1;
+  if (progress < 0.75) return 2;
+  return 3;
 }

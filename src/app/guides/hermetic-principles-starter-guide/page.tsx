@@ -39,7 +39,7 @@ export default function HermeticStarterGuideLandingPage() {
           })}
         />
 
-        <header className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <header className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div className="space-y-5">
             <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
               Free Starter Guide
@@ -64,7 +64,7 @@ export default function HermeticStarterGuideLandingPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--char)]/45 p-6">
+          <div className="rounded-[1.6rem] border border-[color:var(--copper)]/22 bg-[color:var(--obsidian)]/22 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
               What You’ll Get
             </p>
@@ -73,7 +73,7 @@ export default function HermeticStarterGuideLandingPage() {
                 <li key={item}>— {item}</li>
               ))}
             </ul>
-            <div className="mt-6 rounded-xl border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/50 p-4">
+            <div className="mt-6 rounded-xl border border-[color:var(--copper)]/18 bg-[color:var(--obsidian)]/20 p-4">
               <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--mist)]">
                 Delivery
               </p>
@@ -95,7 +95,7 @@ export default function HermeticStarterGuideLandingPage() {
           secondaryLabel="Browse Start Here"
         />
 
-        <section className="rounded-2xl border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/45 p-6">
+        <section className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/18 p-6">
           <h2 className="font-ritual text-2xl">After the Guide</h2>
           <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
             Once you begin with the Hermetic principles, the next recommended path is{" "}

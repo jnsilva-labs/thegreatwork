@@ -80,6 +80,10 @@ export default function JourneyPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionPaused, setSessionPaused] = useState(false);
+  const [breathStepIndex, setBreathStepIndex] = useState(0);
+  const [breathSecondsLeft, setBreathSecondsLeft] = useState(
+    journeyMeditations[0]?.breathPattern[0]?.seconds ?? 0,
+  );
   const [cameraMode] = useState<CameraMode>("cinematic");
   const soundEnabled = useHermeticStore((state) => state.soundEnabled);
   const soundPlaying = useHermeticStore((state) => state.soundPlaying);
@@ -114,16 +118,42 @@ export default function JourneyPage() {
     }
   }, [activeIndex, sessionStarted, setSoundPreset, soundEnabled, soundPlaying]);
 
+  useEffect(() => {
+    const pattern = chapters[activeIndex]?.meditation?.breathPattern;
+    if (!sessionStarted || sessionPaused || !pattern || pattern.length === 0) return;
+
+    const interval = window.setInterval(() => {
+      if (breathSecondsLeft > 1) {
+        setBreathSecondsLeft(breathSecondsLeft - 1);
+        return;
+      }
+
+      const nextIndex = (breathStepIndex + 1) % pattern.length;
+      setBreathStepIndex(nextIndex);
+      setBreathSecondsLeft(pattern[nextIndex]?.seconds ?? pattern[0]?.seconds ?? 0);
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [activeIndex, breathSecondsLeft, breathStepIndex, chapters, sessionPaused, sessionStarted]);
+
   const activeChapter = journeyChapters[activeIndex];
   const activeLines = activeChapter ? lineCache.get(activeChapter.slug)?.lines : [];
   const activeRadius = activeChapter ? lineCache.get(activeChapter.slug)?.radius ?? 1 : 1;
   const activeEntry = chapters[activeIndex];
+  const activeBreathStep = activeEntry.meditation?.breathPattern[breathStepIndex];
   const isComplete = sessionStarted && activeIndex === chapters.length - 1 && !sessionPaused;
+
+  const resetBreathCycle = (index: number) => {
+    const pattern = chapters[index]?.meditation?.breathPattern;
+    setBreathStepIndex(0);
+    setBreathSecondsLeft(pattern?.[0]?.seconds ?? 0);
+  };
 
   const handleBegin = () => {
     setActiveIndex(0);
     setSessionStarted(true);
     setSessionPaused(false);
+    resetBreathCycle(0);
   };
 
   const handlePause = () => {
@@ -131,15 +161,18 @@ export default function JourneyPage() {
   };
 
   const handleStep = (direction: -1 | 1) => {
+    const nextIndex = Math.min(chapters.length - 1, Math.max(0, activeIndex + direction));
     setSessionStarted(true);
     setSessionPaused(false);
-    setActiveIndex((current) => Math.min(chapters.length - 1, Math.max(0, current + direction)));
+    setActiveIndex(nextIndex);
+    resetBreathCycle(nextIndex);
   };
 
   const handleJumpTo = (index: number) => {
     setSessionStarted(true);
     setSessionPaused(false);
     setActiveIndex(index);
+    resetBreathCycle(index);
   };
 
   const toggleStillness = () => {
@@ -147,46 +180,73 @@ export default function JourneyPage() {
   };
 
   return (
-    <div className="min-h-screen px-6 py-16 text-[color:var(--bone)] sm:px-10 lg:px-20">
-      <div className="mx-auto max-w-6xl space-y-10">
-        <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
+    <div className="journey-ritual min-h-screen px-6 py-14 text-[color:var(--bone)] sm:px-10 lg:px-20">
+      <div className="mx-auto max-w-5xl space-y-12 sm:space-y-16">
+        <header className="space-y-8 pt-6">
           <div className="space-y-5">
             <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
               {journeySessionIntro.eyebrow}
             </p>
             <h1 className="font-ritual text-4xl sm:text-6xl">{journeySessionIntro.title}</h1>
-            <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+            <p className="max-w-3xl text-base leading-relaxed text-[color:#D5D0C6] sm:text-lg">
               {journeySessionIntro.body}
             </p>
           </div>
-          <div className="space-y-4 lg:pt-8">
-            <div className="editorial-panel rounded-[2rem] p-6">
-              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Invocation</p>
-              <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
-                Enter slowly. The aim is not to consume seven principles in one sitting, but to leave with one steadier breath and one truer perception.
-              </p>
-            </div>
-            <div className="editorial-panel rounded-[2rem] p-6">
-              <p className="editorial-quote text-[color:var(--bone)]">
-                Stay until the form stops being decorative and begins to feel like a threshold.
-              </p>
-            </div>
+          <div className="journey-invocation max-w-3xl space-y-4">
+            <p className="text-xs uppercase tracking-[0.34em] text-[color:var(--gilt)]">Invocation</p>
+            <p className="text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+              {journeySessionIntro.arrivalLine}
+            </p>
+            <p className="font-ritual text-2xl leading-relaxed text-[color:var(--bone)] sm:text-[2.2rem]">
+              Stay until the form stops being decorative and begins to feel like a threshold.
+            </p>
           </div>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-          <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-            <section className="editorial-panel rounded-[2rem] p-6">
-              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Arrival</p>
-              <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
-                {journeySessionIntro.arrivalLine}
+        <section className="journey-altar editorial-panel vellum-smoke rounded-[2rem] p-4 sm:p-6">
+          {activeChapter && activeLines ? (
+            <GalleryViewer
+              lines={activeLines}
+              cameraMode={cameraMode}
+              forceStillness={sessionPaused || !sessionStarted}
+              containerClassName="h-[38vh] sm:h-[46vh] lg:h-[54vh]"
+              particleSize={activeChapter.particle.size}
+              particleAlpha={activeChapter.particle.alpha}
+              particleDensity={activeChapter.particle.density}
+              flowStrength={
+                sessionPaused || !sessionStarted
+                  ? activeChapter.particle.flow * 0.28
+                  : activeChapter.particle.flow
+              }
+              trailAmount={sessionPaused ? 0.06 : 0.18}
+              scale={activeChapter.scale * 0.9}
+              boundsRadius={activeRadius}
+              fitKey={activeIndex}
+            />
+          ) : null}
+
+          <div className="journey-altar__caption mt-6 grid gap-6 border-t border-[color:var(--copper)]/18 px-2 pt-5 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="max-w-2xl space-y-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
+                  Active passage
+                </p>
+                <p className="mt-2 text-xs uppercase tracking-[0.3em] text-[color:var(--mist)]">
+                  {toRoman(activeIndex + 1)} · {activeEntry.principle.title}
+                </p>
+              </div>
+              <p className="max-w-xl font-ritual text-[1.9rem] leading-[1.08] text-[color:var(--bone)] sm:text-[2.25rem]">
+                {activeEntry.meditation?.meditationTitle}
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <p className="max-w-xl text-sm leading-relaxed text-[color:#D5D0C6] sm:text-base">
+                {activeEntry.meditation?.meditationBody[0]}
+              </p>
+              <div className="flex flex-wrap gap-3 pt-1">
                 {!sessionStarted ? (
                   <button
                     type="button"
                     onClick={handleBegin}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/15 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                    className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition"
                   >
                     Begin Session
                   </button>
@@ -194,7 +254,7 @@ export default function JourneyPage() {
                   <button
                     type="button"
                     onClick={handlePause}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/15 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                    className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition"
                   >
                     {sessionPaused ? "Resume" : "Pause"}
                   </button>
@@ -202,230 +262,227 @@ export default function JourneyPage() {
                 <button
                   type="button"
                   onClick={toggleStillness}
-                  className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                  className="inline-flex min-h-[48px] items-center rounded-full border border-[color:var(--copper)]/55 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
                 >
                   {stillnessMode ? "Stillness On" : "Stillness"}
                 </button>
               </div>
-            </section>
+            </div>
 
-            <section className="editorial-panel rounded-[2rem] p-6">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
-                    Principle
-                  </p>
-                  <p className="mt-2 font-ritual text-3xl">
-                    {String(activeIndex + 1).padStart(2, "0")}
-                  </p>
+            <div className="grid gap-5">
+              <div className="rounded-[1.4rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/28 p-4 sm:p-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-2">
+                    <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Breath cue</p>
+                    <p className="font-ritual text-[2rem] leading-none text-[color:var(--bone)] sm:text-[2.5rem]">
+                      {activeBreathStep?.label ?? "Breathe"}
+                    </p>
+                    <p className="max-w-sm text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+                      {activeEntry.meditation?.breathCue}
+                    </p>
+                  </div>
+                  <div className="journey-breath-counter self-start sm:self-center">
+                    <span>
+                      {String(Math.max(1, breathSecondsLeft || activeBreathStep?.seconds || 0)).padStart(2, "0")}
+                    </span>
+                  </div>
                 </div>
-                <div className="h-px flex-1 bg-[color:var(--copper)]/20" />
-                <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--mist)]">
-                  {chapters.length} stages
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {activeEntry.meditation?.breathPattern.map((step, index) => (
+                    <div
+                      key={`${step.label}-${step.seconds}`}
+                      className={`rounded-full border px-3 py-2 text-[0.62rem] uppercase tracking-[0.24em] ${
+                        index === breathStepIndex
+                          ? "border-[color:var(--gilt)] text-[color:var(--bone)]"
+                          : "border-[color:var(--copper)]/30 text-[color:var(--mist)]"
+                      }`}
+                    >
+                      {step.label} · {step.seconds}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[1.4rem] border border-[color:var(--copper)]/16 bg-[color:var(--obsidian)]/18 p-4 sm:p-5">
+                <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Focus</p>
+                <p className="mt-2 max-w-sm text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+                  {activeEntry.meditation?.focusLine}
                 </p>
               </div>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {chapters.map(({ principle }, index) => (
-                  <button
-                    key={principle.slug}
-                    type="button"
-                    onClick={() => handleJumpTo(index)}
-                    className={`min-h-[44px] rounded-full border px-4 py-2 text-xs uppercase tracking-[0.24em] transition ${
-                      index === activeIndex
-                        ? "border-[color:var(--gilt)] text-[color:var(--bone)]"
-                        : "border-[color:var(--copper)]/40 text-[color:var(--mist)] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
-                    }`}
-                  >
-                    {principle.title}
-                  </button>
-                ))}
-              </div>
-            </section>
+            </div>
+          </div>
+        </section>
 
-            <section className="editorial-panel rounded-[2rem] p-6">
-              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Ritual flow</p>
-              <ol className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
+        <section className="journey-utility flex flex-col gap-4 border-y border-[color:var(--copper)]/18 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] sm:ml-auto">
+            <button
+              type="button"
+              onClick={() => handleStep(-1)}
+              disabled={activeIndex === 0}
+              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/45 px-4 py-2 transition hover:border-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              Previous
+            </button>
+            <span>
+              {String(activeIndex + 1).padStart(2, "0")} / {String(chapters.length).padStart(2, "0")}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleStep(1)}
+              disabled={activeIndex === chapters.length - 1}
+              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/45 px-4 py-2 transition hover:border-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-35"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+
+        <section className="journey-flow space-y-8">
+          <div className="journey-index flex flex-wrap gap-2">
+            {chapters.map(({ principle }, index) => (
+              <button
+                key={principle.slug}
+                type="button"
+                onClick={() => handleJumpTo(index)}
+                className={`min-h-[44px] rounded-full border px-4 py-2 text-[0.68rem] uppercase tracking-[0.24em] transition ${
+                  index === activeIndex
+                    ? "border-[color:var(--gilt)] text-[color:var(--bone)]"
+                    : "border-[color:var(--copper)]/32 text-[color:var(--mist)] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                }`}
+              >
+                {principle.title}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-10">
+            {chapters.map(({ principle, meditation }, index) => {
+              const isActive = index === activeIndex;
+              const isPast = index < activeIndex;
+
+              return (
+                <article
+                  key={principle.slug}
+                  className={`journey-chapter relative border-t border-[color:var(--copper)]/18 pt-10 ${
+                    isActive ? "is-active" : isPast ? "is-past" : ""
+                  }`}
+                >
+                  <div className="journey-threshold" aria-hidden="true" />
+                  <div className="grid gap-8 lg:grid-cols-[0.2fr_0.8fr]">
+                    <div className="space-y-3">
+                      <p className="font-ritual text-4xl text-[color:var(--gilt)]/72">
+                        {toRoman(index + 1)}
+                      </p>
+                      <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
+                        {principle.title}
+                      </p>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <h2 className="font-ritual text-3xl text-[color:var(--bone)] sm:text-4xl">
+                          {principle.title}
+                        </h2>
+                        <p className="font-ritual text-xl text-[color:var(--bone)]/88 sm:text-2xl">
+                          {meditation?.meditationTitle}
+                        </p>
+                      </div>
+
+                      <div className="space-y-5 text-base leading-relaxed text-[color:#D5D0C6] sm:text-lg">
+                        {meditation?.meditationBody.map((paragraph) => (
+                          <p key={paragraph}>{paragraph}</p>
+                        ))}
+                      </div>
+
+                      <div className="journey-reflection grid gap-6 border-t border-[color:var(--copper)]/18 pt-6 sm:grid-cols-2">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
+                            Reflection
+                          </p>
+                          <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+                            {meditation?.reflectionPrompt}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
+                            Integration
+                          </p>
+                          <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+                            {meditation?.integrationLine}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="editorial-panel rounded-[2rem] p-6 sm:p-8">
+          {isComplete ? (
+            <>
+              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
+                {journeySessionIntro.completionTitle}
+              </p>
+              <p className="mt-4 max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+                {journeySessionIntro.completionBody}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
+                Ritual flow
+              </p>
+              <ol className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
                 <li>1. Settle the breath and soften the eyes.</li>
                 <li>2. Let the form hold your attention without forcing meaning.</li>
                 <li>3. Read slowly and stay with one sentence that opens something.</li>
                 <li>4. Leave with one reflection, not ten ideas.</li>
               </ol>
-            </section>
-          </aside>
+            </>
+          )}
 
-          <section className="space-y-6">
-            <div className="editorial-panel vellum-smoke rounded-[2rem] p-4 sm:p-5">
-              {activeChapter && activeLines ? (
-                <GalleryViewer
-                  lines={activeLines}
-                  cameraMode={cameraMode}
-                  forceStillness={sessionPaused || !sessionStarted}
-                  containerClassName="h-[34vh] sm:h-[40vh] lg:h-[44vh]"
-                  particleSize={activeChapter.particle.size}
-                  particleAlpha={activeChapter.particle.alpha}
-                  particleDensity={activeChapter.particle.density}
-                  flowStrength={sessionPaused || !sessionStarted ? activeChapter.particle.flow * 0.35 : activeChapter.particle.flow}
-                  trailAmount={sessionPaused ? 0.08 : 0.2}
-                  scale={activeChapter.scale * 0.82}
-                  boundsRadius={activeRadius}
-                  fitKey={activeIndex}
-                />
-              ) : null}
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-4 px-2">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Breath cue</p>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--mist)]">
-                    {activeEntry.meditation?.breathCue}
-                  </p>
-                </div>
-                <div className="rounded-full border border-[color:var(--copper)]/30 px-4 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">
-                  {sessionPaused ? "Paused" : sessionStarted ? "In practice" : "Waiting"}
-                </div>
-              </div>
-            </div>
-
-            <article className="editorial-panel rounded-[2rem] p-6 sm:p-8">
-              {!sessionStarted ? (
-                <div className="space-y-5">
-                  <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Begin</p>
-                  <h2 className="font-ritual text-3xl sm:text-4xl">{activeEntry.principle.title}</h2>
-                  <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-                    {journeySessionIntro.arrivalLine}
-                  </p>
-                  <p className="max-w-3xl text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
-                    Start when you are ready. The page will guide you through one principle at a time, with a slower
-                    instruction, a focal form, and one question worth carrying back into the day.
-                  </p>
-                </div>
-              ) : sessionPaused ? (
-                <div className="space-y-5">
-                  <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Pause</p>
-                  <h2 className="font-ritual text-3xl sm:text-4xl">Rest here for a moment.</h2>
-                  <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-                    Nothing is being withheld from you by the pause. Let the form remain simple. Let the breath return
-                    to its own rhythm. Resume when the mind feels less eager to rush toward the next thing.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.35em] text-[color:var(--mist)]">
-                    <span className="font-ritual text-sm text-[color:var(--gilt)]">
-                      {["I", "II", "III", "IV", "V", "VI", "VII"][activeIndex]}
-                    </span>
-                    {activeEntry.principle.title}
-                  </div>
-                  <div className="space-y-3 etched-divider pb-2">
-                    <h2 className="font-ritual text-3xl sm:text-4xl">
-                      {activeEntry.meditation?.meditationTitle ?? activeEntry.principle.axiom}
-                    </h2>
-                    <p className="text-sm uppercase tracking-[0.22em] text-[color:var(--gilt)] sm:tracking-[0.3em]">
-                      {activeEntry.principle.axiom}
-                    </p>
-                  </div>
-                  <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-                    {activeEntry.meditation?.focusLine ?? activeEntry.principle.short}
-                  </p>
-                  <div className="space-y-5">
-                    {activeEntry.meditation?.meditationBody.map((paragraph) => (
-                      <p
-                        key={paragraph}
-                        className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg"
-                      >
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                  <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
-                    <section className="editorial-panel rounded-[1.6rem] p-5">
-                      <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Reflection</p>
-                      <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
-                        {activeEntry.meditation?.reflectionPrompt}
-                      </p>
-                    </section>
-                    <section className="editorial-panel rounded-[1.6rem] p-5">
-                      <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Carry this forward</p>
-                      <p className="mt-4 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
-                        {activeEntry.meditation?.integrationLine}
-                      </p>
-                    </section>
-                  </div>
-                </div>
-              )}
-            </article>
-
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => handleStep(-1)}
-                disabled={activeIndex === 0}
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => handleStep(1)}
-                disabled={activeIndex === chapters.length - 1}
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/15 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next Principle
-              </button>
-            </div>
-
-            {isComplete ? (
-              <section className="editorial-panel rounded-[2rem] p-6 sm:p-8">
-                <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Integration</p>
-                <h2 className="mt-3 font-ritual text-3xl">{journeySessionIntro.completionTitle}</h2>
-                <p className="mt-4 max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-                  {journeySessionIntro.completionBody}
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <TrackedLink
-                    href="/start-here"
-                    location="journey:completion"
-                    label="Return to Start Here"
-                    variant="completion"
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
-                  >
-                    Return to Start Here
-                  </TrackedLink>
-                  <TrackedLink
-                    href="/principles"
-                    location="journey:completion"
-                    label="Study the Principles"
-                    variant="completion"
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
-                  >
-                    Study the Principles
-                  </TrackedLink>
-                  <TrackedLink
-                    href="/great-work"
-                    location="journey:completion"
-                    label="Enter the Great Work"
-                    variant="completion-primary"
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/15 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
-                  >
-                    Enter the Great Work
-                  </TrackedLink>
-                </div>
-              </section>
-            ) : null}
-          </section>
-        </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <TrackedLink
+              href="/principles"
+              location="journey:footer"
+              label="Study the Principles"
+              variant="journey"
+              className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition"
+            >
+              Study the Principles
+            </TrackedLink>
+            <TrackedLink
+              href="/study"
+              location="journey:footer"
+              label="Continue Through the Path"
+              variant="journey"
+              className="inline-flex min-h-[48px] items-center rounded-full border border-[color:var(--copper)]/45 px-5 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+            >
+              Continue Through the Path
+            </TrackedLink>
+          </div>
+        </section>
       </div>
     </div>
   );
 }
 
 function getBoundsRadius(lines: LineSet) {
-  let maxDistance = 0;
-  lines.forEach((line) => {
-    line.forEach((point) => {
-      const distance = point.length();
-      if (Number.isFinite(distance)) {
-        maxDistance = Math.max(maxDistance, distance);
-      }
-    });
-  });
-  return maxDistance > 0 ? maxDistance : 1;
+  let max = 1;
+  for (const line of lines) {
+    for (const point of line) {
+      const radius = Math.hypot(point.x, point.y, point.z ?? 0);
+      if (radius > max) max = radius;
+    }
+  }
+  return max;
+}
+
+function toRoman(value: number) {
+  const numerals = ["I", "II", "III", "IV", "V", "VI", "VII"];
+  return numerals[value - 1] ?? String(value);
 }

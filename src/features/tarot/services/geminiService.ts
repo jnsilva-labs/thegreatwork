@@ -151,8 +151,15 @@ export const generateInterpretation = async ({
       const personalKey = apiKey?.trim();
 
       if (!personalKey) {
+        const sharedMessage =
+          tarotError.code === 'SHARED_KEY_UNAVAILABLE'
+            ? 'Shared Gemini access is not configured on this server. Add your personal Gemini key in Settings to continue.'
+            : tarotError.code === 'SHARED_KEY_INVALID'
+              ? 'The shared Gemini key on this server is invalid. Add your personal Gemini key in Settings to continue.'
+              : 'Shared free Gemini usage is currently exhausted. Add your personal Gemini key in Settings to continue.';
+
         throw new TarotInterpretationError(
-          'Shared free usage is currently exhausted. Add your personal Gemini key in Settings to continue.',
+          sharedMessage,
           {
             code: tarotError.code,
             status: tarotError.status,

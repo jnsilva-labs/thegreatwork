@@ -24,8 +24,9 @@ export function CodexChrome() {
   }, []);
 
   const isHomepage = pathname === "/";
+  const showPrinciplesRail = pathname?.startsWith("/principles/") ?? false;
 
-  if (isHomepage) return null;
+  if (isHomepage || !showPrinciplesRail) return null;
 
   return (
     <>

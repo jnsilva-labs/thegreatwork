@@ -85,6 +85,14 @@ export function RitualCanvas() {
           </EffectComposer>
         </Suspense>
       </Canvas>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(0,0,0,0.4) 100%)",
+        }}
+      />
     </div>
   );
 }

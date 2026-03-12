@@ -8,7 +8,7 @@ type WebGLGuardProps = {
 };
 
 export function WebGLGuard({ fallback, children }: WebGLGuardProps) {
-  const [supported, setSupported] = useState(false);
+  const [supported, setSupported] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -36,5 +36,9 @@ export function WebGLGuard({ fallback, children }: WebGLGuardProps) {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
-  return <>{supported ? children : fallback}</>;
+  if (supported === false) {
+    return <>{fallback}</>;
+  }
+
+  return <>{children}</>;
 }

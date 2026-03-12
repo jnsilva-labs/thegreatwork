@@ -63,30 +63,61 @@ export default function StartHerePage() {
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">
       <div className="mx-auto max-w-5xl space-y-10">
-        <header className="space-y-5">
+        <header className="space-y-6">
           <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">Orientation</p>
-          <h1 className="font-ritual text-4xl sm:text-6xl">Start Here</h1>
-          <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-            Welcome to Awareness Paradox. This page is the clearest first path through the library:
-            foundations, direct experience, symbolic study, and the pages most worth your attention first.
-          </p>
-          <TrackedLink
-            href="/study"
-            location="start-here:header"
-            label="See The Full Path"
-            variant="primary"
-            className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.24em] transition hover:border-[color:var(--gilt)]"
-          >
-            See The Full Path
-          </TrackedLink>
+          <div className="space-y-5">
+            <h1 className="font-ritual text-4xl sm:text-6xl">Start Here</h1>
+            <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+              Welcome to Awareness Paradox. This is the clearest first path through the library:
+              foundations, direct experience, symbolic study, and the pages most worth your attention first.
+            </p>
+          </div>
+          <div className="max-w-3xl border-l border-[color:var(--copper)]/24 pl-5">
+            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Best use</p>
+            <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+              Start with one door only. Read less than you want to, stay with it longer than feels efficient,
+              and let one symbol travel with you into daily life.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <TrackedLink
+              href="/study"
+              location="start-here:header"
+              label="See The Full Path"
+              variant="primary"
+              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+            >
+              See The Full Path
+            </TrackedLink>
+            <TrackedLink
+              href={substackUrl}
+              location="start-here:header"
+              label="Subscribe on Substack"
+              variant="secondary"
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.24em] transition hover:border-[color:var(--gilt)]"
+            >
+              Subscribe on Substack
+            </TrackedLink>
+          </div>
         </header>
 
-        <section className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--char)]/50 p-6 sm:p-8">
-          <h2 className="font-ritual text-2xl">Your first week</h2>
-          <ol className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+        <section className="space-y-5 border-t border-[color:var(--copper)]/22 pt-8">
+          <div className="max-w-2xl">
+            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Your first week</p>
+            <h2 className="mt-3 font-ritual text-2xl">A simple initiation rhythm</h2>
+          </div>
+          <ol className="grid gap-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
             {firstWeekSteps.map((step, index) => (
-              <li key={step}>
-                {index + 1}. {step}
+              <li
+                key={step}
+                className="grid gap-3 rounded-[1.2rem] border border-[color:var(--copper)]/14 bg-[color:var(--obsidian)]/12 p-4 sm:grid-cols-[2.5rem_1fr] sm:items-start"
+              >
+                <span className="font-ritual text-2xl leading-none text-[color:var(--gilt)]/88">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span>{step}</span>
               </li>
             ))}
           </ol>
@@ -97,11 +128,11 @@ export default function StartHerePage() {
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Choose your first door</p>
             <h2 className="mt-2 font-ritual text-3xl">Four ways into the work</h2>
           </div>
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             {tracks.map((track) => (
               <article
                 key={track.title}
-                className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--char)]/45 p-6"
+                className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6"
               >
                 <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
                   {track.subtitle}
@@ -128,7 +159,7 @@ export default function StartHerePage() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
-          <article className="rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--char)]/45 p-6">
+          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Reading order</p>
             <h2 className="mt-3 font-ritual text-2xl">If you want the clearest path</h2>
             <ol className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
@@ -151,7 +182,7 @@ export default function StartHerePage() {
             </ol>
           </article>
 
-          <article className="rounded-2xl border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/50 p-6">
+          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/16 p-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Simple rhythm</p>
             <h2 className="mt-3 font-ritual text-2xl">A weekly way to use the site</h2>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
@@ -177,7 +208,7 @@ export default function StartHerePage() {
           tertiaryLabel="Preview the Guide"
         />
 
-        <section className="rounded-2xl border border-[color:var(--copper)]/25 bg-[color:var(--obsidian)]/50 p-6">
+        <section className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/18 p-6">
           <h2 className="font-ritual text-2xl">Keep Going</h2>
           <div className="mt-4 flex flex-wrap gap-3">
             <TrackedLink
