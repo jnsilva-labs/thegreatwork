@@ -33,13 +33,14 @@ export const TarotCardFace: React.FC<TarotCardFaceProps> = ({ card, className = 
     >
       {showIllustration ? (
         <>
+          <div className="absolute inset-0 bg-[#e8e0d1]" />
           <Image
             src={card.imageUrl!}
             alt={card.name}
             fill
             unoptimized
             sizes="(max-width: 768px) 320px, 480px"
-            className="object-cover"
+            className="object-contain p-[2px]"
             onError={() => setImgError(true)}
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,7,13,0.12),rgba(3,7,13,0.45)_100%)]" />
