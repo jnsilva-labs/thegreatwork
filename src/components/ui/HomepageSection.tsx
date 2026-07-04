@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { gsap } from "gsap";
 import { MagneticLink } from "@/components/ui/MagneticLink";
+import { DUR, EASE_CEREMONIAL, STAGGER } from "@/components/motion/motionTokens";
+import { useMotionPreference } from "@/components/motion/useMotionPreference";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import type { HomepageSectionItem } from "@/data/homepage";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
-import { useUiStore } from "@/lib/uiStore";
 
 type HomepageSectionProps = {
   id: string;
@@ -34,10 +35,10 @@ export function HomepageSection({
 }: HomepageSectionProps) {
   const progress = useHermeticStore((state) => state.progressByChapter[index] ?? 0);
   const sectionRef = useRef<HTMLElement | null>(null);
+  const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const [revealed, setRevealed] = useState(false);
-  const reducedMotion = usePrefersReducedMotion();
-  const stillness = useUiStore((state) => state.stillness);
-  const motionBlocked = reducedMotion || stillness;
+  const { motionOk } = useMotionPreference();
+  const motionBlocked = !motionOk;
   const opacity = 0.5 + progress * 0.5;
   const atmosphereClass = sectionType ? `home-atmosphere--${sectionType}` : "home-atmosphere--paradox";
   const atmosphereOpacity = getAtmosphereOpacity(sectionType, progress);
@@ -74,8 +75,62 @@ export function HomepageSection({
     return () => observer.disconnect();
   }, [motionBlocked]);
 
+  // Authored entrance choreography: rule draws -> label -> title rises ->
+  // copy staggers -> principle items -> CTA and corner fade. Built paused,
+  // played when the existing observer reveals the section. CSS transitions
+  // are disabled under [data-gsap] so the two systems never fight.
+  useLayoutEffect(() => {
+    if (!motionOk) return;
+    const root = sectionRef.current;
+    if (!root) return;
+
+    const ctx = gsap.context(() => {
+      const q = gsap.utils.selector(root);
+      const divider = q(".home-divider");
+      const label = q(".home-section-label");
+      const title = q(".home-section-title");
+      const copy = q(".home-section-copy");
+      const principleItems = q(".home-principle-item");
+      const closers = [...q(".home-cta"), ...q(".home-roman-corner")];
+
+      gsap.set(divider, { scaleX: 0 });
+      gsap.set(label, { y: 10, opacity: 0 });
+      gsap.set(title, { y: 14, opacity: 0 });
+      gsap.set([...copy, ...principleItems], { y: 24, opacity: 0 });
+      gsap.set(closers, { opacity: 0 });
+
+      const tl = gsap.timeline({ paused: true, defaults: { ease: EASE_CEREMONIAL } });
+      tl.to(divider, { scaleX: 1, duration: DUR.etch });
+      if (label.length) tl.to(label, { y: 0, opacity: 1, duration: DUR.reveal }, "-=0.55");
+      tl.to(title, { y: 0, opacity: 1, duration: DUR.reveal }, "-=0.4");
+      if (copy.length) tl.to(copy, { y: 0, opacity: 1, duration: DUR.reveal, stagger: STAGGER }, "-=0.35");
+      if (principleItems.length) {
+        tl.to(principleItems, { y: 0, opacity: 1, duration: DUR.reveal, stagger: STAGGER }, "-=0.3");
+      }
+      if (closers.length) tl.to(closers, { opacity: 1, duration: DUR.reveal }, "-=0.2");
+
+      timelineRef.current = tl;
+    }, root);
+
+    return () => {
+      timelineRef.current = null;
+      ctx.revert();
+    };
+  }, [motionOk]);
+
+  useEffect(() => {
+    if (revealed) {
+      timelineRef.current?.play();
+    }
+  }, [revealed]);
+
   return (
-    <section id={id} ref={sectionRef} className={`home-stage px-6 py-20 sm:px-10 sm:py-28 lg:px-20 ${revealed ? "is-revealed" : ""}`}>
+    <section
+      id={id}
+      ref={sectionRef}
+      data-gsap={motionOk ? "" : undefined}
+      className={`home-stage px-6 py-20 sm:px-10 sm:py-28 lg:px-20 ${revealed ? "is-revealed" : ""}`}
+    >
       <div
         className="home-section mx-auto max-w-5xl pt-10 transition"
         style={{ opacity }}

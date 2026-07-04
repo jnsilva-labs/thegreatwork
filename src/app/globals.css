@@ -679,6 +679,19 @@ body.nav-panel-open {
   opacity: 1;
 }
 
+/* GSAP-choreographed sections own these elements' motion; disable the CSS
+   transitions so inline tween styles are never double-eased. Pseudo-element
+   accents (label rule, principle gold rule, divider pulse) stay CSS-driven
+   from .is-revealed. */
+.home-stage[data-gsap] .home-divider,
+.home-stage[data-gsap] .home-section-label,
+.home-stage[data-gsap] .home-section-title,
+.home-stage[data-gsap] .home-section-copy,
+.home-stage[data-gsap] .home-principle-item,
+.home-stage[data-gsap] .home-roman-corner {
+  transition: none;
+}
+
 .hero-sigil-wrap {
   opacity: 0.94;
 }

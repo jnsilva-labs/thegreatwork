@@ -43,7 +43,13 @@ describe('classifyInterpretError', () => {
   });
 
   it('maps NoObjectGeneratedError to BAD_RESPONSE_FORMAT 502', () => {
-    const classified = classifyInterpretError(new NoObjectGeneratedError({ message: 'malformed' }));
+    const noObjectError = new NoObjectGeneratedError({
+      message: 'malformed',
+      response: { id: 'test', timestamp: new Date(), modelId: 'test-model' },
+      usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+      finishReason: 'stop',
+    } as ConstructorParameters<typeof NoObjectGeneratedError>[0]);
+    const classified = classifyInterpretError(noObjectError);
     expect(classified.code).toBe('BAD_RESPONSE_FORMAT');
     expect(classified.status).toBe(502);
   });

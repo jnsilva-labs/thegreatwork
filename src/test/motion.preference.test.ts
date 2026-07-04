@@ -3,23 +3,22 @@ import { isMotionOk } from '../components/motion/useMotionPreference';
 
 describe('isMotionOk', () => {
   it('allows motion only when nothing blocks it', () => {
-    expect(isMotionOk(false, false, 'high')).toBe(true);
-    expect(isMotionOk(false, false, 'medium')).toBe(true);
+    expect(isMotionOk(false, false, false)).toBe(true);
   });
 
   it('blocks motion when prefers-reduced-motion is set', () => {
-    expect(isMotionOk(true, false, 'high')).toBe(false);
+    expect(isMotionOk(true, false, false)).toBe(false);
   });
 
   it('blocks motion when stillness mode is on', () => {
-    expect(isMotionOk(false, true, 'high')).toBe(false);
+    expect(isMotionOk(false, true, false)).toBe(false);
   });
 
-  it('blocks motion on the low quality tier', () => {
-    expect(isMotionOk(false, false, 'low')).toBe(false);
+  it('blocks motion on genuinely low-power devices', () => {
+    expect(isMotionOk(false, false, true)).toBe(false);
   });
 
   it('blocks motion when multiple signals combine', () => {
-    expect(isMotionOk(true, true, 'low')).toBe(false);
+    expect(isMotionOk(true, true, true)).toBe(false);
   });
 });

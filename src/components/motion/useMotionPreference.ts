@@ -1,12 +1,38 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
-import { useHermeticStore } from '@/lib/hermeticStore';
 import { useUiStore } from '@/lib/uiStore';
 
 // Pure predicate so the truth table is unit-testable without a DOM.
-export function isMotionOk(reducedMotion: boolean, stillness: boolean, qualityTier: string): boolean {
-  return !reducedMotion && !stillness && qualityTier !== 'low';
+// Note: this deliberately does NOT read hermeticStore.qualityTier — that is
+// a WebGL budget tier which RitualCanvas auto-sets to "low" for any mobile
+// viewport, and mobile users should still get entrance choreography. Motion
+// only shuts off for genuinely constrained devices.
+export function isMotionOk(reducedMotion: boolean, stillness: boolean, lowPowerDevice: boolean): boolean {
+  return !reducedMotion && !stillness && !lowPowerDevice;
+}
+
+// Same heuristic WebGLGuard uses: data-saver, very slow connection, or a
+// very weak CPU. Evaluated once on mount (client only).
+function useLowPowerDevice() {
+  const [lowPower, setLowPower] = useState(false);
+
+  useEffect(() => {
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
+
+    setLowPower(
+      Boolean(connection?.saveData) ||
+        Boolean(connection?.effectiveType && ['slow-2g', '2g'].includes(connection.effectiveType)) ||
+        (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 2),
+    );
+  }, []);
+
+  return lowPower;
 }
 
 // One truth for "may we animate?". When false, motion primitives render
@@ -14,7 +40,7 @@ export function isMotionOk(reducedMotion: boolean, stillness: boolean, qualityTi
 export function useMotionPreference() {
   const reducedMotion = usePrefersReducedMotion();
   const stillness = useUiStore((state) => state.stillness);
-  const qualityTier = useHermeticStore((state) => state.qualityTier);
+  const lowPowerDevice = useLowPowerDevice();
 
-  return { motionOk: isMotionOk(reducedMotion, stillness, qualityTier) };
+  return { motionOk: isMotionOk(reducedMotion, stillness, lowPowerDevice) };
 }
