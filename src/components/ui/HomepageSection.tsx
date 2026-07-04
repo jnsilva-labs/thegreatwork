@@ -39,9 +39,8 @@ export function HomepageSection({
   const stillness = useUiStore((state) => state.stillness);
   const motionBlocked = reducedMotion || stillness;
   const opacity = 0.5 + progress * 0.5;
-  const translate = motionBlocked ? 0 : (1 - progress) * 24;
   const atmosphereClass = sectionType ? `home-atmosphere--${sectionType}` : "home-atmosphere--paradox";
-  const motion = getSectionMotion(sectionType, progress, translate);
+  const atmosphereOpacity = getAtmosphereOpacity(sectionType, progress);
   const paragraphBaseDelay = motionBlocked ? 0 : 140;
   const titleRevealStyle = motionBlocked
     ? undefined
@@ -79,13 +78,13 @@ export function HomepageSection({
     <section id={id} ref={sectionRef} className={`home-stage px-6 py-20 sm:px-10 sm:py-28 lg:px-20 ${revealed ? "is-revealed" : ""}`}>
       <div
         className="home-section mx-auto max-w-5xl pt-10 transition"
-        style={{ opacity, transform: motion.container }}
+        style={{ opacity }}
       >
         <div className="home-divider" aria-hidden="true" />
         <div
           className={`home-atmosphere ${atmosphereClass}`}
           aria-hidden="true"
-          style={{ opacity: motion.atmosphereOpacity, transform: motion.atmosphereTransform }}
+          style={{ opacity: atmosphereOpacity }}
         />
         <div className="grid gap-8 lg:grid-cols-[0.92fr_0.08fr]">
           <div className="max-w-3xl space-y-8">
@@ -166,7 +165,6 @@ export function HomepageSection({
               className="home-glow-rail sticky top-32 pt-8 text-right"
               style={
                 {
-                  transform: motion.rail,
                   ["--rail-fill"]: progress.toString(),
                 } as CSSProperties
               }
@@ -185,66 +183,22 @@ export function HomepageSection({
   );
 }
 
-function getSectionMotion(sectionType: string | undefined, progress: number, translate: number) {
-  const baseScale = 0.985 + progress * 0.015;
-
+function getAtmosphereOpacity(sectionType: string | undefined, progress: number) {
   switch (sectionType) {
     case "alchemy":
-      return {
-        container: `translateY(${translate}px) scale(${baseScale}) rotate(${(1 - progress) * -0.45}deg)`,
-        title: `translate3d(0, ${(1 - progress) * 20}px, 0)`,
-        rail: `translateY(${(1 - progress) * 34}px) rotate(${(1 - progress) * 2}deg)`,
-        atmosphereOpacity: 0.42 + progress * 0.42,
-        atmosphereTransform: `scale(${0.96 + progress * 0.06})`
-      };
+      return 0.42 + progress * 0.42;
     case "divination":
-      return {
-        container: `translate3d(${(1 - progress) * 8}px, ${translate}px, 0)`,
-        title: `translate3d(${(1 - progress) * 14}px, ${(1 - progress) * 16}px, 0)`,
-        rail: `translateY(${(1 - progress) * 30}px)`,
-        atmosphereOpacity: 0.38 + progress * 0.38,
-        atmosphereTransform: `translateX(${(1 - progress) * 16}px) scale(${0.98 + progress * 0.04})`
-      };
+      return 0.38 + progress * 0.38;
     case "astrology":
-      return {
-        container: `translate3d(${(1 - progress) * -8}px, ${translate}px, 0) scale(${baseScale})`,
-        title: `translate3d(${(1 - progress) * -10}px, ${(1 - progress) * 14}px, 0)`,
-        rail: `translateY(${(1 - progress) * 28}px)`,
-        atmosphereOpacity: 0.34 + progress * 0.46,
-        atmosphereTransform: `translateY(${(1 - progress) * -12}px) scale(${0.97 + progress * 0.05})`
-      };
+      return 0.34 + progress * 0.46;
     case "geometry":
-      return {
-        container: `translateY(${translate}px) scale(${0.97 + progress * 0.03})`,
-        title: `translateY(${(1 - progress) * 16}px) scale(${0.985 + progress * 0.015})`,
-        rail: `translateY(${(1 - progress) * 36}px)`,
-        atmosphereOpacity: 0.4 + progress * 0.42,
-        atmosphereTransform: `scale(${0.92 + progress * 0.08}) rotate(${(1 - progress) * 2.2}deg)`
-      };
+      return 0.4 + progress * 0.42;
     case "principles":
-      return {
-        container: `translateY(${translate}px)`,
-        title: `translateY(${(1 - progress) * 18}px)`,
-        rail: `translateY(${(1 - progress) * 32}px)`,
-        atmosphereOpacity: 0.3 + progress * 0.4,
-        atmosphereTransform: `translateY(${(1 - progress) * 10}px)`
-      };
+      return 0.3 + progress * 0.4;
     case "community":
-      return {
-        container: `translateY(${translate}px) scale(${0.99 + progress * 0.01})`,
-        title: `translateY(${(1 - progress) * 14}px)`,
-        rail: `translateY(${(1 - progress) * 24}px)`,
-        atmosphereOpacity: 0.34 + progress * 0.34,
-        atmosphereTransform: `scale(${0.99 + progress * 0.03})`
-      };
+      return 0.34 + progress * 0.34;
     case "paradox":
     default:
-      return {
-        container: `translateY(${translate}px) scale(${baseScale})`,
-        title: `translate3d(0, ${(1 - progress) * 18}px, 0)`,
-        rail: `translateY(${(1 - progress) * 36}px)`,
-        atmosphereOpacity: 0.36 + progress * 0.4,
-        atmosphereTransform: `scale(${0.98 + progress * 0.04})`
-      };
+      return 0.36 + progress * 0.4;
   }
 }
