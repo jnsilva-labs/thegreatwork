@@ -15,7 +15,7 @@ interface InterpretationRequestBody {
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-const REQUEST_TIMEOUT_MS = 25_000;
+const REQUEST_TIMEOUT_MS = 55_000;
 const PRIMARY_MODEL = 'google/gemini-3.5-flash';
 const FALLBACK_MODEL = 'anthropic/claude-sonnet-4.6';
 
@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       system: SYSTEM_INSTRUCTION,
       prompt: buildPrompt({ question, intention, spread, cards }),
       temperature: 0.8,
+      maxOutputTokens: 2048,
       output: Output.object({ schema: interpretationSchema }),
       abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       providerOptions: {

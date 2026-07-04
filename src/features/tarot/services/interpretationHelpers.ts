@@ -10,14 +10,14 @@ TONE:
 - Use metaphors of the alchemical laboratory.
 - Avoid generic prediction language.
 
-STRUCTURE:
+STRUCTURE (keep each field tight; depth comes from precision, not length):
 1. mirrorStatement: direct insight in 1-2 sentences.
-2. archetypeShadow: detailed psychological analysis.
-3. alchemicalPhase: explain the phase and process.
-4. practicalGuidance: 3 concrete actions.
-5. journalPrompts: 3 reflective questions.
-6. mantra: short grounding affirmation.
-Return valid JSON only.
+2. archetypeShadow: psychological analysis, 80-120 words total across all cards.
+3. alchemicalPhase: name the phase and its process, 60-90 words.
+4. practicalGuidance: 3 concrete actions, one sentence each.
+5. journalPrompts: 3 reflective questions, one line each.
+6. mantra: one short grounding affirmation.
+Write at an 8th-grade reading level with a poet's ear. Return valid JSON only.
 `;
 
 export function buildPrompt({
