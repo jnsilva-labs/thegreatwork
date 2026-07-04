@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { gateway, generateText, Output } from 'ai';
-import { buildPrompt, coerceInterpretation, SYSTEM_INSTRUCTION } from '@/features/tarot/services/interpretationHelpers';
-import { interpretationSchema } from '@/features/tarot/services/interpretationSchema';
+import { buildPrompt, SYSTEM_INSTRUCTION } from '@/features/tarot/services/interpretationHelpers';
+import { interpretationSchema, toInterpretation } from '@/features/tarot/services/interpretationSchema';
 import { DrawnCard, SpreadDefinition } from '@/features/tarot/types';
 import { classifyInterpretError } from './classifier';
 
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(coerceInterpretation(result.output));
+    return NextResponse.json(toInterpretation(result.output));
   } catch (error) {
     const classified = classifyInterpretError(error);
     console.error(

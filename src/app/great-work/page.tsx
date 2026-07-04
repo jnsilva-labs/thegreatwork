@@ -81,7 +81,7 @@ export default function GreatWorkPage() {
           </h2>
           <div className="space-y-10">
             {greatWork.stages.map((stage, index) => (
-              <article key={stage.id} className="py-6 first:pt-0">
+              <article key={stage.id} id={stage.id} className="scroll-mt-24 py-6 first:pt-0">
                 {index > 0 && <EtchRule className="mb-10" />}
                 <div className="prose-measure space-y-4">
                   <div className="flex items-center gap-4">
