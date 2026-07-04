@@ -22,6 +22,20 @@ export const getReadings = (): Reading[] => {
   return data ? JSON.parse(data) : [];
 };
 
+export const updateReadingNotes = (readingId: string, notes: string): void => {
+  if (!hasStorage()) return;
+  const updated = getReadings().map((reading) =>
+    reading.id === readingId ? { ...reading, notes } : reading,
+  );
+  localStorage.setItem(KEYS.READINGS, JSON.stringify(updated));
+};
+
+export const deleteReading = (readingId: string): void => {
+  if (!hasStorage()) return;
+  const updated = getReadings().filter((reading) => reading.id !== readingId);
+  localStorage.setItem(KEYS.READINGS, JSON.stringify(updated));
+};
+
 export const saveSettings = (settings: AppSettings): void => {
   if (!hasStorage()) return;
   localStorage.setItem(KEYS.SETTINGS, JSON.stringify(settings));
