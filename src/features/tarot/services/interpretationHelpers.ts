@@ -12,7 +12,9 @@ TONE:
 
 STRUCTURE (keep each field tight; depth comes from precision, not length):
 1. mirrorStatement: direct insight in 1-2 sentences.
-2. archetypeShadow: psychological analysis, 80-120 words total across all cards.
+2. archetypeShadow: psychological analysis in exactly TWO short paragraphs separated
+   by a blank line — the first names the archetypes at play, the second turns to the
+   shadow and what it asks of the reader. 140-180 words total across all cards.
 3. phase: exactly one of "nigredo", "albedo", "citrinitas", "rubedo" — the four stages
    of the Great Work. Choose where this reading truly sits; do not default to nigredo.
 4. phaseReason: one sentence explaining why the reading sits in that stage.

@@ -47,7 +47,7 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
           onClick?.();
         }
       }}
-      className={`relative perspective-1000 ${currentSizeClass} cursor-pointer group z-0 hover:z-10 transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]`}
+      className={`relative perspective-1000 ${currentSizeClass} cursor-pointer group z-0 hover:z-10 transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] ${isFaceUp ? 'card-reveal-arrive' : ''}`}
     >
       <div className={`relative w-full h-full text-center transition-transform duration-700 motion-reduce:transition-none transform-style-3d ${isFaceUp ? 'rotate-y-180' : ''} ${hovered ? 'scale-[1.02]' : ''}`}>
         
