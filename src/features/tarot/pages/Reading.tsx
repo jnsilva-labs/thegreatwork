@@ -33,6 +33,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
   const [stage, setStage] = useState<ReadingStage>('shuffling');
   const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
+  const [flippedIds, setFlippedIds] = useState<ReadonlySet<string>>(new Set());
   const [interpretation, setInterpretation] = useState<Interpretation | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -86,6 +87,22 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
     return () => window.clearTimeout(timer);
   }, [spread.positions, stage]);
+
+  const allFlipped = drawnCards.length > 0 && drawnCards.every((card) => flippedIds.has(card.id));
+
+  // The reveal is the ritual: the first tap turns a card; once it faces up,
+  // tapping again opens its detail.
+  const handleCardClick = (card: DrawnCard) => {
+    if (!flippedIds.has(card.id)) {
+      setFlippedIds((prev) => new Set(prev).add(card.id));
+      return;
+    }
+    setSelectedCardId(card.id);
+  };
+
+  const turnAllCards = () => {
+    setFlippedIds(new Set(drawnCards.map((card) => card.id)));
+  };
 
   const handlePrevCard = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -214,10 +231,24 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                   <p className="text-base leading-relaxed text-[color:#D5D0C6] sm:text-lg">{intention}</p>
                 </div>
               </div>
-              <SpreadLayout type={spreadId} cards={drawnCards} revealedCount={drawnCards.length} onCardClick={(card) => setSelectedCardId(card.id)} />
+              <SpreadLayout type={spreadId} cards={drawnCards} revealedIds={flippedIds} onCardClick={handleCardClick} />
             </div>
 
-            {!interpretation && !apiKeyMissing && !apiError && (
+            {!interpretation && !apiKeyMissing && !apiError && !allFlipped && (
+              <div className="sticky bottom-6 z-40 mt-4 flex flex-col items-center gap-2 animate-fade-in pb-2 text-center">
+                <p className="rounded-full border border-[color:var(--copper)]/25 bg-[rgba(6,11,19,0.9)] px-6 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">
+                  Turn each card when you are ready
+                </p>
+                <button
+                  onClick={turnAllCards}
+                  className="min-h-[44px] text-[10px] uppercase tracking-[0.24em] text-[color:var(--mist)]/64 underline underline-offset-4 transition hover:text-[color:var(--gilt)]"
+                >
+                  Turn them all at once
+                </button>
+              </div>
+            )}
+
+            {!interpretation && !apiKeyMissing && !apiError && allFlipped && (
               <div className="sticky bottom-6 z-40 mt-4 flex justify-center animate-fade-in pb-2">
                 <button
                   onClick={triggerInterpretation}
