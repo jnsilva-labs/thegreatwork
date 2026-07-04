@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { useUiStore } from '@/lib/uiStore';
 
@@ -14,25 +14,29 @@ export function isMotionOk(reducedMotion: boolean, stillness: boolean, lowPowerD
 }
 
 // Same heuristic WebGLGuard uses: data-saver, very slow connection, or a
-// very weak CPU. Evaluated once on mount (client only).
-function useLowPowerDevice() {
-  const [lowPower, setLowPower] = useState(false);
+// very weak CPU. Computed once per page load; false during SSR.
+let lowPowerCache: boolean | null = null;
 
-  useEffect(() => {
+function getLowPowerSnapshot(): boolean {
+  if (lowPowerCache === null) {
     const connection = (
       navigator as Navigator & {
         connection?: { saveData?: boolean; effectiveType?: string };
       }
     ).connection;
 
-    setLowPower(
+    lowPowerCache =
       Boolean(connection?.saveData) ||
-        Boolean(connection?.effectiveType && ['slow-2g', '2g'].includes(connection.effectiveType)) ||
-        (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 2),
-    );
-  }, []);
+      Boolean(connection?.effectiveType && ['slow-2g', '2g'].includes(connection.effectiveType)) ||
+      (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 2);
+  }
+  return lowPowerCache;
+}
 
-  return lowPower;
+const subscribeNever = () => () => {};
+
+function useLowPowerDevice() {
+  return useSyncExternalStore(subscribeNever, getLowPowerSnapshot, () => false);
 }
 
 // One truth for "may we animate?". When false, motion primitives render

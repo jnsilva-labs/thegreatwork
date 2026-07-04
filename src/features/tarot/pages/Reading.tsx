@@ -268,7 +268,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
             )}
 
             {interpretation && (
-              <div className="relative mb-20 w-full max-w-5xl animate-fade-in border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.9)] p-8 md:p-14 shadow-2xl">
+              <div className="luminous-edge relative mb-20 w-full max-w-5xl animate-fade-in bg-[rgba(6,11,19,0.9)] p-8 md:p-14 shadow-2xl">
 
                 <div className="text-center space-y-6">
                   <div className="mb-4 inline-block rounded-full border border-[color:var(--gilt)]/25 p-2">

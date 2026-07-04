@@ -18,22 +18,20 @@ export function Dissolve({ show, className, children }: DissolveProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(show);
 
+  // Render-phase adjustments (React's sanctioned derived-state pattern):
+  // mount immediately when shown; hide instantly when motion is off.
+  if (show && !rendered) {
+    setRendered(true);
+  }
+  if (!show && rendered && !motionOk) {
+    setRendered(false);
+  }
+
+  // Animated exit — the only async path.
   useLayoutEffect(() => {
-    if (!motionOk) {
-      setRendered(show);
-      return;
-    }
-
-    if (show) {
-      setRendered(true);
-      return;
-    }
-
+    if (!motionOk || show) return;
     const el = ref.current;
-    if (!el) {
-      setRendered(false);
-      return;
-    }
+    if (!el) return;
 
     const tween = gsap.to(el, {
       opacity: 0,

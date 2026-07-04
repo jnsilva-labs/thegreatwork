@@ -149,7 +149,7 @@ export function HomepageSection({
               </p>
             )}
             <h2
-              className="home-section-title font-ritual text-3xl leading-tight text-[color:var(--bone)] sm:text-4xl lg:text-5xl transition"
+              className="home-section-title type-title font-ritual text-[color:var(--bone)] transition"
               style={titleRevealStyle}
             >
               {title}
@@ -159,7 +159,7 @@ export function HomepageSection({
               {body.map((paragraph, i) => (
                 <p
                   key={i}
-                  className="home-section-copy max-w-2xl text-base leading-relaxed text-[color:#D5D0C6] sm:text-lg"
+                  className="home-section-copy prose-measure text-base leading-relaxed text-[color:#D5D0C6] sm:text-lg"
                   style={
                     motionBlocked
                       ? undefined

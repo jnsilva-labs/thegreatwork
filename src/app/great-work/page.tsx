@@ -5,6 +5,9 @@ import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { greatWork } from "@/data/greatWork";
 import { Ouroboros } from "@/components/Ouroboros";
 import { AlchemyGlyph } from "@/components/AlchemyGlyph";
+import { EtchHeading } from "@/components/motion/EtchHeading";
+import { EtchRule } from "@/components/motion/EtchRule";
+import { Reveal } from "@/components/motion/Reveal";
 
 export default function GreatWorkPage() {
   const [activeGlyph, setActiveGlyph] = useState<string | null>(null);
@@ -27,9 +30,11 @@ export default function GreatWorkPage() {
                 <p key={line}>{line}</p>
               ))}
             </div>
-            <p className="max-w-2xl border-l border-[color:var(--copper)]/28 pl-5 font-ritual text-2xl leading-tight text-[color:var(--bone)] sm:text-3xl">
-              The work does not begin in brilliance. It begins where matter yields and the old form darkens.
-            </p>
+            <Reveal variant="drift">
+              <p className="quote-measure border-l border-[color:var(--copper)]/28 pl-5 font-ritual text-2xl leading-tight text-[color:var(--bone)] sm:text-3xl">
+                The work does not begin in brilliance. It begins where matter yields and the old form darkens.
+              </p>
+            </Reveal>
           </div>
           <div className="relative flex items-center justify-center py-4 lg:justify-end lg:pt-8">
             <div className="relative flex items-center justify-center rounded-full border border-[color:var(--copper)]/24 bg-[color:var(--char)]/20 p-8 sm:p-10">
@@ -61,10 +66,12 @@ export default function GreatWorkPage() {
         </section>
 
         <section className="max-w-3xl border-l border-[color:var(--copper)]/24 pl-5">
-          <p className="font-ritual text-2xl leading-tight text-[color:var(--bone)] sm:text-3xl">
-            The Great Work survives because it names a sequence people still recognize: breakdown, purification,
-            illumination, and integration.
-          </p>
+          <Reveal variant="drift">
+            <p className="font-ritual text-2xl leading-tight text-[color:var(--bone)] sm:text-3xl">
+              The Great Work survives because it names a sequence people still recognize: breakdown, purification,
+              illumination, and integration.
+            </p>
+          </Reveal>
         </section>
 
         <section className="space-y-8">
@@ -74,11 +81,9 @@ export default function GreatWorkPage() {
           </h2>
           <div className="space-y-10">
             {greatWork.stages.map((stage, index) => (
-              <article
-                key={stage.id}
-                className="border-t border-[color:var(--copper)]/14 py-6 first:border-t-0 first:pt-0"
-              >
-                <div className="max-w-3xl space-y-4">
+              <article key={stage.id} className="py-6 first:pt-0">
+                {index > 0 && <EtchRule className="mb-10" />}
+                <div className="prose-measure space-y-4">
                   <div className="flex items-center gap-4">
                     <p className="font-ritual text-4xl text-[color:var(--gilt)]/86 sm:text-5xl">
                       {["I", "II", "III", "IV"][index]}
@@ -92,7 +97,9 @@ export default function GreatWorkPage() {
                   <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">
                     {stage.keynotes.join(" · ")}
                   </p>
-                  <h3 className="font-ritual text-3xl leading-tight sm:text-4xl">{stage.title}</h3>
+                  <EtchHeading as="h3" className="font-ritual text-3xl leading-tight sm:text-4xl">
+                    {stage.title}
+                  </EtchHeading>
                   <div className="space-y-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
                     {stage.description.map((line) => (
                       <p key={line}>{line}</p>
