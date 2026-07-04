@@ -42,10 +42,19 @@ export interface DrawnCard extends Card {
   positionId: number; // Matches SpreadPosition.id
 }
 
+// The four canonical stages of the Great Work (mirrors src/data/greatWork.ts).
+export type AlchemicalStage = 'nigredo' | 'albedo' | 'citrinitas' | 'rubedo';
+
+export const ALCHEMICAL_STAGES: AlchemicalStage[] = ['nigredo', 'albedo', 'citrinitas', 'rubedo'];
+
 export interface Interpretation {
   mirrorStatement: string;
   archetypeShadow: string;
+  // Legacy free-prose phase text. Older journal entries only have this;
+  // new readings also carry the canonical `phase` + `phaseReason`.
   alchemicalPhase: string;
+  phase?: AlchemicalStage;
+  phaseReason?: string;
   practicalGuidance: string[];
   journalPrompts: string[];
   mantra: string;
@@ -60,6 +69,7 @@ export interface Reading {
   cards: DrawnCard[];
   interpretation?: Interpretation;
   tags?: string[];
+  notes?: string; // Personal reflection written by the user in the Journal
 }
 
 export interface Deck {

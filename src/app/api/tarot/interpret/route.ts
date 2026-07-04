@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { gateway, generateText, Output } from 'ai';
-import { buildPrompt, coerceInterpretation, SYSTEM_INSTRUCTION } from '@/features/tarot/services/interpretationHelpers';
-import { interpretationSchema } from '@/features/tarot/services/interpretationSchema';
+import { buildPrompt, SYSTEM_INSTRUCTION } from '@/features/tarot/services/interpretationHelpers';
+import { interpretationSchema, toInterpretation } from '@/features/tarot/services/interpretationSchema';
 import { DrawnCard, SpreadDefinition } from '@/features/tarot/types';
 import { classifyInterpretError } from './classifier';
 
@@ -15,7 +15,7 @@ interface InterpretationRequestBody {
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-const REQUEST_TIMEOUT_MS = 25_000;
+const REQUEST_TIMEOUT_MS = 55_000;
 const PRIMARY_MODEL = 'google/gemini-3.5-flash';
 const FALLBACK_MODEL = 'anthropic/claude-sonnet-4.6';
 
@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       system: SYSTEM_INSTRUCTION,
       prompt: buildPrompt({ question, intention, spread, cards }),
       temperature: 0.8,
+      maxOutputTokens: 2048,
       output: Output.object({ schema: interpretationSchema }),
       abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       providerOptions: {
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(coerceInterpretation(result.output));
+    return NextResponse.json(toInterpretation(result.output));
   } catch (error) {
     const classified = classifyInterpretError(error);
     console.error(

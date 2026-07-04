@@ -6,6 +6,7 @@ import { DEFAULT_DECK, SPREADS } from '../constants';
 import SpreadLayout from '../components/SpreadLayout';
 import TarotCardFace from '../components/TarotCardFace';
 import TarotShell from '../components/TarotShell';
+import { PhaseArc } from '../components/PhaseArc';
 import { generateInterpretation, TarotInterpretationError } from '../services/geminiService';
 import { getDecks, getSettings, saveReading } from '../services/storageService';
 import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, SpreadType, TarotView } from '../types';
@@ -32,6 +33,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
   const [stage, setStage] = useState<ReadingStage>('shuffling');
   const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
+  const [flippedIds, setFlippedIds] = useState<ReadonlySet<string>>(new Set());
   const [interpretation, setInterpretation] = useState<Interpretation | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -85,6 +87,22 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
     return () => window.clearTimeout(timer);
   }, [spread.positions, stage]);
+
+  const allFlipped = drawnCards.length > 0 && drawnCards.every((card) => flippedIds.has(card.id));
+
+  // The reveal is the ritual: the first tap turns a card; once it faces up,
+  // tapping again opens its detail.
+  const handleCardClick = (card: DrawnCard) => {
+    if (!flippedIds.has(card.id)) {
+      setFlippedIds((prev) => new Set(prev).add(card.id));
+      return;
+    }
+    setSelectedCardId(card.id);
+  };
+
+  const turnAllCards = () => {
+    setFlippedIds(new Set(drawnCards.map((card) => card.id)));
+  };
 
   const handlePrevCard = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -213,10 +231,24 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                   <p className="text-base leading-relaxed text-[color:#D5D0C6] sm:text-lg">{intention}</p>
                 </div>
               </div>
-              <SpreadLayout type={spreadId} cards={drawnCards} revealedCount={drawnCards.length} onCardClick={(card) => setSelectedCardId(card.id)} />
+              <SpreadLayout type={spreadId} cards={drawnCards} revealedIds={flippedIds} onCardClick={handleCardClick} />
             </div>
 
-            {!interpretation && !apiKeyMissing && !apiError && (
+            {!interpretation && !apiKeyMissing && !apiError && !allFlipped && (
+              <div className="sticky bottom-6 z-40 mt-4 flex flex-col items-center gap-2 animate-fade-in pb-2 text-center">
+                <p className="rounded-full border border-[color:var(--copper)]/25 bg-[rgba(6,11,19,0.9)] px-6 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">
+                  Turn each card when you are ready
+                </p>
+                <button
+                  onClick={turnAllCards}
+                  className="min-h-[44px] text-[10px] uppercase tracking-[0.24em] text-[color:var(--mist)]/64 underline underline-offset-4 transition hover:text-[color:var(--gilt)]"
+                >
+                  Turn them all at once
+                </button>
+              </div>
+            )}
+
+            {!interpretation && !apiKeyMissing && !apiError && allFlipped && (
               <div className="sticky bottom-6 z-40 mt-4 flex justify-center animate-fade-in pb-2">
                 <button
                   onClick={triggerInterpretation}
@@ -277,15 +309,22 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                   <p className="font-ritual text-3xl leading-snug text-[color:var(--bone)] md:text-5xl">&quot;{interpretation.mirrorStatement}&quot;</p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-12 border-y border-[color:var(--copper)]/12 py-12 md:grid-cols-2">
-                  <div className="space-y-4">
+                <div className="border-y border-[color:var(--copper)]/12 py-12">
+                  <div className="mx-auto max-w-2xl space-y-4 text-center">
                     <h3 className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Archetype & Shadow</h3>
-                    <p className="whitespace-pre-wrap text-lg leading-relaxed text-[color:#D5D0C6]">{interpretation.archetypeShadow}</p>
+                    <p className="whitespace-pre-wrap text-left text-lg leading-relaxed text-[color:#D5D0C6]">{interpretation.archetypeShadow}</p>
                   </div>
-                  <div className="space-y-4">
-                    <h3 className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Alchemical Phase</h3>
-                    <p className="whitespace-pre-wrap text-lg leading-relaxed text-[color:#D5D0C6]">{interpretation.alchemicalPhase}</p>
-                  </div>
+                </div>
+
+                <div className="border-b border-[color:var(--copper)]/12 py-12">
+                  <h3 className="mb-8 text-center text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Where You Stand in the Work</h3>
+                  {interpretation.phase ? (
+                    <PhaseArc phase={interpretation.phase} reason={interpretation.phaseReason} />
+                  ) : (
+                    <p className="mx-auto max-w-2xl whitespace-pre-wrap text-lg leading-relaxed text-[color:#D5D0C6]">
+                      {interpretation.alchemicalPhase}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-6">

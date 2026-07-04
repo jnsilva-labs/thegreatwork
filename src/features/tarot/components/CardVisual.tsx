@@ -34,13 +34,22 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
   const currentSizeClass = className.includes('w-') ? className : `${sizeClasses[size]} ${className}`;
 
   return (
-    <div 
+    <div
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`relative perspective-1000 ${currentSizeClass} cursor-pointer group z-0 hover:z-10 transition-all duration-300`}
+      role="button"
+      tabIndex={0}
+      aria-label={isFaceUp && card ? `${card.name}${card.isReversed ? ', reversed' : ''} — open details` : 'Turn this card'}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick?.();
+        }
+      }}
+      className={`relative perspective-1000 ${currentSizeClass} cursor-pointer group z-0 hover:z-10 transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]`}
     >
-      <div className={`relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${isFaceUp ? 'rotate-y-180' : ''} ${hovered ? 'scale-[1.02]' : ''}`}>
+      <div className={`relative w-full h-full text-center transition-transform duration-700 motion-reduce:transition-none transform-style-3d ${isFaceUp ? 'rotate-y-180' : ''} ${hovered ? 'scale-[1.02]' : ''}`}>
         
         {/* Back of Card - Sacred Geometry Design */}
         <div className="absolute w-full h-full backface-hidden rounded shadow-2xl bg-void-900 border border-alchemy-gold/30 flex items-center justify-center overflow-hidden">
