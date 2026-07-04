@@ -12,6 +12,13 @@ import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, Spre
 
 type ReadingStage = 'shuffling' | 'drawing' | 'interpreting' | 'complete';
 
+const LOADING_MESSAGES = [
+  'Channeling...',
+  'Reading the symbolic field...',
+  'Distilling the archetypes...',
+  'Setting words to the work...',
+];
+
 interface ReadingProps {
   request: ReadingRequest | null;
   onNavigate: (view: TarotView) => void;
@@ -30,6 +37,20 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!isLoadingAI) {
+      setLoadingMessageIndex(0);
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setLoadingMessageIndex((index) => (index + 1) % LOADING_MESSAGES.length);
+    }, 4000);
+
+    return () => window.clearInterval(timer);
+  }, [isLoadingAI]);
 
   useEffect(() => {
     if (!request) {
@@ -117,15 +138,24 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
         return;
       }
 
-      const message = error instanceof Error ? error.message : 'Unknown interpretation error.';
       let userMessage = 'The spirits are quiet. Please try again.';
 
-      if (message.includes('429')) {
-        userMessage = 'Gemini is currently overloaded. Please retry in a moment.';
-      } else if (message.includes('403') || message.includes('401')) {
-        userMessage = 'Authentication failed. Please check your API key.';
-      } else if (message.toLowerCase().includes('api key')) {
-        userMessage = 'The API key looks invalid.';
+      if (error instanceof TarotInterpretationError) {
+        switch (error.code) {
+          case 'SHARED_QUOTA_EXCEEDED':
+            userMessage = 'The reading service is busy right now. Please retry in a moment.';
+            break;
+          case 'SHARED_REQUEST_TIMEOUT':
+            userMessage = 'The reading took too long to arrive. Please try again.';
+            break;
+          case 'BAD_RESPONSE_FORMAT':
+          case 'EMPTY_RESPONSE':
+            userMessage = 'The reading arrived garbled. Please try again.';
+            break;
+          case 'PERSONAL_KEY_REQUEST_FAILED':
+            userMessage = 'Your personal key request failed. Please check the key in Settings.';
+            break;
+        }
       }
 
       setApiError(userMessage);
@@ -194,7 +224,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                   className="inline-flex min-h-[56px] items-center gap-4 rounded-full border border-[color:var(--gilt)]/55 bg-[rgba(6,11,19,0.94)] px-8 py-4 text-sm uppercase tracking-[0.3em] text-[color:var(--gilt)] transition hover:bg-[rgba(184,155,94,0.12)] hover:text-[color:var(--bone)] disabled:opacity-50"
                 >
                   {isLoadingAI ? <Loader2 className="animate-spin" /> : <Eye size={20} />}
-                  {isLoadingAI ? 'Channeling...' : 'Reveal Guidance'}
+                  {isLoadingAI ? LOADING_MESSAGES[loadingMessageIndex] : 'Reveal Guidance'}
                 </button>
               </div>
             )}
@@ -208,16 +238,30 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
                   {apiError || 'Shared free usage is unavailable right now. Add your personal Gemini key in Settings to continue.'}
                 </p>
-                <button
-                  onClick={() => onNavigate('settings')}
-                  className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)] px-6 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition hover:bg-[rgba(184,155,94,0.14)] hover:text-[color:var(--bone)]"
-                >
-                  Enter Personal Key
-                </button>
+                <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    onClick={() => {
+                      setApiKeyMissing(false);
+                      setApiError(null);
+                      void triggerInterpretation();
+                    }}
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)] px-6 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition hover:bg-[rgba(184,155,94,0.14)] hover:text-[color:var(--bone)]"
+                  >
+                    Try Again
+                  </button>
+                  {apiKeyMissing && (
+                    <button
+                      onClick={() => onNavigate('settings')}
+                      className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/40 px-6 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                    >
+                      Enter Personal Key
+                    </button>
+                  )}
+                </div>
                 <button onClick={() => {
                   setApiKeyMissing(false);
                   setApiError(null);
-                }} className="mt-3 block w-full text-xs text-[color:var(--mist)]/72 underline">
+                }} className="mt-3 block w-full min-h-[44px] text-xs text-[color:var(--mist)]/72 underline">
                   Dismiss
                 </button>
               </div>

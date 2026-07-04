@@ -50,7 +50,7 @@ async function callGeminiDirect({
   const prompt = buildPrompt({ question, intention, spread, cards });
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
     {
       method: 'POST',
       headers: {
@@ -153,10 +153,10 @@ export const generateInterpretation = async ({
       if (!personalKey) {
         const sharedMessage =
           tarotError.code === 'SHARED_KEY_UNAVAILABLE'
-            ? 'Shared Gemini access is not configured on this server. Add your personal Gemini key in Settings to continue.'
+            ? 'Shared readings are not configured on this server. Add your personal Gemini key in Settings to continue.'
             : tarotError.code === 'SHARED_KEY_INVALID'
-              ? 'The shared Gemini key on this server is invalid. Add your personal Gemini key in Settings to continue.'
-              : 'Shared free Gemini usage is currently exhausted. Add your personal Gemini key in Settings to continue.';
+              ? 'The shared reading service is misconfigured. Add your personal Gemini key in Settings to continue.'
+              : 'Shared free readings are currently exhausted. Add your personal Gemini key in Settings to continue.';
 
         throw new TarotInterpretationError(
           sharedMessage,

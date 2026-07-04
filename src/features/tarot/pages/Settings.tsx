@@ -44,7 +44,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
                 <Key size={18} /> The Voice (API Key)
               </h2>
               <p className="mb-2 text-sm leading-relaxed text-[color:var(--mist)]">
-                Readings use the app&apos;s shared free Gemini key first. Add your own key only as a fallback if shared quota is reached.
+                Readings use the app&apos;s shared AI service first. Add your own Gemini key only as a fallback if shared quota is reached.
               </p>
               <div className="flex items-start gap-2 border border-[color:var(--gilt)]/10 bg-[rgba(184,155,94,0.06)] p-3 text-xs text-[color:var(--gilt)]/88">
                 <Zap size={14} className="mt-0.5 shrink-0" />
