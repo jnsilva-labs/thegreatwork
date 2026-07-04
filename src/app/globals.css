@@ -21,9 +21,29 @@
   --violet: var(--accent2);
   --font-ritual-serif: "Didot", "Bodoni 72", "Iowan Old Style", "Times New Roman", serif;
   --font-ritual-sans: "Avenir Next", "Helvetica Neue", "Neue Haas Grotesk", "Segoe UI", sans-serif;
+
+  /* Authored type scale (Editorial Ritual). Display is reserved for the
+     hero; titles map onto the existing section-heading size so adopting
+     the tokens never reflows a page. */
+  --type-display: clamp(2.8rem, 6.5vw, 5.5rem);
+  --type-title: clamp(2rem, 4vw, 3.25rem);
+  --type-subtitle: clamp(1.25rem, 2vw, 1.6rem);
+  --type-eyebrow: 0.75rem;
+  --tracking-eyebrow: 0.32em;
+  --type-body: 1.0625rem;
+  --type-caption: 0.8125rem;
+
+  /* Line-length discipline */
+  --measure-body: 62ch;
+  --measure-quote: 34ch;
+
+  /* Materiality */
+  --glow-strength: 1;
+  --grain-opacity: 0.4;
 }
 
 html[data-theme="abyssal"] {
+  --glow-strength: 0.8;
   --bg: #0a0f16;
   --fg: #e6e4dd;
   --muted: #a6b0ba;
@@ -37,6 +57,7 @@ html[data-theme="abyssal"] {
 }
 
 html[data-theme="crimson"] {
+  --glow-strength: 0.9;
   --bg: #0f0b0b;
   --fg: #e9e2d6;
   --muted: #c0a89d;
@@ -99,6 +120,59 @@ body.nav-panel-open {
 
 .font-ritual {
   font-family: var(--font-ritual-serif), "Times New Roman", serif;
+  font-optical-sizing: auto;
+}
+
+/* Type-scale utilities (see --type-* tokens). Display sizes tighten up;
+   body keeps its generous 1.7 leading. */
+.type-display {
+  font-size: var(--type-display);
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+
+.type-title {
+  font-size: var(--type-title);
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+}
+
+.type-subtitle {
+  font-size: var(--type-subtitle);
+  line-height: 1.3;
+}
+
+.type-eyebrow {
+  font-size: var(--type-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+/* Line-length discipline for body copy and quotes. */
+.prose-measure {
+  max-inline-size: var(--measure-body);
+}
+
+.quote-measure {
+  max-inline-size: var(--measure-quote);
+}
+
+/* Materiality: a 1px luminous edge that reads as light falling on a
+   surface, replacing flat borders on flagship panels and cards. */
+.luminous-edge {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gilt) calc(28% * var(--glow-strength)), transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--gilt) calc(14% * var(--glow-strength)), transparent),
+    0 0 24px color-mix(in srgb, var(--glow) calc(10% * var(--glow-strength)), transparent);
+}
+
+/* Materiality: atmospheres and decorative layers dissolve into the void
+   at section seams instead of ending abruptly. */
+.section-falloff {
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, transparent 0%, black 12%, black 88%, transparent 100%);
 }
 
 .bg-sacred-geo {
@@ -313,6 +387,7 @@ body.nav-panel-open {
     radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--gilt) 18%, transparent), transparent 42%),
     radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--bone) 8%, transparent), transparent 34%);
   box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gilt) calc(24% * var(--glow-strength)), transparent),
     inset 0 0 0 1px color-mix(in srgb, var(--bone) 4%, transparent),
     0 24px 60px rgba(5, 5, 9, 0.28);
   backdrop-filter: blur(10px);
@@ -339,10 +414,12 @@ body.nav-panel-open {
 
 .editorial-quote {
   font-family: var(--font-ritual-serif), "Times New Roman", serif;
-  font-size: clamp(1.7rem, 3vw, 3.4rem);
-  line-height: 1.03;
+  font-size: var(--type-title);
+  line-height: 1.08;
   letter-spacing: 0.01em;
   text-wrap: balance;
+  max-inline-size: var(--measure-quote);
+  hanging-punctuation: first;
 }
 
 .vellum-smoke {
@@ -465,6 +542,7 @@ body.nav-panel-open {
   filter: blur(30px);
   mix-blend-mode: screen;
   animation: atmosphere-drift 18s ease-in-out infinite;
+  mask-image: linear-gradient(180deg, transparent 0%, black 12%, black 88%, transparent 100%);
 }
 
 .home-atmosphere--paradox {
@@ -677,6 +755,19 @@ body.nav-panel-open {
 
 .home-stage.is-revealed .home-roman-corner {
   opacity: 1;
+}
+
+/* GSAP-choreographed sections own these elements' motion; disable the CSS
+   transitions so inline tween styles are never double-eased. Pseudo-element
+   accents (label rule, principle gold rule, divider pulse) stay CSS-driven
+   from .is-revealed. */
+.home-stage[data-gsap] .home-divider,
+.home-stage[data-gsap] .home-section-label,
+.home-stage[data-gsap] .home-section-title,
+.home-stage[data-gsap] .home-section-copy,
+.home-stage[data-gsap] .home-principle-item,
+.home-stage[data-gsap] .home-roman-corner {
+  transition: none;
 }
 
 .hero-sigil-wrap {

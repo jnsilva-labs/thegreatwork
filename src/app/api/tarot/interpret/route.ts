@@ -1,18 +1,9 @@
 import { NextResponse } from 'next/server';
-import { buildPrompt, coerceInterpretation, extractJsonObject, SYSTEM_INSTRUCTION } from '@/features/tarot/services/interpretationHelpers';
+import { gateway, generateText, Output } from 'ai';
+import { buildPrompt, coerceInterpretation, SYSTEM_INSTRUCTION } from '@/features/tarot/services/interpretationHelpers';
+import { interpretationSchema } from '@/features/tarot/services/interpretationSchema';
 import { DrawnCard, SpreadDefinition } from '@/features/tarot/types';
-
-interface GeminiCandidatePart {
-  text?: string;
-}
-
-interface GeminiResponse {
-  candidates?: Array<{
-    content?: {
-      parts?: GeminiCandidatePart[];
-    };
-  }>;
-}
+import { classifyInterpretError } from './classifier';
 
 interface InterpretationRequestBody {
   question?: string;
@@ -22,25 +13,13 @@ interface InterpretationRequestBody {
 }
 
 export const runtime = 'nodejs';
+export const maxDuration = 60;
 
-const GEMINI_TIMEOUT_MS = 15000;
-
-function getSharedApiKey() {
-  return process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-}
+const REQUEST_TIMEOUT_MS = 25_000;
+const PRIMARY_MODEL = 'google/gemini-3.5-flash';
+const FALLBACK_MODEL = 'anthropic/claude-sonnet-4.6';
 
 export async function POST(request: Request) {
-  const sharedApiKey = getSharedApiKey();
-  if (!sharedApiKey) {
-    return NextResponse.json(
-      {
-        code: 'SHARED_KEY_UNAVAILABLE',
-        error: 'Shared Gemini key is not configured on the server.',
-      },
-      { status: 503 },
-    );
-  }
-
   let body: InterpretationRequestBody;
   try {
     body = (await request.json()) as InterpretationRequestBody;
@@ -69,136 +48,35 @@ export async function POST(request: Request) {
     );
   }
 
-  const prompt = buildPrompt({ question, intention, spread, cards });
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
-
-  let response: Response;
   try {
-    response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(sharedApiKey)}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    const result = await generateText({
+      model: gateway(PRIMARY_MODEL),
+      system: SYSTEM_INSTRUCTION,
+      prompt: buildPrompt({ question, intention, spread, cards }),
+      temperature: 0.8,
+      output: Output.object({ schema: interpretationSchema }),
+      abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      providerOptions: {
+        gateway: {
+          models: [FALLBACK_MODEL],
+          tags: ['feature:tarot-interpretation'],
         },
-        signal: controller.signal,
-        body: JSON.stringify({
-          system_instruction: {
-            role: 'system',
-            parts: [{ text: SYSTEM_INSTRUCTION }],
-          },
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.8,
-          },
-        }),
       },
-    );
+    });
+
+    return NextResponse.json(coerceInterpretation(result.output));
   } catch (error) {
-    clearTimeout(timer);
-
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      return NextResponse.json(
-        {
-          code: 'SHARED_REQUEST_TIMEOUT',
-          error: 'Shared Gemini request timed out.',
-        },
-        { status: 504 },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        code: 'SHARED_REQUEST_FAILED',
-        error: 'Failed to reach Gemini service.',
-      },
-      { status: 502 },
+    const classified = classifyInterpretError(error);
+    console.error(
+      `[tarot/interpret] ${classified.code} (${classified.status})`,
+      error instanceof Error ? error.message : error,
     );
-  } finally {
-    clearTimeout(timer);
-  }
-
-  if (!response.ok) {
-    const detail = await response.text();
-
-    if (response.status === 429) {
-      return NextResponse.json(
-        {
-          code: 'SHARED_QUOTA_EXCEEDED',
-          error: 'Shared Gemini quota/rate limit reached.',
-          detail,
-        },
-        { status: 429 },
-      );
-    }
-
-    if (response.status === 401 || response.status === 403) {
-      return NextResponse.json(
-        {
-          code: 'SHARED_KEY_INVALID',
-          error: 'Shared Gemini key is invalid or unauthorized.',
-          detail,
-        },
-        { status: 503 },
-      );
-    }
-
     return NextResponse.json(
       {
-        code: 'SHARED_REQUEST_FAILED',
-        error: 'Shared Gemini request failed.',
-        detail,
+        code: classified.code,
+        error: classified.message,
       },
-      { status: 502 },
-    );
-  }
-
-  let payload: GeminiResponse;
-  try {
-    payload = (await response.json()) as GeminiResponse;
-  } catch {
-    return NextResponse.json(
-      {
-        code: 'BAD_RESPONSE_FORMAT',
-        error: 'Gemini returned invalid JSON.',
-      },
-      { status: 502 },
-    );
-  }
-  const text = payload.candidates
-    ?.at(0)
-    ?.content?.parts?.map((part) => part.text ?? '')
-    .join('')
-    .trim();
-
-  if (!text) {
-    return NextResponse.json(
-      {
-        code: 'EMPTY_RESPONSE',
-        error: 'Gemini returned an empty response.',
-      },
-      { status: 502 },
-    );
-  }
-
-  try {
-    const parsed = extractJsonObject(text);
-    return NextResponse.json(coerceInterpretation(parsed));
-  } catch (error) {
-    return NextResponse.json(
-      {
-        code: 'BAD_RESPONSE_FORMAT',
-        error: error instanceof Error ? error.message : 'Failed to parse Gemini response.',
-      },
-      { status: 502 },
+      { status: classified.status },
     );
   }
 }
