@@ -7,6 +7,7 @@ import SpreadLayout from '../components/SpreadLayout';
 import TarotCardFace from '../components/TarotCardFace';
 import TarotShell from '../components/TarotShell';
 import { PhaseArc } from '../components/PhaseArc';
+import { useMotionPreference } from '@/components/motion/useMotionPreference';
 import { generateInterpretation, TarotInterpretationError } from '../services/geminiService';
 import { getDecks, getSettings, saveReading } from '../services/storageService';
 import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, SpreadType, TarotView } from '../types';
@@ -40,6 +41,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const { motionOk } = useMotionPreference();
 
   useEffect(() => {
     if (!isLoadingAI) {
@@ -90,18 +92,34 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
   const allFlipped = drawnCards.length > 0 && drawnCards.every((card) => flippedIds.has(card.id));
 
-  // The reveal is the ritual: the first tap turns a card; once it faces up,
-  // tapping again opens its detail.
+  // The cards reveal themselves, one at a time, once they are dealt.
+  // Larger spreads cascade a little faster so the Celtic Cross doesn't drag.
+  useEffect(() => {
+    if (stage !== 'drawing' || drawnCards.length === 0) return;
+
+    if (!motionOk) {
+      setFlippedIds(new Set(drawnCards.map((card) => card.id)));
+      return;
+    }
+
+    const stagger = drawnCards.length > 5 ? 550 : 850;
+    const timers = drawnCards.map((card, index) =>
+      window.setTimeout(() => {
+        setFlippedIds((prev) => new Set(prev).add(card.id));
+      }, 900 + index * stagger),
+    );
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [stage, drawnCards, motionOk]);
+
+  // Tapping a card mid-cascade turns it early; once face-up, tapping opens
+  // its detail.
   const handleCardClick = (card: DrawnCard) => {
     if (!flippedIds.has(card.id)) {
       setFlippedIds((prev) => new Set(prev).add(card.id));
       return;
     }
     setSelectedCardId(card.id);
-  };
-
-  const turnAllCards = () => {
-    setFlippedIds(new Set(drawnCards.map((card) => card.id)));
   };
 
   const handlePrevCard = (event: React.MouseEvent) => {
@@ -234,20 +252,6 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
               <SpreadLayout type={spreadId} cards={drawnCards} revealedIds={flippedIds} onCardClick={handleCardClick} />
             </div>
 
-            {!interpretation && !apiKeyMissing && !apiError && !allFlipped && (
-              <div className="sticky bottom-6 z-40 mt-4 flex flex-col items-center gap-2 animate-fade-in pb-2 text-center">
-                <p className="rounded-full border border-[color:var(--copper)]/25 bg-[rgba(6,11,19,0.9)] px-6 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">
-                  Turn each card when you are ready
-                </p>
-                <button
-                  onClick={turnAllCards}
-                  className="min-h-[44px] text-[10px] uppercase tracking-[0.24em] text-[color:var(--mist)]/64 underline underline-offset-4 transition hover:text-[color:var(--gilt)]"
-                >
-                  Turn them all at once
-                </button>
-              </div>
-            )}
-
             {!interpretation && !apiKeyMissing && !apiError && allFlipped && (
               <div className="sticky bottom-6 z-40 mt-4 flex justify-center animate-fade-in pb-2">
                 <button
@@ -312,7 +316,13 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                 <div className="border-y border-[color:var(--copper)]/12 py-12">
                   <div className="mx-auto max-w-2xl space-y-4 text-center">
                     <h3 className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Archetype & Shadow</h3>
-                    <p className="whitespace-pre-wrap text-left text-lg leading-relaxed text-[color:#D5D0C6]">{interpretation.archetypeShadow}</p>
+                    <div className="space-y-5 text-left">
+                      {interpretation.archetypeShadow.split(/\n{2,}/).map((paragraph, index) => (
+                        <p key={index} className="text-lg leading-relaxed text-[color:#D5D0C6]">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
