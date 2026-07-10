@@ -16,9 +16,13 @@
 | 2026-07-04 | self | Gated entrance motion on `hermeticStore.qualityTier`, which RitualCanvas auto-sets to "low" for ANY mobile viewport or ≤4GB memory — it would have disabled all reveals on phones. | `qualityTier` is a WebGL render-budget tier, not a motion capability signal. Gate motion on prefers-reduced-motion + stillness + a true low-power heuristic (saveData / 2g / ≤2 cores), like WebGLGuard. |
 | 2026-07-04 | self | Exported a helper (`classifyInterpretError`) from a Next.js route.ts and the build failed: route files only allow route-field exports. | Put shared/testable route logic in a sibling module (e.g. `classifier.ts` next to `route.ts`). |
 | 2026-07-04 | self | Tried to QA IntersectionObserver-driven reveals in the Claude Preview browser; IO callbacks never fire because the page runs with `document.hidden: true` (and the default viewport is 0×0). | Entrance/reveal choreography must be eyeballed in a visible browser. In the preview tool, verify state/attributes/styles via preview_eval instead, and resize the viewport explicitly before layout checks. |
+| 2026-07-10 | self | Used an unquoted dynamic-route path in zsh while gathering review context; `[slug]` was parsed as a glob and prevented the remaining inspection command from running. | Quote filesystem paths containing brackets in zsh commands. |
 
 ## User Preferences
 - Keep collaboration pragmatic and concise.
+- AI access baseline (2026-07): allow a generous shared tier of 10 tarot readings and 3 natal readings per verified visitor per day; avoid adding paid infrastructure where a Vercel-native or no-cost approach is sufficient.
+- UX decision (2026-07): do not add daily Turnstile friction to tarot; prioritize acquisition/return visits over making the shared quota hard to evade. Treat the tarot allowance as a soft per-browser cap, paired with strict payload limits and best-effort burst controls.
+- Deployment topology (2026-07): the public Next.js app is on Vercel; `astro-service` is hosted on Render. Secure their public server-to-server connection with an application secret rather than assuming a shared private network.
 - Copy voice: avoid "LLM speak" (e.g., "it's not X, it's Y"), minimize em dashes. Ground claims in real source texts (Corpus Hermeticum, Emerald Tablet, Rosarium Philosophorum, Kybalion, Plato's Timaeus, Eliphas Levi). Bridge mystical to personable. Linguistics of a poet laureate/top academia but 8th-grade reading level.
 - Mobile-first: all interactive elements need 44px minimum touch targets.
 - Social/video direction: prioritize audience growth through awe, curiosity, and inspiration. Synthetic on-screen talent is acceptable if it feels realistic, wise, and cinematically mythic rather than cheesy or cosplay-like.
