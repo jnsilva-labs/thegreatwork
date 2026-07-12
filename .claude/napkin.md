@@ -17,6 +17,7 @@
 | 2026-07-04 | self | Exported a helper (`classifyInterpretError`) from a Next.js route.ts and the build failed: route files only allow route-field exports. | Put shared/testable route logic in a sibling module (e.g. `classifier.ts` next to `route.ts`). |
 | 2026-07-04 | self | Tried to QA IntersectionObserver-driven reveals in the Claude Preview browser; IO callbacks never fire because the page runs with `document.hidden: true` (and the default viewport is 0×0). | Entrance/reveal choreography must be eyeballed in a visible browser. In the preview tool, verify state/attributes/styles via preview_eval instead, and resize the viewport explicitly before layout checks. |
 | 2026-07-10 | self | Used an unquoted dynamic-route path in zsh while gathering review context; `[slug]` was parsed as a glob and prevented the remaining inspection command from running. | Quote filesystem paths containing brackets in zsh commands. |
+| 2026-07-10 | self | Tried to apply a broad plan revision after review, but one stale paragraph context prevented the entire patch from applying. | Re-read the exact affected plan sections and apply smaller, independently verifiable patches after review feedback. |
 
 ## User Preferences
 - Keep collaboration pragmatic and concise.
