@@ -79,8 +79,10 @@ const isDailyUsage = (value: unknown): value is DailyUsage => {
     UUID_PATTERN.test(record.id) &&
     typeof record.day === "string" &&
     isUtcDate(record.day) &&
+    typeof record.tarotUsed === "number" &&
     Number.isSafeInteger(record.tarotUsed) &&
     record.tarotUsed >= 0 &&
+    typeof record.natalUsed === "number" &&
     Number.isSafeInteger(record.natalUsed) &&
     record.natalUsed >= 0
   );
