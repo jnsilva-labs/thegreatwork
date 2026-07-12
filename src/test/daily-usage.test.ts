@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   DailyUsageConfigurationError,
+  DAILY_TAROT_LIMIT,
   checkDailyUsage,
   incrementDailyUsage,
   readDailyUsage,
@@ -118,7 +119,7 @@ describe("daily usage", () => {
   });
 
   it("allows the tenth tarot reading and rejects the eleventh until UTC midnight", () => {
-    const ninth = usage({ tarotUsed: 9 });
+    const ninth = usage({ tarotUsed: DAILY_TAROT_LIMIT - 1 });
     expect(checkDailyUsage({ usage: ninth, kind: "tarot", now: NOW })).toEqual({
       allowed: true,
       remaining: 1,
@@ -126,7 +127,7 @@ describe("daily usage", () => {
     });
 
     const tenth = incrementDailyUsage(ninth, "tarot");
-    expect(tenth.tarotUsed).toBe(10);
+    expect(tenth.tarotUsed).toBe(DAILY_TAROT_LIMIT);
     expect(checkDailyUsage({ usage: tenth, kind: "tarot", now: NOW })).toEqual({
       allowed: false,
       remaining: 0,

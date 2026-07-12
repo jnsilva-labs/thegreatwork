@@ -125,7 +125,9 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
     setApiError(null);
     setApiKeyMissing(false);
 
-    const apiKey = getSettings().apiKey?.trim();
+    const settings = getSettings();
+    const apiKey = settings.apiKey?.trim();
+    const activeDeck = getDecks().find((deck) => deck.id === settings.activeDeckId) || DEFAULT_DECK;
 
     try {
       const result = await generateInterpretation({
@@ -134,6 +136,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
         spread,
         cards: drawnCards,
         apiKey: apiKey || undefined,
+        isCustomDeck: activeDeck.isCustom,
       });
 
       setInterpretation(result);

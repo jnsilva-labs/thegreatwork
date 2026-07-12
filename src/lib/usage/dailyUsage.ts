@@ -1,9 +1,10 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 
 export const DAILY_USAGE_COOKIE = "ap_daily_usage";
+export const DAILY_TAROT_LIMIT = 10;
 
 const LIMITS = {
-  tarot: 10,
+  tarot: DAILY_TAROT_LIMIT,
   natal: 3
 } as const;
 
@@ -96,15 +97,15 @@ const freshUsage = (now: Date): DailyUsage => ({
   natalUsed: 0
 });
 
-export function readDailyUsage({ cookie, now }: { cookie?: string; now: Date }): DailyUsage {
+export function readVerifiedDailyUsage({ cookie, now }: { cookie?: string; now: Date }): DailyUsage | undefined {
   const secret = getSecret();
   if (!cookie) {
-    return freshUsage(now);
+    return undefined;
   }
 
   const parts = cookie.split(".");
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
-    return freshUsage(now);
+    return undefined;
   }
 
   const [payload, signature] = parts;
@@ -112,19 +113,23 @@ export function readDailyUsage({ cookie, now }: { cookie?: string; now: Date }):
   const signatureBytes = Buffer.from(signature);
   const expectedBytes = Buffer.from(expected);
   if (signatureBytes.length !== expectedBytes.length || !timingSafeEqual(signatureBytes, expectedBytes)) {
-    return freshUsage(now);
+    return undefined;
   }
 
   try {
     const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as unknown;
     if (!isDailyUsage(parsed) || parsed.day !== utcDay(now)) {
-      return freshUsage(now);
+      return undefined;
     }
 
     return parsed;
   } catch {
-    return freshUsage(now);
+    return undefined;
   }
+}
+
+export function readDailyUsage({ cookie, now }: { cookie?: string; now: Date }): DailyUsage {
+  return readVerifiedDailyUsage({ cookie, now }) ?? freshUsage(now);
 }
 
 export function checkDailyUsage({
