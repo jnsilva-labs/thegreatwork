@@ -39,6 +39,12 @@ vercel
 vercel --prod
 ```
 
+## Astrology service secrets
+
+Set `DAILY_USAGE_COOKIE_SECRET` only in Vercel. It signs the soft daily browser allowance for shared tarot and natal readings.
+
+Set `ASTRO_SERVICE_SECRET` in both Vercel and Render, using the exact same value. Vercel sends it only on server-to-server natal and month-ahead requests; Render rejects direct chart and transit requests without it. Do not prefix either variable with `NEXT_PUBLIC_`.
+
 ## Styleguide
 
 Visit `/styleguide` to see tokens, type scale, and sigils.
