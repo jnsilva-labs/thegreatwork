@@ -1,5 +1,6 @@
 import { DEFAULT_DECK, SPREADS } from '@/features/tarot/constants';
 import { DrawnCard, SpreadDefinition, SpreadType } from '@/features/tarot/types';
+import { normalizeTarotQuestion } from '@/lib/tarot/question';
 
 const REQUEST_KEYS = ['question', 'intention', 'spreadId', 'cards'] as const;
 const CARD_KEYS = ['id', 'reversed', 'position'] as const;
@@ -78,6 +79,11 @@ export function parseSharedInterpretationRequest(value: unknown): SharedInterpre
     return invalid();
   }
 
+  const question = normalizeTarotQuestion(value.question);
+  if (!question) {
+    return invalid();
+  }
+
   const spread = SPREADS[value.spreadId] as SpreadDefinition | undefined;
   if (!spread || spread.id !== value.spreadId) {
     return invalid();
@@ -110,7 +116,7 @@ export function parseSharedInterpretationRequest(value: unknown): SharedInterpre
   });
 
   return {
-    question: value.question.trim(),
+    question,
     intention: value.intention.trim(),
     spread: spread as SpreadDefinition & { id: SpreadType },
     cards: reconstructedCards,
