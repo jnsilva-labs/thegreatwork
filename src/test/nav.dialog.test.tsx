@@ -11,7 +11,7 @@ vi.mock('@/components/analytics/TrackedLink', () => ({
 import { NavBar } from '@/components/ui/NavBar';
 
 describe('navigation menu dialog', () => {
-  it('uses the menu trigger as the dialog restoration target and traps focus while open', async () => {
+  it('moves focus into the real menu panel, cycles Tab in both directions, and restores its trigger', async () => {
     const user = userEvent.setup();
     render(<NavBar />);
 
@@ -23,6 +23,19 @@ describe('navigation menu dialog', () => {
     const close = screen.getByRole('button', { name: /^close$/i });
     expect(dialog.getAttribute('aria-modal')).toBe('true');
     expect(document.activeElement).toBe(close);
+
+    const focusables = dialog.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    expect(first).toBeTruthy();
+    expect(last).toBeTruthy();
+    await user.tab({ shift: true });
+    expect(document.activeElement).toBe(last);
+    await user.tab();
+    expect(document.activeElement).toBe(first);
 
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog', { name: /menu/i })).toBeNull();
