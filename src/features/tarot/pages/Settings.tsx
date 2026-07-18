@@ -24,7 +24,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
     <TarotShell>
       <div className="relative z-10 mx-auto max-w-3xl space-y-10 px-6 py-16 md:px-12">
         <header className="flex items-center gap-4">
-          <button onClick={() => onNavigate('home')} className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
+          <button type="button" onClick={() => onNavigate('home')} aria-label="Return to tarot home" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -53,13 +53,16 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mist)]">Personal API Key (Optional)</label>
+              <label htmlFor="personal-api-key" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mist)]">Personal API Key (Optional)</label>
               <input
+                id="personal-api-key"
+                name="apiKey"
                 type="password"
                 value={settings.apiKey || ''}
                 onChange={(event) => setSettings({ ...settings, apiKey: event.target.value })}
                 placeholder="AIzaSy..."
-                className="w-full border border-[color:var(--copper)]/16 bg-[#050810] p-4 font-mono text-sm text-[color:#D5D0C6] outline-none transition focus:border-[color:var(--gilt)]"
+                autoComplete="off"
+                className="w-full border border-[color:var(--copper)]/16 bg-[#050810] p-4 font-mono text-sm text-[color:#D5D0C6] outline-none transition-[border-color] focus:border-[color:var(--gilt)]"
               />
             </div>
 
@@ -68,7 +71,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-2 text-[color:var(--gilt)] hover:underline"
+                className="inline-flex min-h-[44px] items-center gap-2 text-[color:var(--gilt)] hover:underline"
               >
                 <ExternalLink size={12} /> Get a Gemini API Key
               </a>
@@ -84,17 +87,21 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
                 <span className="text-xs text-[color:var(--mist)]">Allow cards to appear upside down, indicating internalized or blocked energy.</span>
               </div>
               <button
+                type="button"
                 onClick={() => setSettings({ ...settings, reversalsEnabled: !settings.reversalsEnabled })}
-                className={`relative h-6 w-12 rounded-full transition-colors ${settings.reversalsEnabled ? 'bg-[color:var(--gilt)]' : 'border border-[color:var(--copper)]/16 bg-[#050810]'}`}
+                aria-pressed={settings.reversalsEnabled}
+                aria-label="Enable reversals"
+                className={`relative h-11 w-12 rounded-full transition-colors ${settings.reversalsEnabled ? 'bg-[color:var(--gilt)]' : 'border border-[color:var(--copper)]/16 bg-[#050810]'}`}
               >
-                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${settings.reversalsEnabled ? 'translate-x-6' : ''}`}></div>
+                <div className={`absolute left-1 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white transition-transform ${settings.reversalsEnabled ? 'translate-x-6' : ''}`}></div>
               </button>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={handleSave}
-            className="flex w-full items-center justify-center gap-3 border border-[color:var(--gilt)]/45 bg-[rgba(6,11,19,0.86)] py-4 text-sm uppercase tracking-[0.3em] text-[color:var(--gilt)] transition hover:bg-[rgba(184,155,94,0.12)] hover:text-[color:var(--bone)]"
+            className="flex min-h-12 w-full items-center justify-center gap-3 border border-[color:var(--gilt)]/45 bg-[rgba(6,11,19,0.86)] py-4 text-sm uppercase tracking-[0.3em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[rgba(184,155,94,0.12)] hover:text-[color:var(--bone)]"
           >
             {isSaved ? <ShieldCheck size={20} /> : <Save size={20} />}
             {isSaved ? 'Attunement Complete' : 'Save Settings'}

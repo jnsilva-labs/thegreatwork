@@ -99,7 +99,7 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedIds, o
                 {cards[0] && <CardWithLabel card={cards[0]} isFaceUp={isRevealed(cards[0])} size="sm" onClick={() => onCardClick(cards[0])} />}
              </div>
              {/* Crossing Card (Rotated) */}
-             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-90 z-20 hover:z-30 hover:rotate-0 transition-all duration-500">
+             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-90 z-20 transition-transform duration-500 hover:z-30 hover:rotate-0">
                 {cards[1] && <CardVisual card={cards[1]} isFaceUp={isRevealed(cards[1])} size="sm" onClick={() => onCardClick(cards[1])} />}
              </div>
              
