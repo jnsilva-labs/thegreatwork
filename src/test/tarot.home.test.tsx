@@ -25,7 +25,14 @@ describe('tarot reading entry', () => {
     expect(screen.getByRole('alert').textContent).toMatch(/question/i);
     expect(onStartReading).not.toHaveBeenCalled();
 
-    await user.type(screen.getByLabelText(/the question/i), '  What needs attention?  ');
+    const question = screen.getByLabelText(/the question/i);
+    await user.type(question, '   ');
+    await user.click(reveal);
+    expect(screen.getByRole('alert').textContent).toMatch(/question/i);
+    expect(onStartReading).not.toHaveBeenCalled();
+
+    await user.clear(question);
+    await user.type(question, '  What needs attention?  ');
     await user.click(reveal);
 
     expect(onStartReading).toHaveBeenCalledWith({

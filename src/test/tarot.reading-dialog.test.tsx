@@ -27,6 +27,7 @@ describe('tarot card details dialog', () => {
     const dialog = screen.getByRole('dialog', { name: /card details/i });
     const close = screen.getByRole('button', { name: /close card details/i });
     expect(document.body.contains(dialog)).toBe(true);
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
     expect(document.activeElement).toBe(close);
 
     const focusables = dialog.querySelectorAll<HTMLElement>(
