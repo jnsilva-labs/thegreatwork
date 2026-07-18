@@ -71,4 +71,13 @@ describe('shared tarot interpretation request', () => {
       InvalidInterpretationRequest,
     );
   });
+
+  it.each([
+    ['U+115F', '\u115F'],
+    ['U+1160', '\u1160'],
+    ['U+3164', '\u3164'],
+    ['U+FFA0', '\uFFA0'],
+  ])('rejects invisible Hangul filler %s', (_codePoint, question) => {
+    expect(() => parseSharedInterpretationRequest({ ...payload, question })).toThrow(InvalidInterpretationRequest);
+  });
 });

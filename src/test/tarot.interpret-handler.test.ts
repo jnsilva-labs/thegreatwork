@@ -132,6 +132,29 @@ describe('tarot interpretation handler', () => {
     expect(response.headers.get('set-cookie')).toBeNull();
   });
 
+  it.each([
+    ['U+115F', '\u115F'],
+    ['U+1160', '\u1160'],
+    ['U+3164', '\u3164'],
+    ['U+FFA0', '\uFFA0'],
+  ])('rejects invisible Hangul filler %s before quota and burst reservations', async (_codePoint, question) => {
+    const reserve = vi.fn(() => ({ allowed: true, retryAfter: 0, release: vi.fn() }));
+    const generate = vi.fn().mockResolvedValue(interpretation);
+    const handler = createInterpretHandler({ generate, now: () => NOW, burstLimiter: { reserve } });
+    const request = new Request('https://example.test/api/tarot/interpret', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ...payload, question }),
+    });
+
+    const response = await handler(request);
+
+    expect(response.status).toBe(400);
+    expect(generate).not.toHaveBeenCalled();
+    expect(reserve).not.toHaveBeenCalled();
+    expect(response.headers.get('set-cookie')).toBeNull();
+  });
+
   it('returns the BYOK-eligible quota code once the daily tarot allowance is exhausted', async () => {
     const { generate, handler } = createHandler();
     const cookie = serializeDailyUsage(dailyUsage(10), NOW).value;
