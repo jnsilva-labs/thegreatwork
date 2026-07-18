@@ -91,7 +91,6 @@ git commit -m "fix: reject blank tarot questions"
 - Modify: `vitest.config.ts`
 - Create: `src/test/setup.ts`
 - Create: `src/test/tarot.home.test.tsx`
-- Create: `src/test/ui.focus-dialog.test.tsx`
 - Create: `src/test/nav.dialog.test.tsx`
 - Create: `src/test/tarot.reading-dialog.test.tsx`
 
@@ -107,23 +106,19 @@ Keep the existing Node environment for `src/test/**/*.test.ts`. Add a jsdom proj
 
 Render Home with spies. Assert one-card is selected by default, clicking another spread changes `aria-pressed` without calling `onStartReading`, a blank Reveal announces the inline error, and a trimmed question plus Reveal calls `onStartReading` once with the selected spread.
 
-- [ ] **Step 4: Write failing dialog interaction coverage**
-
-Render a minimal test host using the focus-dialog hook. Assert initial focus, Escape close, Tab/Shift+Tab wrapping, and restoration to the trigger. This is the required automated boundary before applying it to NavBar and Reading.
-
-- [ ] **Step 5: Add failing integration tests for the real dialog consumers**
+- [ ] **Step 4: Add failing integration tests for the real dialog consumers**
 
 Render NavBar and the smallest practical Reading fixture with their dependencies mocked at module edges. For each real trigger, assert initial close-control focus, Escape invokes the correct state close path, Tab/Shift+Tab remains inside, and focus returns to the original menu/card button. These tests must exercise the actual trigger-ref plumbing, not only the generic hook.
 
-- [ ] **Step 6: Run the new tests to verify they fail for missing behavior**
+- [ ] **Step 5: Run the new tests to verify they fail for missing behavior**
 
-Run: `npm test -- src/test/tarot.home.test.tsx src/test/ui.focus-dialog.test.tsx src/test/nav.dialog.test.tsx src/test/tarot.reading-dialog.test.tsx`
+Run: `npm test -- src/test/tarot.home.test.tsx src/test/nav.dialog.test.tsx src/test/tarot.reading-dialog.test.tsx`
 Expected: test harness loads; interaction assertions fail until the UI/hook tasks are implemented.
 
-- [ ] **Step 7: Commit the focused test harness**
+- [ ] **Step 6: Commit the focused test harness**
 
 ```bash
-git add package.json package-lock.json vitest.config.ts src/test/setup.ts src/test/tarot.home.test.tsx src/test/ui.focus-dialog.test.tsx src/test/nav.dialog.test.tsx src/test/tarot.reading-dialog.test.tsx
+git add package.json package-lock.json vitest.config.ts src/test/setup.ts src/test/tarot.home.test.tsx src/test/nav.dialog.test.tsx src/test/tarot.reading-dialog.test.tsx
 git commit -m "test: add interaction coverage for reading flow"
 ```
 
@@ -223,6 +218,7 @@ git commit -m "feat: clarify reading paths"
 - Create: `src/components/ui/useFocusDialog.ts`
 - Create: `src/lib/a11y/focusCycle.ts`
 - Create: `src/test/a11y.focus-cycle.test.ts`
+- Create: `src/test/ui.focus-dialog.test.tsx`
 - Test: `src/test/ui.focus-dialog.test.tsx`
 - Modify: `src/app/layout.tsx:46-56`
 - Modify: `src/app/page.tsx:82-129`
@@ -245,30 +241,34 @@ Expected: FAIL because the helper does not exist.
 
 Keep it DOM-free and limited to determining wrap direction. Re-run the focused test and expect PASS.
 
-- [ ] **Step 4: Build `useFocusDialog` around that helper**
+- [ ] **Step 4: Write the failing hook interaction test**
+
+Render a minimal host using the planned `useFocusDialog` API. Assert initial focus, Escape invokes its close callback, Tab/Shift+Tab wrap, and focus restores to the trigger. Run it to verify it fails because the hook does not exist before implementation.
+
+- [ ] **Step 5: Build `useFocusDialog` around that helper**
 
 The hook accepts `open`, `dialogRef`, `initialFocusRef`, `triggerRef`, and `onClose: () => void`; on open, focus the close control; on Escape invoke `onClose`; on Tab cycle focusable descendants; on close restore focus to the trigger. It must add and remove listeners deterministically and must not add a dependency.
 
-- [ ] **Step 5: Add the sole document main landmark and skip link**
+- [ ] **Step 6: Add the sole document main landmark and skip link**
 
 In RootLayout, render a visually-hidden, focus-visible `href="#main-content"` link immediately inside body and wrap `children` in `main id="main-content" tabIndex={-1}`. Replace the existing `main` elements in `page.tsx` and `ripley-scroll/page.tsx` with non-landmark containers.
 
-- [ ] **Step 6: Apply the dialog hook to menu and Tarot overlay**
+- [ ] **Step 7: Apply the dialog hook to menu and Tarot overlay**
 
 Give NavBar's trigger a ref, `aria-expanded`, and `aria-controls`; give the aside a labelled `role="dialog" aria-modal="true"`; use its Close button as initial focus. Convert `CardVisual` from faux `div role="button"` to native button without changing its visual internals. Extend the card selection callback through SpreadLayout so Reading receives the clicked native button and stores it in `lastCardTriggerRef` before opening the detail dialog. Apply the hook with that trigger ref to Reading's card detail overlay, give it title/description IDs, make close/previous/next controls 44px, and contain overscroll.
 
-- [ ] **Step 7: Move Tarot API errors into announced inline feedback**
+- [ ] **Step 8: Move Tarot API errors into announced inline feedback**
 
 Replace the fixed API-key/error overlay with an inline `role="alert"` or `aria-live="assertive"` panel beside the interpretation controls. Preserve personal-key fallback actions and 44px dismissal/retry controls; do not place it inside the card-detail dialog or trap focus.
 
-- [ ] **Step 8: Test and perform keyboard QA**
+- [ ] **Step 9: Test and perform keyboard QA**
 
 Run: `npm test -- src/test/a11y.focus-cycle.test.ts src/test/ui.focus-dialog.test.tsx src/test/nav.dialog.test.tsx src/test/tarot.reading-dialog.test.tsx`
 Expected: PASS.
 
 Manual desktop QA: Tab to skip link, open/close menu with Enter/Escape, confirm Tab stays inside and returns to trigger; open Tarot detail, test same behavior, then verify error is announced without trapping focus.
 
-- [ ] **Step 9: Commit landmark and dialog safety**
+- [ ] **Step 10: Commit landmark and dialog safety**
 
 ```bash
 git add src/components/ui/useFocusDialog.ts src/lib/a11y/focusCycle.ts src/test/a11y.focus-cycle.test.ts src/app/layout.tsx src/app/page.tsx src/app/ripley-scroll/page.tsx src/components/ui/NavBar.tsx src/features/tarot/pages/Reading.tsx src/features/tarot/components/CardVisual.tsx src/features/tarot/components/SpreadLayout.tsx
