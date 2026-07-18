@@ -65,4 +65,10 @@ describe('shared tarot interpretation request', () => {
       InvalidInterpretationRequest,
     );
   });
+
+  it('rejects a visually blank question', () => {
+    expect(() => parseSharedInterpretationRequest({ ...payload, question: '\u200B' })).toThrow(
+      InvalidInterpretationRequest,
+    );
+  });
 });

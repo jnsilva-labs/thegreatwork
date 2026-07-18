@@ -10,4 +10,8 @@ describe('tarot question normalization', () => {
     expect(normalizeTarotQuestion(' \n\t ')).toBeNull();
     expect(TAROT_QUESTION_REQUIRED_MESSAGE).toBe('Ask a question before revealing the cards.');
   });
+
+  it('rejects visually blank format characters', () => {
+    expect(normalizeTarotQuestion('\u200B')).toBeNull();
+  });
 });

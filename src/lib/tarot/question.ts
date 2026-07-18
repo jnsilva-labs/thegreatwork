@@ -2,5 +2,5 @@ export const TAROT_QUESTION_REQUIRED_MESSAGE = 'Ask a question before revealing 
 
 export const normalizeTarotQuestion = (value: string): string | null => {
   const question = value.trim();
-  return question || null;
+  return /[\p{L}\p{N}\p{P}\p{S}]/u.test(question) ? question : null;
 };
