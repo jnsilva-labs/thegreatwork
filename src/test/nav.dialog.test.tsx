@@ -32,6 +32,8 @@ describe('navigation menu dialog', () => {
 
     expect(first).toBeTruthy();
     expect(last).toBeTruthy();
+    first.focus();
+    expect(document.activeElement).toBe(first);
     await user.tab({ shift: true });
     expect(document.activeElement).toBe(last);
     await user.tab();
