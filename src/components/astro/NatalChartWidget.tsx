@@ -364,7 +364,7 @@ export function NatalChartWidget() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-6 pb-12 pt-2">
+    <div id="natal-widget" className="mx-auto w-full max-w-5xl scroll-mt-28 space-y-6 pb-12 pt-2">
       <section className="relative overflow-hidden rounded-[1.65rem] border border-[color:var(--copper)]/38 bg-[color:var(--char)]/62 p-4 shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-7">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(184,155,94,0.2),transparent_58%),radial-gradient(circle_at_88%_4%,rgba(232,227,216,0.12),transparent_46%)]" />
         <div className="pointer-events-none absolute -right-14 top-8 hidden h-40 w-40 rounded-full border border-[color:var(--gilt)]/26 sm:block" />
@@ -396,8 +396,10 @@ export function NatalChartWidget() {
             <label className="space-y-1 text-sm">
               <span className="text-[color:var(--bone)]">Birth date</span>
               <input
+                name="birth-date"
                 type="date"
                 required
+                autoComplete="bday"
                 className="min-h-[44px] w-full rounded-xl border border-[color:var(--copper)]/45 bg-[color:var(--bg)]/65 px-3 py-2 text-sm text-[color:var(--bone)]"
                 value={birthDate}
                 onChange={(event) => setBirthDate(event.target.value)}
@@ -407,8 +409,11 @@ export function NatalChartWidget() {
             <label className="space-y-1 text-sm">
               <span className="text-[color:var(--bone)]">Birth time</span>
               <input
+                name="birth-time"
                 type="time"
+                required={!timeUnknown}
                 disabled={timeUnknown}
+                autoComplete="off"
                 className="min-h-[44px] w-full rounded-xl border border-[color:var(--copper)]/45 bg-[color:var(--bg)]/65 px-3 py-2 text-sm text-[color:var(--bone)] disabled:cursor-not-allowed disabled:opacity-60"
                 value={birthTime}
                 onChange={(event) => setBirthTime(event.target.value)}
@@ -418,16 +423,17 @@ export function NatalChartWidget() {
             <label className="space-y-1 text-sm">
               <span className="text-[color:var(--bone)]">Birth place</span>
               <input
+                name="birth-place"
                 required
                 placeholder="City, Region, Country"
+                autoComplete="address-level2"
                 className="min-h-[44px] w-full rounded-xl border border-[color:var(--copper)]/45 bg-[color:var(--bg)]/65 px-3 py-2 text-sm text-[color:var(--bone)]"
                 value={birthPlace}
                 onChange={(event) => setBirthPlace(event.target.value)}
-                autoComplete="off"
               />
             </label>
 
-            <label className="flex items-center gap-3 rounded-xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 px-3 py-2.5 text-sm sm:col-span-2">
+            <label className="flex min-h-[44px] items-center gap-3 rounded-xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 px-3 py-2.5 text-sm sm:col-span-2">
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-[color:var(--gilt)]"
@@ -474,18 +480,23 @@ export function NatalChartWidget() {
               </div>
             ) : null}
 
-            <div className="flex flex-col items-start gap-3 pt-1 sm:col-span-2 sm:flex-row sm:flex-wrap sm:items-center">
-              <button
-                type="submit"
-                disabled={loading}
-                className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 px-6 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/25 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {loading ? "Revealing..." : "Reveal the Pattern"}
-              </button>
+            <div className="space-y-2 pt-1 sm:col-span-2">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 px-6 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/25 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {loading ? "Revealing..." : "Reveal the Pattern"}
+                </button>
 
-              <span className="text-xs text-[color:var(--mist)]" aria-live="polite">
-                {statusMessage}
-              </span>
+                <span className="text-xs text-[color:var(--mist)]" aria-live="polite">
+                  {statusMessage}
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-[color:var(--mist)]">
+                Your birth details are sent to calculate this reading; please enter only what is needed.
+              </p>
             </div>
           </form>
 

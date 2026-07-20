@@ -10,8 +10,10 @@ import { useUiStore } from "@/lib/uiStore";
 type PathDoor = {
   title: string;
   body: string;
-  href: string;
-  label: string;
+  actions: readonly {
+    href: string;
+    label: string;
+  }[];
   symbol: string;
   accent: "teal" | "gold" | "bone";
 };
@@ -20,7 +22,7 @@ type HomepageHeroProps = {
   title: string;
   subtitle: string;
   body: string;
-  pathDoors: PathDoor[];
+  pathDoors: readonly PathDoor[];
 };
 
 export function HomepageHero({
@@ -154,15 +156,20 @@ export function HomepageHero({
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">
                   {door.body}
                 </p>
-                <MagneticLink
-                  href={door.href}
-                  location="home:hero-door"
-                  label={door.label}
-                  variant={door.title}
-                  className="home-cta mt-4 inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-[0.65rem] uppercase tracking-[0.26em] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
-                >
-                  {door.label}
-                </MagneticLink>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {door.actions.map((action) => (
+                    <MagneticLink
+                      key={action.href}
+                      href={action.href}
+                      location="home:hero-door"
+                      label={action.label}
+                      variant={door.title}
+                      className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-[0.65rem] uppercase tracking-[0.26em] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                    >
+                      {action.label}
+                    </MagneticLink>
+                  ))}
+                </div>
               </article>
             );
           })}

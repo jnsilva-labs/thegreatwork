@@ -1,6 +1,7 @@
 import { JsonLd } from "@/components/seo/JsonLd";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { NatalChartWidget } from "@/components/astro/NatalChartWidget";
+import { MagneticLink } from "@/components/ui/MagneticLink";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { buildWebPageSchema } from "@/lib/seo/schema";
 
@@ -122,6 +123,18 @@ export default function AstrologyPage() {
             </div>
           </div>
         </section>
+
+        <div>
+          <MagneticLink
+            href="#natal-widget"
+            location="astrology:intro"
+            label="Create Your Natal Chart"
+            variant="natal-cta"
+            className="inline-flex min-h-[48px] items-center rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/12 px-5 py-3 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:bg-[color:var(--gilt)]/22 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+          >
+            Create Your Natal Chart
+          </MagneticLink>
+        </div>
 
         <section className="space-y-4">
           <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
