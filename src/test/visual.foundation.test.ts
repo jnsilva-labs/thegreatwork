@@ -29,7 +29,7 @@ describe("illuminated archive visual foundation", () => {
     expect(layout).not.toContain('@fontsource/manrope/400-italic.css');
     expect(layout).not.toContain('@fontsource/cormorant-garamond/600.css');
     expect(globals).toMatch(
-      /\.italic\s*{[^}]*font-family:\s*var\(--font-ritual-serif\);[^}]*font-style:\s*italic;/s,
+      /\.italic\s*{[\s\S]*?font-family:\s*var\(--font-ritual-serif\);[\s\S]*?font-style:\s*italic;/,
     );
   });
 
