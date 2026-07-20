@@ -20,6 +20,7 @@ describe("illuminated archive visual foundation", () => {
       '@fontsource/cormorant-garamond/400.css',
       '@fontsource/cormorant-garamond/400-italic.css',
       '@fontsource/manrope/400.css',
+      '@fontsource/manrope/400-italic.css',
       '@fontsource/manrope/500.css',
       '@fontsource/manrope/600.css',
       '@fontsource/manrope/700.css',
