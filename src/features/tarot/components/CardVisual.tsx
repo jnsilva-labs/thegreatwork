@@ -47,7 +47,7 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
           onClick?.();
         }
       }}
-      className={`relative perspective-1000 ${currentSizeClass} cursor-pointer group z-0 hover:z-10 transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]`}
+      className={`relative perspective-1000 ${currentSizeClass} cursor-pointer group z-0 hover:z-10 transition-[transform,box-shadow] duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]`}
     >
       <div className={`relative w-full h-full text-center transition-transform duration-700 motion-reduce:transition-none transform-style-3d ${isFaceUp ? 'rotate-y-180' : ''} ${hovered ? 'scale-[1.02]' : ''}`}>
         
@@ -55,7 +55,7 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
         <div className="absolute w-full h-full backface-hidden rounded shadow-2xl bg-void-900 border border-alchemy-gold/30 flex items-center justify-center overflow-hidden">
           
           {/* Layered Geometry */}
-          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]"></div>
+          <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(197,160,89,0.28)_0.75px,transparent_0.75px)] [background-size:12px_12px]"></div>
           
           <div className="absolute inset-2 border border-alchemy-gold/20 rounded-sm"></div>
           <div className="absolute inset-1.5 border-[0.5px] border-alchemy-gold/10"></div>
