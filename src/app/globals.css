@@ -1343,6 +1343,20 @@ body.nav-panel-open {
   line-height: 1.65;
 }
 
+.etched-rule {
+  height: 1px;
+  margin-block: clamp(1.5rem, 4vw, 3rem);
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--copper) 48%, transparent) 18%,
+    color-mix(in srgb, var(--gilt) 58%, transparent) 50%,
+    color-mix(in srgb, var(--copper) 48%, transparent) 82%,
+    transparent
+  );
+}
+
 .etched-list {
   display: grid;
   gap: 0;

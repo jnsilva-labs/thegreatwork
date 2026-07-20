@@ -136,6 +136,7 @@ describe("illuminated archive editorial primitives", () => {
       ".plate-caption",
       ".marginalia",
       ".etched-list",
+      ".etched-rule",
       ".ritual-link",
       ".oracle-room",
       ".trust-note",
