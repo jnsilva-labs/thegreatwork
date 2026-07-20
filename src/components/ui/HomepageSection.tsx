@@ -144,8 +144,8 @@ export function HomepageSection({
   }, [motionOk]);
 
   useEffect(() => {
-    if (revealed) timelineRef.current?.play();
-  }, [revealed]);
+    if (revealed && motionOk) timelineRef.current?.play();
+  }, [motionOk, revealed]);
 
   const quoteContent = quote ? (
     <blockquote className="home-pull-quote home-reveal-secondary">

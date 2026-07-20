@@ -1254,7 +1254,7 @@ body.nav-panel-open {
   display: block;
   margin-block-start: 1.25rem;
   color: var(--gilt);
-  font-family: var(--font-body);
+  font-family: var(--font-ritual-sans);
   font-size: var(--type-caption);
   font-style: normal;
   letter-spacing: 0.16em;

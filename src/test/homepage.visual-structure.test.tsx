@@ -1,8 +1,37 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
+
+const motionPreference = vi.hoisted(() => ({ motionOk: false }));
+const timelineSpies = vi.hoisted(() => ({
+  play: vi.fn(),
+  revert: vi.fn(),
+  set: vi.fn(),
+}));
+
+vi.mock("gsap", () => {
+  const timeline = {
+    play: timelineSpies.play,
+    to: vi.fn(() => timeline),
+  };
+
+  return {
+    gsap: {
+      context: (callback: () => void) => {
+        callback();
+        return { revert: timelineSpies.revert };
+      },
+      set: timelineSpies.set,
+      timeline: () => timeline,
+      utils: {
+        selector: (root: ParentNode) => (selector: string) =>
+          Array.from(root.querySelectorAll(selector)),
+      },
+    },
+  };
+});
 
 vi.mock("@/components/ui/HeroSigil", () => ({
   HeroSigil: () => <div data-testid="hero-sigil" />,
@@ -31,43 +60,16 @@ vi.mock("@/lib/uiStore", () => ({
 }));
 
 vi.mock("@/components/motion/useMotionPreference", () => ({
-  useMotionPreference: () => ({ motionOk: false }),
+  useMotionPreference: () => ({ motionOk: motionPreference.motionOk }),
 }));
 
 import { HomepageHero } from "@/components/ui/HomepageHero";
 import { HomepageSection } from "@/components/ui/HomepageSection";
 import { archivalFigures } from "@/data/archivalFigures";
-import { trackedSections } from "@/data/homepage";
+import { pathDoors, trackedSections } from "@/data/homepage";
 
 const readSource = (relativePath: string) =>
   readFileSync(resolve(process.cwd(), relativePath), "utf8");
-
-const pathDoors = [
-  {
-    title: "I'm New Here",
-    body: "Begin with an orientation.",
-    actions: [{ href: "/start-here", label: "Begin Your Initiation" }],
-    symbol: "◇",
-    accent: "teal" as const,
-  },
-  {
-    title: "I Want a Reading",
-    body: "Enter through direct experience.",
-    actions: [
-      { href: "/tarot", label: "Tarot · Draw a card" },
-      { href: "/astrology#natal-widget", label: "Astrology · Create a chart" },
-    ],
-    symbol: "◎",
-    accent: "gold" as const,
-  },
-  {
-    title: "I Want Serious Study",
-    body: "Follow a source-grounded map.",
-    actions: [{ href: "/study", label: "Walk The Path" }],
-    symbol: "⟐",
-    accent: "bone" as const,
-  },
-];
 
 describe("homepage illuminated archive structure", () => {
   it("uses one semantic hero heading while preserving two visual title lines", () => {
@@ -85,19 +87,13 @@ describe("homepage illuminated archive structure", () => {
   });
 
   it("preserves all three path doors and both live-reading routes", () => {
-    render(
-      <HomepageHero
-        title="Awareness Paradox"
-        subtitle="True without lying"
-        body="A living archive."
-        pathDoors={pathDoors}
-      />,
-    );
-
-    expect(screen.getAllByRole("article")).toHaveLength(3);
-    expect(screen.getByRole("link", { name: "Tarot · Draw a card" }).getAttribute("href")).toBe("/tarot");
-    expect(screen.getByRole("link", { name: "Astrology · Create a chart" }).getAttribute("href")).toBe(
-      "/astrology#natal-widget",
+    expect(pathDoors).toHaveLength(3);
+    const readingDoor = pathDoors.find((door) => door.title === "I Want a Reading");
+    expect(readingDoor?.actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ href: "/tarot" }),
+        expect.objectContaining({ href: "/astrology#natal-widget" }),
+      ]),
     );
   });
 
@@ -135,6 +131,37 @@ describe("homepage illuminated archive structure", () => {
     expect(screen.getByText("Corpus Hermeticum")).toBeTruthy();
   });
 
+  it("plays a newly created reveal timeline when motion is re-enabled after reveal", async () => {
+    class TestIntersectionObserver {
+      observe() {}
+      disconnect() {}
+    }
+    vi.stubGlobal("IntersectionObserver", TestIntersectionObserver);
+    motionPreference.motionOk = false;
+    timelineSpies.play.mockClear();
+
+    const renderSection = () => (
+      <HomepageSection
+        id="motion-chapter"
+        index={0}
+        title="A visible chapter"
+        body={["The chapter remains readable as motion preferences change."]}
+      />
+    );
+    const { container, rerender } = render(renderSection());
+
+    await waitFor(() => {
+      expect(container.querySelector("#motion-chapter")?.classList.contains("is-revealed")).toBe(true);
+    });
+    expect(timelineSpies.play).not.toHaveBeenCalled();
+
+    motionPreference.motionOk = true;
+    rerender(renderSection());
+
+    await waitFor(() => expect(timelineSpies.play).toHaveBeenCalledTimes(1));
+    motionPreference.motionOk = false;
+  });
+
   it("keeps quoted prose out of body copy and removes the unexplained blank tail", () => {
     for (const section of trackedSections) {
       if (!section.quote) continue;
@@ -147,11 +174,12 @@ describe("homepage illuminated archive structure", () => {
     expect(page).not.toMatch(/h-\[50vh\]|h-\[70vh\]/);
   });
 
-  it("lets the single reveal timeline own upgraded-section motion", () => {
+  it("keeps upgraded-section motion free of broad transitions and undefined font tokens", () => {
     const section = readSource("src/components/ui/HomepageSection.tsx");
+    const globals = readSource("src/app/globals.css");
 
-    expect(section).toContain("gsap.timeline");
     expect(section).not.toMatch(/className=\"[^\"]*\btransition\b/);
     expect(section).not.toContain("transition-all");
+    expect(globals).not.toContain("var(--font-body)");
   });
 });

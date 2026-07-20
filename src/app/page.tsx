@@ -9,39 +9,12 @@ import { FallbackEngraving } from "@/components/ui/FallbackEngraving";
 import { AudioLayer } from "@/components/ui/AudioLayer";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { HomepageHero } from "@/components/ui/HomepageHero";
-import { homepageSections, homepageSlugs, trackedSections } from "@/data/homepage";
+import { homepageSections, homepageSlugs, pathDoors, trackedSections } from "@/data/homepage";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { buildWebPageSchema } from "@/lib/seo/schema";
 
 const HOME_DESCRIPTION =
   "A living archive of alchemy, tarot, astrology, sacred geometry, and Hermetic principles for reflective self-study and practical inner work.";
-
-const pathDoors = [
-  {
-    title: "I'm New Here",
-    body: "Start with a clear orientation, the Hermetic starter path, and the first practices that make the library usable.",
-    actions: [{ href: "/start-here", label: "Begin Your Initiation" }],
-    symbol: "◇",
-    accent: "teal",
-  },
-  {
-    title: "I Want a Reading",
-    body: "Enter through direct experience with tarot or astrology and let the symbolic language meet you through a live reading.",
-    actions: [
-      { href: "/tarot", label: "Tarot · Draw a card" },
-      { href: "/astrology#natal-widget", label: "Astrology · Create a chart" },
-    ],
-    symbol: "◎",
-    accent: "gold",
-  },
-  {
-    title: "I Want Serious Study",
-    body: "Follow a clearer map through the principles, alchemy, tarot, astrology, and source-grounded study without losing the thread.",
-    actions: [{ href: "/study", label: "Walk The Path" }],
-    symbol: "⟐",
-    accent: "bone",
-  },
-] as const;
 
 export const metadata = buildPageMetadata({
   path: "/",
@@ -84,7 +57,7 @@ export default function Home() {
           title={hero.title}
           subtitle={hero.subtitle ?? ""}
           body={hero.body[0] ?? ""}
-          pathDoors={[...pathDoors]}
+          pathDoors={pathDoors}
         />
 
         {/* Tracked sections: paradox → alchemy → divination → astrology → geometry → principles → community */}

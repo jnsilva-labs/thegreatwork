@@ -20,6 +20,17 @@ export type HomepageSectionItem = {
 
 export type HomepageLayout = "essay" | "plate" | "quote" | "map";
 
+export type HomepagePathDoor = {
+  title: string;
+  body: string;
+  actions: readonly {
+    href: string;
+    label: string;
+  }[];
+  symbol: string;
+  accent: "teal" | "gold" | "bone";
+};
+
 export type HomepageSection = {
   id: string;
   sectionType: SectionType;
@@ -39,6 +50,33 @@ export type SocialLink = {
   href: string;
   label: string;
 };
+
+export const pathDoors = [
+  {
+    title: "I'm New Here",
+    body: "Start with a clear orientation, the Hermetic starter path, and the first practices that make the library usable.",
+    actions: [{ href: "/start-here", label: "Begin Your Initiation" }],
+    symbol: "◇",
+    accent: "teal",
+  },
+  {
+    title: "I Want a Reading",
+    body: "Enter through direct experience with tarot or astrology and let the symbolic language meet you through a live reading.",
+    actions: [
+      { href: "/tarot", label: "Tarot · Draw a card" },
+      { href: "/astrology#natal-widget", label: "Astrology · Create a chart" },
+    ],
+    symbol: "◎",
+    accent: "gold",
+  },
+  {
+    title: "I Want Serious Study",
+    body: "Follow a clearer map through the principles, alchemy, tarot, astrology, and source-grounded study without losing the thread.",
+    actions: [{ href: "/study", label: "Walk The Path" }],
+    symbol: "⟐",
+    accent: "bone",
+  },
+] as const satisfies readonly HomepagePathDoor[];
 
 /* ─── Social Links ──────────────────────────────────────────────────── */
 
