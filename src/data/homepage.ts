@@ -1,4 +1,5 @@
 import { principles } from "./principles";
+import type { ArchivalFigureId } from "./archivalFigures";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 
@@ -17,6 +18,8 @@ export type HomepageSectionItem = {
   description: string;
 };
 
+export type HomepageLayout = "essay" | "plate" | "quote" | "map";
+
 export type HomepageSection = {
   id: string;
   sectionType: SectionType;
@@ -25,6 +28,8 @@ export type HomepageSection = {
   body: string[];
   quote?: string;
   quoteSource?: string;
+  layout?: HomepageLayout;
+  figureId?: ArchivalFigureId;
   cta?: { label: string; href: string };
   items?: HomepageSectionItem[];
 };
@@ -94,10 +99,11 @@ export const homepageSections: HomepageSection[] = [
     sectionType: "paradox",
     title: "The Paradox",
     subtitle: "You are already made of what you seek",
+    layout: "quote",
     quote: "If thou learnest that thou art thyself of Life and Light, thou shalt return again to Life.",
     quoteSource: "Corpus Hermeticum",
     body: [
-      "The Corpus Hermeticum records a voice that says: \"If thou learnest that thou art thyself of Life and Light, thou shalt return again to Life.\" The paradox is older than language. The deeper you turn inward, the more you recognize your continuity with everything beyond you.",
+      "The paradox is older than language. The deeper you turn inward, the more you recognize your continuity with everything beyond you.",
       "Civilizations across every continent encoded this recognition into star maps, card systems, alchemical processes, and geometric forms. They raised temples and mystery schools around it. The knowledge was always in plain sight. People simply had to be ready to see it.",
       "That readiness looks different for everyone. Sometimes it arrives as a question you cannot stop asking. Sometimes as a stillness after something falls apart. The traditions gathered here were built by people who reached that threshold and left instructions for whoever came next.",
       "Awareness Paradox gathers these scattered instruments into a single place. Think of it as a workshop, a library, and a mirror. The tools are ancient. The invitation is yours.",
@@ -111,11 +117,12 @@ export const homepageSections: HomepageSection[] = [
     sectionType: "alchemy",
     title: "The Great Work",
     subtitle: "Solve et Coagula",
+    layout: "map",
     quote: "When your matter darkens, the work has already begun.",
     quoteSource: "Rosarium tradition",
     body: [
       "The alchemists mapped a process of inner transformation that every person, at some point, lives through. They called it the Magnum Opus. Every transformation has two movements: dissolving what was, and forming what will be. Solve et coagula. You cannot have one without the other.",
-      "The Rosarium Philosophorum, a sixteenth-century alchemical text, counsels: \"When you see your matter going black, rejoice. You are at the beginning of the work.\"",
+      "The Rosarium Philosophorum treats the blackening not as failure but as evidence that the work has begun.",
     ],
     cta: { label: "Explore The Great Work", href: "/great-work" },
     items: [
@@ -148,11 +155,13 @@ export const homepageSections: HomepageSection[] = [
     sectionType: "divination",
     title: "Tools of the Oracle",
     subtitle: "A lottery of thoughts as exact as numbers",
+    layout: "plate",
+    figureId: "alchemical-manuscript",
     quote: "The reading does not predict. It illuminates.",
     body: [
       "Eliphas Levi described the tarot as \"a truly philosophical machine, which keeps the mind from wandering, while leaving its initiative and liberty.\" For over two centuries, the Western esoteric tradition has recognized the tarot, the I Ching, runes, and geomancy as instruments of self-inquiry.",
       "The Golden Dawn wove the seventy-eight cards into a web of correspondence connecting Kabbalah, astrology, alchemy, and sacred geometry. Each card became a node in a living map of experience.",
-      "Pull a card. Sit with what surfaces. The reading does not predict. It illuminates.",
+      "Pull a card. Sit with what surfaces. Let the symbolic pattern clarify the question you brought with you.",
     ],
     cta: { label: "Get a Tarot Reading", href: "/tarot" },
   },
@@ -163,10 +172,12 @@ export const homepageSections: HomepageSection[] = [
     sectionType: "astrology",
     title: "As Above, So Below",
     subtitle: "The cosmic sympathy",
+    layout: "essay",
+    figureId: "splendor-solis-sun",
     quote: "You are not merely beneath the heavens. You are from the same order they reveal.",
     quoteSource: "Hermetic frame",
     body: [
-      "The Emerald Tablet of Hermes opens with a declaration: \"That which is below is like that which is above, and that which is above is like that which is below, to do the miracles of one only thing.\" The Arabic original says from, not like. You are not a reflection of the cosmos. You are from the same source.",
+      "The Emerald Tablet declares a correspondence between what is above and what is below. The Arabic original says from, not like: earthly and celestial life emerge from the same source.",
       "In Hermetic cosmology, the soul descends through seven planetary spheres to arrive on earth, gathering qualities at each stage. Your natal chart is a record of that passage. Ptolemy, writing in the second century, treated astrology as natural philosophy: the study of how celestial patterns correspond to earthly life through the bonds of sympatheia.",
     ],
     cta: { label: "Begin with the Big Three", href: "/astrology" },
@@ -178,12 +189,12 @@ export const homepageSections: HomepageSection[] = [
     sectionType: "geometry",
     title: "The Architecture of the Divine",
     subtitle: "God is always doing geometry",
+    layout: "plate",
+    figureId: "alchemical-allegory",
     quote: "Proportion is the visible trace of hidden order.",
     body: [
       "In the Timaeus, Plato assigned a geometric solid to each element: tetrahedron to fire, cube to earth, octahedron to air, icosahedron to water, and the dodecahedron to the cosmos itself. The Platonic tradition held that the deepest structure of reality is mathematical, and that to study proportion is to study the mind of the divine.",
-      "The Golden Ratio, which Luca Pacioli called the Divine Proportion, extends forever beyond our ability to capture it and yet appears everywhere: in spiral shells, in branching trees, in the proportions of your own body. The Flower of Life surfaces across cultures and centuries, painted by unknown hands on the walls of Egyptian temples, drawn in the margins of medieval manuscripts. Its universality is geometry discovering itself.",
-      "Long before modern science named pattern theory, builders and philosophers treated geometry as a sacred discipline. Egyptian temple plans used measured ratios to mirror cosmic order. Pythagorean schools taught number and form as a path to harmony of soul and city. In India and Tibet, mandalas were drawn as maps of consciousness, while Islamic architects used repeating star patterns to express unity unfolding into multiplicity.",
-      "Fractal structure carries that same logic into the living world. Branches resemble trees, blood vessels echo river systems, and neural pathways mirror lightning channels. The nervous system tends to settle around this kind of ordered complexity, which can improve focus, reduce stress, and sharpen spatial awareness. That is why this section is interactive: when you explore and manipulate these forms here, you are training perception as much as appreciating beauty.",
+      "Across temple plans, mandalas, Islamic star patterns, shells, branches, and river systems, proportion makes unity visible through multiplicity. Exploring these forms trains perception: the eye learns to recognize one order moving through many scales.",
     ],
     cta: { label: "Explore the Patterns", href: "/gallery" },
   },
@@ -194,9 +205,10 @@ export const homepageSections: HomepageSection[] = [
     sectionType: "principles",
     title: "The Seven Laws",
     subtitle: "The Magic Key before whose touch all the Doors of the Temple fly open",
+    layout: "map",
     quote: "Every tool on this site is one principle wearing a different face.",
     body: [
-      "The Kybalion codifies seven principles that describe how reality operates at every scale. \"He who knows these, understandingly, possesses the Magic Key before whose touch all the Doors of the Temple fly open.\" Every tool on this site draws from these laws.",
+      "The Kybalion codifies seven principles that describe how reality operates at every scale. The archive approaches them as related lenses for disciplined observation and practice.",
     ],
     cta: { label: "Study the Principles", href: "/principles" },
     items: principles.map((p) => ({
@@ -211,6 +223,7 @@ export const homepageSections: HomepageSection[] = [
     sectionType: "community",
     title: "Walk With Us",
     subtitle: "A growing archive",
+    layout: "essay",
     quote: "Stay near the work as it ripens.",
     body: [
       "Awareness Paradox is a living project. New tools, new writings, and new explorations arrive as they ripen. If any of this resonates, stay close. The Corpus Hermeticum says that Mind \"is present with holy men and good, the pure and merciful,\" and that its presence becomes an aid. Perhaps the same is true of good company.",

@@ -94,9 +94,13 @@ export default function Home() {
             id={section.id}
             index={index}
             sectionType={section.sectionType}
+            layout={section.layout}
+            figureId={section.figureId}
             title={section.title}
             subtitle={section.subtitle}
             body={section.body}
+            quote={section.quote}
+            quoteSource={section.quoteSource}
             cta={section.cta}
             items={section.items}
           >
@@ -125,7 +129,6 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="h-[50vh] sm:h-[70vh]" aria-hidden="true" />
       </div>
     </div>
   );
