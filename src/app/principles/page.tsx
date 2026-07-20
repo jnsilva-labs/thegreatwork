@@ -97,11 +97,11 @@ export default function PrinciplesIndexPage() {
             </div>
             <div className="grid gap-2 text-sm leading-relaxed text-[color:var(--mist)] sm:grid-cols-2 sm:text-[15px]">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">Doctrine</p>
+                <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Doctrine</p>
                 <p className="mt-2">Axiom and commentary show the principle as it was taught.</p>
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">Practice</p>
+                <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Practice</p>
                 <p className="mt-2">The closing prompts are there to make the law visible in daily life.</p>
               </div>
             </div>
@@ -117,17 +117,19 @@ export default function PrinciplesIndexPage() {
               Read the axiom first, then the commentary, then take one practice into the day.
             </p>
           </div>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-7">
+          <ol aria-label="Principles manuscript index" className="grid border-y border-[color:var(--copper)]/22 md:grid-cols-2 xl:grid-cols-7">
             {principles.map((principle, index) => (
-              <Link
-                key={principle.slug}
-                href={`#${principle.slug}`}
-                className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[color:var(--copper)]/24 px-4 py-2 text-center text-[11px] uppercase tracking-[0.2em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
-              >
-                {romanNumerals[index]} · {principle.title}
-              </Link>
+              <li key={principle.slug} className="border-b border-r border-[color:var(--copper)]/16">
+                <Link
+                  href={`#${principle.slug}`}
+                  className="flex min-h-[64px] items-center px-4 py-3 text-left text-xs uppercase tracking-[0.18em] text-[color:var(--mist)] transition-colors hover:bg-[color:var(--char)]/20 hover:text-[color:var(--bone)]"
+                >
+                  <span className="mr-3 font-ritual text-2xl text-[color:var(--gilt)]">{romanNumerals[index]}</span>
+                  {principle.title}
+                </Link>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
         <section className="space-y-14">
@@ -137,6 +139,7 @@ export default function PrinciplesIndexPage() {
               <article
                 key={principle.slug}
                 id={principle.slug}
+                data-principle-commentary=""
                 style={
                   {
                     "--principle-accent": accents.accent,
@@ -166,7 +169,7 @@ export default function PrinciplesIndexPage() {
                   <div className="relative overflow-hidden border-l border-[color:var(--principle-accent)]/55 pl-6 sm:pl-8">
                     <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,var(--principle-wash),rgba(6,11,19,0)_62%)]" />
                     <div className="space-y-6">
-                      <p className="text-[11px] uppercase tracking-[0.32em] text-[color:var(--principle-accent)]">
+                      <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--principle-accent)]">
                         Commentary
                       </p>
                       <div className="max-w-5xl space-y-5 text-lg leading-[1.95] text-[color:#D5D0C6]">
@@ -177,7 +180,7 @@ export default function PrinciplesIndexPage() {
 
                   <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
                     <section className="px-1">
-                      <p className="text-[11px] uppercase tracking-[0.32em] text-[color:var(--gilt)]">Keys to remember</p>
+                      <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Keys to remember</p>
                       <ul className="mt-4 grid gap-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
                         {principle.keys.map((key) => (
                           <li key={key} className="flex gap-3">
@@ -189,7 +192,7 @@ export default function PrinciplesIndexPage() {
                     </section>
 
                     <section className="border border-[color:var(--principle-accent)]/20 bg-[linear-gradient(135deg,var(--principle-wash),rgba(6,11,19,0.5))] px-5 py-5 sm:px-6">
-                      <p className="text-[11px] uppercase tracking-[0.32em] text-[color:var(--principle-accent)]">
+                      <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--principle-accent)]">
                         Practice
                       </p>
                       <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:#D5D0C6] sm:text-base">
@@ -208,13 +211,14 @@ export default function PrinciplesIndexPage() {
                   <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.24em]">
                     <Link
                       href={`/principles/${principle.slug}`}
-                      className="inline-flex min-h-[40px] items-center rounded-full border border-[color:var(--copper)]/24 px-3 py-2 text-[color:var(--gilt)] transition hover:border-[color:var(--principle-accent)] hover:text-[color:var(--bone)]"
+                      aria-label={`Standalone page for ${principle.title}`}
+                      className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/24 px-1 py-2 text-[color:var(--gilt)] transition-colors hover:border-[color:var(--principle-accent)] hover:text-[color:var(--bone)]"
                     >
                       Standalone page
                     </Link>
                     <Link
                       href="/gallery"
-                      className="inline-flex min-h-[40px] items-center rounded-full border border-[color:var(--copper)]/24 px-3 py-2 text-[color:var(--mist)] transition hover:border-[color:var(--principle-accent)] hover:text-[color:var(--bone)]"
+                      className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/24 px-1 py-2 text-[color:var(--mist)] transition-colors hover:border-[color:var(--principle-accent)] hover:text-[color:var(--bone)]"
                     >
                       Pair with geometry
                     </Link>

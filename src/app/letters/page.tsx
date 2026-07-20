@@ -1,4 +1,5 @@
 import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { MarginalNote } from "@/components/editorial";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -41,7 +42,7 @@ export const metadata = buildPageMetadata({
 export default function LettersPage() {
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">
-      <div className="mx-auto max-w-5xl space-y-12">
+      <div className="mx-auto max-w-6xl space-y-16">
         <JsonLd
           id="letters-webpage-schema"
           data={buildWebPageSchema({
@@ -60,7 +61,7 @@ export default function LettersPage() {
           })}
         />
 
-        <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
+        <header className="grid gap-10 border-b border-[color:var(--copper)]/22 pb-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
           <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
               Newsletter & Archive
@@ -79,20 +80,19 @@ export default function LettersPage() {
                 variant="archive"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-5 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-5 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--bone)] transition-colors hover:border-[color:var(--gilt)]"
               >
                 Open Substack Archive
               </TrackedLink>
             </div>
           </div>
 
-          <div className="border-l border-[color:var(--copper)]/24 pl-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">What they do</p>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+          <MarginalNote heading="What they do" headingLevel="h2" glyph="✦">
+            <p className="max-w-md">
               The letters are the slowest way through the site. Each one should return you to one practice,
               one page, or one question worth staying with.
             </p>
-          </div>
+          </MarginalNote>
         </header>
 
         <EmailCtaCard
@@ -107,14 +107,14 @@ export default function LettersPage() {
           tertiaryLabel=""
         />
 
-        <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-4 rounded-[1.6rem] border border-[color:var(--copper)]/22 bg-[color:var(--obsidian)]/22 p-6">
+        <section className="grid gap-10 border-y border-[color:var(--copper)]/22 py-10 lg:grid-cols-[0.9fr_1.1fr]" data-editorial-index="letters">
+          <div className="space-y-5">
             <h2 className="font-ritual text-2xl">What the letters cover</h2>
-            <ul className="space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
-              <li>— Hermetic principles in plain language and real-life application</li>
-              <li>— Astrology as reflective self-study (not deterministic forecasting)</li>
-              <li>— Meditation and contemplative practice prompts</li>
-              <li>— New site tools, essays, and guided pathways as the project grows</li>
+            <ul aria-label="What the letters cover" className="etched-list border-t border-[color:var(--copper)]/18 text-sm leading-relaxed text-[color:var(--mist)]">
+              <li className="etched-list__item"><span aria-hidden="true" className="etched-list__marker">I</span><span>Hermetic principles in plain language and real-life application</span></li>
+              <li className="etched-list__item"><span aria-hidden="true" className="etched-list__marker">II</span><span>Astrology as reflective self-study (not deterministic forecasting)</span></li>
+              <li className="etched-list__item"><span aria-hidden="true" className="etched-list__marker">III</span><span>Meditation and contemplative practice prompts</span></li>
+              <li className="etched-list__item"><span aria-hidden="true" className="etched-list__marker">IV</span><span>New site tools, essays, and guided pathways as the project grows</span></li>
             </ul>
             <div className="pt-2">
               <TrackedLink
@@ -124,35 +124,35 @@ export default function LettersPage() {
                 variant="archive"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-5 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/55 px-1 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition-colors hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
               >
                 Open Substack Archive
               </TrackedLink>
             </div>
           </div>
 
-          <div className="space-y-4 rounded-[1.6rem] border border-[color:var(--copper)]/18 bg-[color:var(--obsidian)]/16 p-6">
+          <div className="space-y-4 lg:border-l lg:border-[color:var(--copper)]/20 lg:pl-10">
             <h2 className="font-ritual text-2xl">Coming letters</h2>
-            <div className="space-y-4">
+            <ol aria-label="Coming letters" className="border-t border-[color:var(--copper)]/18">
               {upcomingLetterThemes.map((item) => (
-                <article
+                <li
                   key={item.title}
-                  className="rounded-xl border border-[color:var(--copper)]/20 bg-[color:var(--char)]/35 p-4"
+                  className="grid gap-2 border-b border-[color:var(--copper)]/18 py-5 md:grid-cols-[0.68fr_1.32fr]"
                 >
                   <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--gilt)]">
                     {item.format}
                   </p>
-                  <h3 className="mt-2 text-lg text-[color:var(--bone)]">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--mist)]">
-                    {item.summary}
-                  </p>
-                </article>
+                  <div>
+                    <h3 className="text-lg text-[color:var(--bone)]">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-[color:var(--mist)]">{item.summary}</p>
+                  </div>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[color:var(--copper)]/25 bg-[color:var(--char)]/35 p-6">
+        <section className="border-y border-[color:var(--copper)]/25 py-7">
           <h2 className="font-ritual text-2xl">Where to begin</h2>
           <div className="mt-4 flex flex-wrap gap-3">
             <TrackedLink
@@ -160,7 +160,7 @@ export default function LettersPage() {
               location="letters:where-to-begin"
               label="Start Here"
               variant="secondary"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
             >
               Start Here
             </TrackedLink>
@@ -169,7 +169,7 @@ export default function LettersPage() {
               location="letters:where-to-begin"
               label="Hermetic Principles"
               variant="secondary"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
             >
               Hermetic Principles
             </TrackedLink>
@@ -178,7 +178,7 @@ export default function LettersPage() {
               location="letters:where-to-begin"
               label="Astrology"
               variant="secondary"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
             >
               Astrology
             </TrackedLink>

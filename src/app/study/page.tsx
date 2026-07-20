@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { EditorialSpread, MarginalNote } from "@/components/editorial";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getSubstackUrl, isExternalHref } from "@/lib/substack";
@@ -125,8 +126,8 @@ export default function StudyPage() {
 
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">
-      <div className="mx-auto max-w-6xl space-y-10">
-        <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
+      <div className="mx-auto max-w-6xl space-y-16">
+        <header className="grid gap-10 border-b border-[color:var(--copper)]/22 pb-12 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
           <div className="space-y-5">
             <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">Study Map</p>
             <h1 className="font-ritual text-4xl sm:text-6xl">The Path</h1>
@@ -141,7 +142,7 @@ export default function StudyPage() {
                 location="study:header"
                 label="Start Here"
                 variant="primary"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition-colors hover:border-[color:var(--gilt)]"
               >
                 Start Here
               </TrackedLink>
@@ -150,7 +151,7 @@ export default function StudyPage() {
                 location="study:header"
                 label="Open the Journey"
                 variant="secondary"
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+                className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
               >
                 Open the Journey
               </TrackedLink>
@@ -161,35 +162,34 @@ export default function StudyPage() {
                 variant="secondary"
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+                className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
               >
                 Subscribe on Substack
               </TrackedLink>
             </div>
           </div>
 
-          <div className="border-l border-[color:var(--copper)]/24 pl-6">
-            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Reading stance</p>
+          <MarginalNote heading="Reading stance" headingLevel="h2" glyph="◇">
             <p className="mt-3 max-w-md text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
               Use this map to move more slowly, not faster. The point is not to consume every path, but to find the
               one that is asking for your attention now.
             </p>
-          </div>
+          </MarginalNote>
         </header>
 
-        <section className="space-y-4">
+        <section className="space-y-8" data-editorial-index="audiences">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Three entry modes</p>
             <h2 className="mt-2 font-ritual text-3xl">One library, three ways to walk it</h2>
           </div>
-          <div className="grid gap-5 lg:grid-cols-3">
+          <ul aria-label="Three ways to walk the library" className="grid border-y border-[color:var(--copper)]/22 lg:grid-cols-3">
             {audiencePaths.map((path) => (
-              <article
+              <li
                 key={path.title}
-                className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6"
+                className="border-b border-[color:var(--copper)]/18 py-7 last:border-b-0 lg:border-b-0 lg:border-r lg:px-7 lg:first:pl-0 lg:last:border-r-0 lg:last:pr-0"
               >
                 <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">{path.subtitle}</p>
-                <h2 className="mt-4 font-ritual text-2xl">{path.title}</h2>
+                <h3 className="mt-4 font-ritual text-3xl">{path.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">{path.body}</p>
                 <p className="mt-4 text-xs uppercase tracking-[0.24em] text-[color:var(--mist)]">
                   {path.rhythm}
@@ -199,29 +199,43 @@ export default function StudyPage() {
                   location="study:audience-path"
                   label={path.cta}
                   variant={path.title}
-                  className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.24em] transition hover:border-[color:var(--gilt)]"
+                  className="ritual-link mt-5 inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/55 px-1 py-2 text-xs uppercase tracking-[0.24em] transition-colors hover:border-[color:var(--gilt)]"
                 >
                   {path.cta}
                 </TrackedLink>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
-        <section className="space-y-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Disciplines</p>
-            <h2 className="mt-2 font-ritual text-3xl">How the traditions fit together</h2>
-          </div>
-          <div className="grid gap-5 lg:grid-cols-2">
+        <EditorialSpread
+          variant="map"
+          eyebrow="Disciplines"
+          title="How the traditions fit together"
+          marginalia={
+            <p>The governing ideas, reflective instruments, and contemplative forms belong to one field of study.</p>
+          }
+        >
+          <ul aria-label="Discipline correspondence map" className="border-t border-[color:var(--copper)]/22">
             {disciplines.map((discipline) => (
-              <article
+              <li
                 key={discipline.title}
-                className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/18 p-6"
+                className="grid gap-4 border-b border-[color:var(--copper)]/18 py-6 md:grid-cols-[0.72fr_1.28fr]"
               >
-                <h2 className="font-ritual text-2xl">{discipline.title}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)]">{discipline.body}</p>
-                <div className="mt-5 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
+                <div>
+                  <h3 className="font-ritual text-2xl">{discipline.title}</h3>
+                  <TrackedLink
+                    href={discipline.href}
+                    location="study:discipline"
+                    label={discipline.cta}
+                    variant={discipline.title}
+                    className="ritual-link mt-4 inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/55 px-1 py-2 text-xs uppercase tracking-[0.24em] transition-colors hover:border-[color:var(--gilt)]"
+                  >
+                    {discipline.cta}
+                  </TrackedLink>
+                </div>
+                <div className="space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
+                  <p>{discipline.body}</p>
                   <p>
                     <span className="text-[color:var(--bone)]">Begin:</span> {discipline.begin}
                   </p>
@@ -229,29 +243,20 @@ export default function StudyPage() {
                     <span className="text-[color:var(--bone)]">Deepen:</span> {discipline.deepen}
                   </p>
                 </div>
-                <TrackedLink
-                  href={discipline.href}
-                  location="study:discipline"
-                  label={discipline.cta}
-                  variant={discipline.title}
-                  className="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.24em] transition hover:border-[color:var(--gilt)]"
-                >
-                  {discipline.cta}
-                </TrackedLink>
-              </article>
+              </li>
             ))}
-          </div>
-        </section>
+          </ul>
+        </EditorialSpread>
 
-        <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6">
+        <section className="grid gap-12 border-t border-[color:var(--copper)]/22 pt-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <article>
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Suggested sequence</p>
             <h2 className="mt-3 font-ritual text-2xl">If you want the clearest progression</h2>
-            <ol className="mt-4 space-y-4 text-sm leading-relaxed text-[color:var(--mist)]">
+            <ol aria-label="Suggested study sequence" className="relative mt-6 border-l border-[color:var(--copper)]/28 text-sm leading-relaxed text-[color:var(--mist)]">
               {pathSequence.map((step, index) => (
                 <li
                   key={step.title}
-                  className="border-b border-[color:var(--copper)]/15 pb-4 last:border-b-0 last:pb-0"
+                  className="relative border-b border-[color:var(--copper)]/15 py-6 pl-8 first:pt-2 last:border-b-0"
                 >
                   <div>
                     <div>
@@ -266,7 +271,7 @@ export default function StudyPage() {
                       location="study:sequence"
                       label={`Open ${step.title}`}
                       variant="open"
-                      className="mt-4 inline-flex min-h-[40px] items-center rounded-full border border-[color:var(--copper)]/28 px-3 py-2 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--gilt)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                      className="ritual-link mt-4 inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/28 px-1 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition-colors hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
                     >
                       Open
                     </TrackedLink>
@@ -276,7 +281,7 @@ export default function StudyPage() {
             </ol>
           </article>
 
-          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/16 p-6">
+          <article className="border-t border-[color:var(--copper)]/22 pt-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Use it well</p>
             <h2 className="mt-3 font-ritual text-2xl">A calmer way to move through the site</h2>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
