@@ -20,14 +20,17 @@ describe("illuminated archive visual foundation", () => {
       '@fontsource/cormorant-garamond/400.css',
       '@fontsource/cormorant-garamond/400-italic.css',
       '@fontsource/manrope/400.css',
-      '@fontsource/manrope/400-italic.css',
       '@fontsource/manrope/500.css',
       '@fontsource/manrope/600.css',
       '@fontsource/manrope/700.css',
     ]) {
       expect(layout).toContain(fontImport);
     }
+    expect(layout).not.toContain('@fontsource/manrope/400-italic.css');
     expect(layout).not.toContain('@fontsource/cormorant-garamond/600.css');
+    expect(globals).toMatch(
+      /\.italic\s*{[^}]*font-family:\s*var\(--font-ritual-serif\);[^}]*font-style:\s*italic;/s,
+    );
   });
 
   it("keeps these visual surfaces free of broad transitions and remote textures", () => {

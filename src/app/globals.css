@@ -127,6 +127,11 @@ body.nav-panel-open {
   font-optical-sizing: auto;
 }
 
+.italic {
+  font-family: var(--font-ritual-serif);
+  font-style: italic;
+}
+
 /* Type-scale utilities (see --type-* tokens). Display sizes tighten up;
    body keeps its generous 1.7 leading. */
 .type-display {
