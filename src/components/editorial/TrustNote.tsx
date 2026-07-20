@@ -4,6 +4,8 @@ import { TrackedLink } from "@/components/analytics/TrackedLink";
 type TrustNoteProps = {
   heading: ReactNode;
   children: ReactNode;
+  eyebrow?: ReactNode;
+  headingLevel?: "h2" | "h3" | "h4";
   link?: {
     href: string;
     label: string;
@@ -11,10 +13,20 @@ type TrustNoteProps = {
   className?: string;
 };
 
-export function TrustNote({ heading, children, link, className }: TrustNoteProps) {
+export function TrustNote({
+  heading,
+  children,
+  eyebrow = "Method note",
+  headingLevel = "h3",
+  link,
+  className,
+}: TrustNoteProps) {
+  const Heading = headingLevel;
+
   return (
     <aside className={`trust-note open-field ${className ?? ""}`}>
-      <h3 className="trust-note__heading">{heading}</h3>
+      {eyebrow ? <p className="type-eyebrow trust-note__eyebrow">{eyebrow}</p> : null}
+      <Heading className="trust-note__heading">{heading}</Heading>
       <div className="trust-note__body">{children}</div>
       {link ? (
         <TrackedLink

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export type EtchedListItem = {
-  id?: string;
+  id: string;
   title?: ReactNode;
   body: ReactNode;
   glyph?: ReactNode;
@@ -11,21 +11,29 @@ type EtchedListProps = {
   items: readonly EtchedListItem[];
   ordered?: boolean;
   marker?: "numeral" | "glyph";
+  headingLevel?: "h2" | "h3" | "h4";
   className?: string;
 };
 
-export function EtchedList({ items, ordered = false, marker = ordered ? "numeral" : "glyph", className }: EtchedListProps) {
+export function EtchedList({
+  items,
+  ordered = false,
+  marker = ordered ? "numeral" : "glyph",
+  headingLevel = "h3",
+  className,
+}: EtchedListProps) {
   const List = ordered ? "ol" : "ul";
+  const Heading = headingLevel;
 
   return (
     <List className={`etched-list etched-list--${marker} ${className ?? ""}`}>
       {items.map((item, index) => (
-        <li key={item.id ?? `${index}-${String(item.title ?? "item")}`} className="etched-list__item">
+        <li key={item.id} className="etched-list__item">
           <span className="etched-list__marker" aria-hidden="true">
             {marker === "numeral" ? toRoman(index + 1) : (item.glyph ?? "◇")}
           </span>
           <div>
-            {item.title ? <h3 className="etched-list__title">{item.title}</h3> : null}
+            {item.title ? <Heading className="etched-list__title">{item.title}</Heading> : null}
             <div className="etched-list__body">{item.body}</div>
           </div>
         </li>

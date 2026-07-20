@@ -50,7 +50,7 @@ describe("illuminated archive editorial primitives", () => {
   });
 
   it("keeps the spread heading before subordinate content for visual variants", () => {
-    const { rerender } = render(
+    const { container, rerender } = render(
       <EditorialSpread variant="image-left" title="The living archive">
         <h3>Subordinate theorem</h3>
       </EditorialSpread>,
@@ -59,31 +59,44 @@ describe("illuminated archive editorial primitives", () => {
     const heading = screen.getByRole("heading", { level: 2, name: "The living archive" });
     const subordinate = screen.getByRole("heading", { level: 3, name: "Subordinate theorem" });
     expect(heading.compareDocumentPosition(subordinate) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.firstElementChild?.className).toContain("editorial-spread--image-left");
 
-    rerender(
-      <EditorialSpread variant="image-right" title="The living archive">
-        <h3>Subordinate theorem</h3>
-      </EditorialSpread>,
-    );
-    expect(screen.getByRole("heading", { level: 2 })).toBeTruthy();
+    for (const variant of ["image-right", "quote", "map"] as const) {
+      rerender(
+        <EditorialSpread variant={variant} title="The living archive">
+          <h3>Subordinate theorem</h3>
+        </EditorialSpread>,
+      );
+      expect(container.firstElementChild?.className).toContain(`editorial-spread--${variant}`);
+    }
   });
 
   it("renders etched sequences as semantic ordered or unordered lists", () => {
     const items = [
-      { title: "Observe", body: "Attend to the pattern." },
-      { title: "Record", body: "Name what changed." },
+      { id: "observe", title: "Observe", body: "Attend to the pattern." },
+      { id: "record", title: "Record", body: "Name what changed." },
     ];
-    const { rerender } = render(<EtchedList items={items} ordered marker="numeral" />);
+    const { rerender } = render(<EtchedList items={items} ordered marker="numeral" headingLevel="h4" />);
 
     expect(screen.getByRole("list").tagName).toBe("OL");
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.getByRole("heading", { level: 4, name: "Observe" })).toBeTruthy();
+    const observeItem = screen.getByRole("heading", { name: "Observe" }).closest("li");
 
-    rerender(<EtchedList items={items} marker="glyph" />);
+    rerender(<EtchedList items={[items[1], items[0]]} ordered marker="numeral" headingLevel="h4" />);
+    expect(screen.getByRole("heading", { name: "Observe" }).closest("li")).toBe(observeItem);
+
+    rerender(<EtchedList items={items} marker="glyph" headingLevel="h4" />);
     expect(screen.getByRole("list").tagName).toBe("UL");
+
+    const source = readFileSync(resolve(process.cwd(), "src/components/editorial/EtchedList.tsx"), "utf8");
+    expect(source).toMatch(/id:\s*string;/);
+    expect(source).toContain("key={item.id}");
+    expect(source).not.toContain("item.id ??");
   });
 
-  it("gives trust notes an accessible heading", () => {
-    render(
+  it("gives trust notes an accessible heading and neutral DOM eyebrow", () => {
+    const { rerender } = render(
       <TrustNote heading="How this interpretation is made">
         Symbolic language is generated from the facts shown above.
       </TrustNote>,
@@ -92,6 +105,16 @@ describe("illuminated archive editorial primitives", () => {
     expect(
       screen.getByRole("heading", { level: 3, name: "How this interpretation is made" }),
     ).toBeTruthy();
+    expect(screen.getByText("Method note")).toBeTruthy();
+
+    rerender(
+      <TrustNote heading="Source boundaries" eyebrow="Source note" headingLevel="h4">
+        This note names the evidence available to the reader.
+      </TrustNote>,
+    );
+    expect(screen.getByRole("heading", { level: 4, name: "Source boundaries" })).toBeTruthy();
+    expect(screen.getByText("Source note")).toBeTruthy();
+    expect(screen.queryByText("Method note")).toBeNull();
   });
 
   it("keeps ritual links rectangular and at least 44px tall", () => {
@@ -121,9 +144,17 @@ describe("illuminated archive editorial primitives", () => {
       "oracle-panel",
       "trust-note",
     ]);
+    for (const variant of ["image-left", "image-right", "quote", "map"]) {
+      expect(container.querySelectorAll(`.editorial-spread--${variant}`)).toHaveLength(1);
+    }
+    expect(screen.getByRole("heading", { level: 4, name: "Reading posture" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 4, name: "Observe" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 3, name: "Celestial inquiry" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 4, name: "How this instrument is made" })).toBeTruthy();
 
     rerender(<VisualQaPage />);
     expect(screen.getByRole("heading", { level: 1, name: /visual qa/i })).toBeTruthy();
+    expect(screen.queryByRole("main")).toBeNull();
     expect(metadata.robots).toMatchObject({ index: false, follow: false });
   });
 
@@ -145,5 +176,7 @@ describe("illuminated archive editorial primitives", () => {
       expect(globals).toContain(selector);
     }
     expect(globals).not.toMatch(/transition:\s*all\b/);
+    expect(globals).not.toContain("Verified method");
+    expect(globals).not.toContain(".trust-note::before");
   });
 });

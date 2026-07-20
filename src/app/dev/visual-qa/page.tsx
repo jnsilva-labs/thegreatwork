@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function VisualQaPage() {
   return (
-    <main className="min-h-screen px-6 py-16 text-[color:var(--bone)] sm:px-10 lg:px-20" data-visual-qa-page="editorial-primitives">
+    <div className="min-h-screen px-6 py-16 text-[color:var(--bone)] sm:px-10 lg:px-20" data-visual-qa-page="editorial-primitives">
       <div className="mx-auto max-w-6xl">
         <header className="mb-20 max-w-3xl space-y-4 border-b border-[color:var(--copper)]/30 pb-8">
           <p className="type-eyebrow text-[color:var(--gilt)]">Internal · Deterministic · No API calls</p>
@@ -20,6 +20,6 @@ export default function VisualQaPage() {
         </header>
         <VisualQaFixtures />
       </div>
-    </main>
+    </div>
   );
 }
