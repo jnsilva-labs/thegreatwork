@@ -10,13 +10,22 @@ describe("illuminated archive visual foundation", () => {
     const globals = readSource("src/app/globals.css");
     const layout = readSource("src/app/layout.tsx");
 
-    for (const token of ["--teal:", "--gold:", "--stone:", "--font-ritual:"]) {
-      expect(globals).toContain(token);
-    }
+    expect(globals).toMatch(/--teal:\s*var\(--border\);/);
+    expect(globals).toMatch(/--gold:\s*var\(--accent\);/);
+    expect(globals).toMatch(/--stone:\s*var\(--muted\);/);
+    expect(globals).toMatch(/--font-ritual-serif:\s*var\(--font-ritual\);/);
 
     expect(globals).toMatch(/\.type-body\s*{[^}]*font-size:\s*var\(--type-body\)/s);
-    expect(layout).toContain('@fontsource/cormorant-garamond/');
-    expect(layout).toContain('@fontsource/manrope/');
+    for (const fontImport of [
+      '@fontsource/cormorant-garamond/400.css',
+      '@fontsource/cormorant-garamond/400-italic.css',
+      '@fontsource/manrope/400.css',
+      '@fontsource/manrope/500.css',
+      '@fontsource/manrope/600.css',
+      '@fontsource/manrope/700.css',
+    ]) {
+      expect(layout).toContain(fontImport);
+    }
     expect(layout).not.toContain('@fontsource/cormorant-garamond/600.css');
   });
 
