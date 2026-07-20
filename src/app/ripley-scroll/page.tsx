@@ -256,7 +256,7 @@ export default function RipleyScrollPage() {
         <div className="pointer-events-none fixed inset-0 z-0 bg-[color:var(--obsidian)]/35" />
       )}
 
-      <main className="relative z-10 px-6 py-16 sm:px-10 lg:px-20">
+      <div className="relative z-10 px-6 py-16 sm:px-10 lg:px-20">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.6fr_1.4fr]">
           <aside className="hidden lg:block">
             <div className="sticky top-24 space-y-8">
@@ -465,7 +465,7 @@ export default function RipleyScrollPage() {
             </div>
           </section>
         </div>
-      </main>
+      </div>
 
       <nav className="pointer-events-auto fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-3 lg:flex">
         {ripleyScrollPanels.map((panel, index) => (

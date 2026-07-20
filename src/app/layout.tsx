@@ -51,12 +51,20 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <a
+          href="#main-content"
+          className="fixed left-4 top-4 z-[100] inline-flex min-h-[44px] -translate-y-24 items-center border border-[color:var(--gilt)] bg-[color:var(--obsidian)] px-4 text-xs uppercase tracking-[0.18em] text-[color:var(--bone)] transition-transform focus:translate-y-0"
+        >
+          Skip to content
+        </a>
         <PostHogProvider>
           <JsonLd id="website-schema" data={buildWebsiteSchema()} />
           <JsonLd id="organization-schema" data={buildOrganizationSchema()} />
           <NavBar />
           <CodexChrome />
-          <div className="relative z-10 pt-20">{children}</div>
+          <main id="main-content" tabIndex={-1} className="relative z-10 pt-20">
+            {children}
+          </main>
           <Footer />
         </PostHogProvider>
         <Analytics />

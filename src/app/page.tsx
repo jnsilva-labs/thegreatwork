@@ -79,7 +79,7 @@ export default function Home() {
         })}
       />
 
-      <main className="relative z-10">
+      <div className="relative z-10">
         <HomepageHero
           title={hero.title}
           subtitle={hero.subtitle ?? ""}
@@ -126,7 +126,7 @@ export default function Home() {
         </section>
 
         <div className="h-[50vh] sm:h-[70vh]" aria-hidden="true" />
-      </main>
+      </div>
     </div>
   );
 }

@@ -16,6 +16,10 @@ export const INDEXABLE_STATIC_ROUTES = [
   "/principles",
   "/journey",
   "/ripley-scroll",
+  "/about",
+  "/method",
+  "/sources",
+  "/privacy",
 ] as const;
 
 export const NOINDEX_ROUTES = ["/astro", "/styleguide", "/dev/plates", "/thank-you/starter-guide"] as const;

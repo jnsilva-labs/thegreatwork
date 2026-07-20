@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { useFocusDialog } from "@/components/ui/useFocusDialog";
 import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import { createEngine, setVolume, start, stop } from "@/lib/audio/engine";
@@ -24,6 +25,11 @@ export function NavBar() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const pathname = usePathname();
   const previousPathname = useRef(pathname);
+  const closePanel = useCallback(() => setPanelOpen(false), []);
+  const { triggerRef, dialogRef, initialFocusRef } = useFocusDialog({
+    open: panelOpen,
+    onClose: closePanel,
+  });
 
   const showUi = useUiStore((state) => state.showUi);
   const toggleUi = useUiStore((state) => state.toggleUi);
@@ -46,45 +52,23 @@ export function NavBar() {
 
   useEffect(() => {
     const stored = getStoredTheme();
-    if (stored) {
-      setTheme(stored);
-    } else {
-      setTheme("obsidian");
-    }
+    setTheme(stored ?? "obsidian");
   }, [setTheme]);
 
   useEffect(() => {
     if (prefersReducedMotion) return;
     const root = document.documentElement;
-    const id = window.setTimeout(() => {
-      root.classList.add("theme-transition");
-    }, 50);
+    const id = window.setTimeout(() => root.classList.add("theme-transition"), 50);
     return () => window.clearTimeout(id);
   }, [prefersReducedMotion]);
 
   useEffect(() => {
-    if (!panelOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setPanelOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [panelOpen]);
-
-  useEffect(() => {
     if (previousPathname.current !== pathname) {
       previousPathname.current = pathname;
-      const closeId = window.setTimeout(() => setPanelOpen(false), 0);
+      const closeId = window.setTimeout(closePanel, 0);
       return () => window.clearTimeout(closeId);
     }
-  }, [pathname]);
-
-  useEffect(() => {
-    document.body.classList.toggle("nav-panel-open", panelOpen);
-    return () => document.body.classList.remove("nav-panel-open");
-  }, [panelOpen]);
+  }, [closePanel, pathname]);
 
   const handleAudioToggle = async () => {
     if (soundPlaying) {
@@ -122,17 +106,13 @@ export function NavBar() {
           location="nav:brand"
           label="Awareness Paradox"
           variant="brand"
-          className="group flex min-h-[44px] items-center gap-3 text-[0.66rem] uppercase tracking-[0.22em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)] sm:text-[0.68rem] sm:tracking-[0.26em]"
+          className="group flex min-h-[44px] items-center gap-3 text-xs uppercase tracking-[0.22em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)] sm:tracking-[0.3em]"
         >
           <span className="h-px w-7 bg-[color:var(--copper)] transition group-hover:bg-[color:var(--gilt)] sm:w-8" />
-          <span className="leading-[1.08] sm:tracking-[0.34em]">
-            Awareness
-            <br />
-            Paradox
-          </span>
+          <span className="leading-[1.08]">Awareness<br />Paradox</span>
         </TrackedLink>
 
-        <nav className="hidden items-center gap-4 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--mist)] xl:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-4 text-xs uppercase tracking-[0.2em] text-[color:var(--mist)] xl:flex">
           {navLinks.map((link) => (
             <TrackedLink
               key={link.href}
@@ -153,24 +133,18 @@ export function NavBar() {
             location="nav:utility"
             label="Free Guide"
             variant="guide"
-            className="hidden min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 px-4 py-2 text-[0.6rem] uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] sm:inline-flex"
+            className="hidden min-h-[44px] items-center border border-[color:var(--gilt)]/55 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] sm:inline-flex"
           >
             Free Guide
           </TrackedLink>
           <button
-            type="button"
-            onClick={() => void handleAudioToggle()}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/55 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
-            aria-label={soundPlaying ? "Mute sound" : "Play sound"}
-            title={soundPlaying ? "Sound on" : "Sound muted"}
-          >
-            {soundPlaying ? <SoundOnIcon /> : <SoundOffIcon />}
-          </button>
-          <button
+            ref={triggerRef}
             type="button"
             onClick={() => setPanelOpen(true)}
             className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/55 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             aria-label="Open menu"
+            aria-expanded={panelOpen}
+            aria-controls="site-menu-dialog"
             title="Menu"
           >
             <MenuIcon />
@@ -182,66 +156,73 @@ export function NavBar() {
         <div className="fixed inset-0 z-50">
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label="Close menu overlay"
             className="absolute inset-0 bg-[color:var(--obsidian)]/78 backdrop-blur-sm"
-            onClick={() => setPanelOpen(false)}
+            onClick={closePanel}
           />
-          <aside className="absolute inset-x-0 bottom-0 top-0 overflow-y-auto border-l border-[color:var(--copper)]/24 bg-[color:var(--char)]/94 px-5 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-[0.68rem] uppercase tracking-[0.26em] text-[color:var(--mist)] sm:left-auto sm:max-w-[27rem] sm:px-6">
-            <div className="flex items-center justify-between">
-              <TrackedLink
-                href="/"
-                location="nav:panel"
-                label="Awareness Paradox Home"
-                variant="brand"
-                onClick={() => setPanelOpen(false)}
-                className="flex min-h-[44px] items-center gap-3 text-[0.68rem] uppercase tracking-[0.28em] text-[color:var(--bone)]"
-              >
-                <span className="h-px w-8 bg-[color:var(--copper)]" />
-                <span className="leading-[1.15]">
-                  Awareness
-                  <br />
-                  Paradox
-                </span>
-              </TrackedLink>
+          <aside
+            ref={dialogRef}
+            id="site-menu-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="site-menu-title"
+            tabIndex={-1}
+            className="absolute inset-x-0 bottom-0 top-0 overflow-y-auto border-l border-[color:var(--copper)]/24 bg-[color:var(--char)]/96 px-5 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-xs uppercase tracking-[0.22em] text-[color:var(--mist)] sm:left-auto sm:max-w-[29rem] sm:px-7"
+          >
+            <div className="flex items-center justify-between gap-5 border-b border-[color:var(--copper)]/24 pb-5">
+              <div>
+                <TrackedLink
+                  href="/"
+                  location="nav:panel"
+                  label="Awareness Paradox Home"
+                  variant="brand"
+                  onClick={closePanel}
+                  className="type-eyebrow inline-flex min-h-[44px] items-center text-[color:var(--gilt)]"
+                >
+                  Awareness Paradox <span className="sr-only">Home</span>
+                </TrackedLink>
+                <h2 id="site-menu-title" className="mt-2 font-ritual text-3xl normal-case tracking-normal text-[color:var(--bone)]">Menu</h2>
+              </div>
               <button
+                ref={initialFocusRef}
                 type="button"
-                onClick={() => setPanelOpen(false)}
-                className="min-h-[44px] px-2 text-[0.62rem] tracking-[0.28em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
+                onClick={closePanel}
+                className="min-h-[44px] border border-[color:var(--copper)]/48 px-3 text-xs tracking-[0.22em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
               >
                 Close
               </button>
             </div>
 
-            <div className="mt-8 space-y-7">
-              <section className="space-y-3">
-                <p className="text-[0.58rem] tracking-[0.34em] text-[color:var(--gilt)]">Navigate</p>
-                <div className="space-y-2">
-                  {navLinks.map((link) => (
+            <div className="mt-7 space-y-7">
+              <nav aria-label="Menu navigation" className="space-y-3">
+                <p className="text-xs tracking-[0.28em] text-[color:var(--gilt)]">Navigate</p>
+                <div className="border-y border-[color:var(--copper)]/24">
+                  {navLinks.map((link, index) => (
                     <TrackedLink
                       key={link.href}
                       href={link.href}
                       location="nav:panel"
                       label={link.label}
                       variant="nav"
-                      onClick={() => setPanelOpen(false)}
-                      className="flex min-h-[48px] items-center rounded-full border border-[color:var(--copper)]/32 bg-[color:var(--obsidian)]/30 px-4 text-[0.65rem] tracking-[0.28em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                      onClick={closePanel}
+                      className={`flex min-h-[48px] items-center justify-between px-1 text-xs tracking-[0.22em] text-[color:var(--bone)] transition hover:text-[color:var(--gilt)] ${index ? "border-t border-[color:var(--copper)]/18" : ""}`}
                     >
-                      {link.label}
+                      {link.label}<span aria-hidden="true">↗</span>
                     </TrackedLink>
                   ))}
                 </div>
-              </section>
+              </nav>
 
-              <section className="space-y-3">
-                <p className="text-[0.58rem] tracking-[0.34em] text-[color:var(--gilt)]">Quick actions</p>
-                <div className="flex flex-wrap gap-3">
+              <section aria-labelledby="menu-invitations" className="space-y-3">
+                <h3 id="menu-invitations" className="text-xs font-normal tracking-[0.28em] text-[color:var(--gilt)]">Invitations</h3>
+                <div className="grid gap-2 sm:grid-cols-2">
                   <TrackedLink
                     href="/guides/hermetic-principles-starter-guide"
                     location="nav:panel"
                     label="Free Guide"
                     variant="guide"
-                    onClick={() => setPanelOpen(false)}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-4 py-2 text-[0.6rem] tracking-[0.24em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                    onClick={closePanel}
+                    className="inline-flex min-h-[44px] items-center border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/8 px-4 py-2 text-xs tracking-[0.18em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
                   >
                     Free Guide
                   </TrackedLink>
@@ -250,90 +231,94 @@ export function NavBar() {
                     location="nav:panel"
                     label="Open Substack"
                     variant="letters"
-                    onClick={() => setPanelOpen(false)}
+                    onClick={closePanel}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/45 px-4 py-2 text-[0.6rem] tracking-[0.24em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                    className="inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/45 px-4 py-2 text-xs tracking-[0.18em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
                   >
                     Open Substack
                   </TrackedLink>
                 </div>
               </section>
 
-              <section className="space-y-4 rounded-[1.8rem] border border-[color:var(--copper)]/35 bg-[color:var(--obsidian)]/55 p-5">
-                <p className="text-[0.58rem] tracking-[0.34em] text-[color:var(--gilt)]">Atmosphere controls</p>
-                <ControlRow label="Theme">
-                  <select
-                    value={theme}
-                    onChange={(event) => setTheme(event.target.value as typeof theme)}
-                    className="w-full rounded-full border border-[color:var(--copper)]/55 bg-transparent px-3 py-3 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
-                    aria-label="Theme"
-                  >
-                    <option value="obsidian">Obsidian</option>
-                    <option value="abyssal">Abyssal</option>
-                    <option value="crimson">Crimson</option>
-                  </select>
-                </ControlRow>
-                <ControlRow label={`Quality ${qualityLabel}`}>
-                  <div className="flex gap-2">
+              <details className="border-y border-[color:var(--copper)]/28 py-1">
+                <summary className="flex min-h-[44px] cursor-pointer items-center justify-between text-xs tracking-[0.24em] text-[color:var(--bone)]">
+                  Environment
+                  <span aria-hidden="true" className="text-[color:var(--gilt)]">+</span>
+                </summary>
+                <div className="space-y-5 border-t border-[color:var(--copper)]/18 py-5">
+                  <ControlRow label="Sound">
                     <button
                       type="button"
-                      onClick={() => setAutoQuality(true)}
-                      className={controlToggleClass(autoQuality)}
+                      onClick={() => void handleAudioToggle()}
+                      className={controlToggleClass(soundPlaying)}
+                      aria-label={soundPlaying ? "Mute sound" : "Play sound"}
+                      aria-pressed={soundPlaying}
                     >
-                      Auto
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAutoQuality(false);
-                        setQuality("high");
-                      }}
-                      className={controlToggleClass(!autoQuality && qualityTier !== "low")}
-                    >
-                      High
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAutoQuality(false);
-                        setQuality("low");
-                      }}
-                      className={controlToggleClass(!autoQuality && qualityTier === "low")}
-                    >
-                      Low
-                    </button>
-                  </div>
-                </ControlRow>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <ControlRow label="Animate">
-                    <button type="button" onClick={handleAnimateToggle} className={controlToggleClass(!stillness)}>
-                      {stillness ? "Off" : "On"}
+                      {soundPlaying ? "On" : "Off"}
                     </button>
                   </ControlRow>
-                  <ControlRow label="HUD">
-                    <button type="button" onClick={toggleUi} className={controlToggleClass(showUi)}>
-                      {showUi ? "On" : "Off"}
-                    </button>
+                  <ControlRow label="Theme">
+                    <select
+                      value={theme}
+                      onChange={(event) => setTheme(event.target.value as typeof theme)}
+                      className="min-h-[44px] w-full border border-[color:var(--copper)]/55 bg-transparent px-3 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                      aria-label="Theme"
+                    >
+                      <option value="obsidian">Obsidian</option>
+                      <option value="abyssal">Abyssal</option>
+                      <option value="crimson">Crimson</option>
+                    </select>
+                  </ControlRow>
+                  <ControlRow label={`Quality · ${qualityLabel}`}>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button type="button" aria-label="Quality Auto" aria-pressed={autoQuality} onClick={() => setAutoQuality(true)} className={controlToggleClass(autoQuality)}>Auto</button>
+                      <button
+                        type="button"
+                        aria-label="Quality High"
+                        aria-pressed={!autoQuality && qualityTier !== "low"}
+                        onClick={() => { setAutoQuality(false); setQuality("high"); }}
+                        className={controlToggleClass(!autoQuality && qualityTier !== "low")}
+                      >High</button>
+                      <button
+                        type="button"
+                        aria-label="Quality Low"
+                        aria-pressed={!autoQuality && qualityTier === "low"}
+                        onClick={() => { setAutoQuality(false); setQuality("low"); }}
+                        className={controlToggleClass(!autoQuality && qualityTier === "low")}
+                      >Low</button>
+                    </div>
+                  </ControlRow>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <ControlRow label="Motion">
+                      <button type="button" aria-label="Motion" aria-pressed={!stillness} onClick={handleAnimateToggle} className={controlToggleClass(!stillness)}>
+                        {stillness ? "Off" : "On"}
+                      </button>
+                    </ControlRow>
+                    <ControlRow label="Interface overlay">
+                      <button type="button" aria-label="Interface overlay" aria-pressed={showUi} onClick={toggleUi} className={controlToggleClass(showUi)}>
+                        {showUi ? "On" : "Off"}
+                      </button>
+                    </ControlRow>
+                  </div>
+                  <ControlRow label="Volume">
+                    <input
+                      type="range"
+                      min={0}
+                      max={0.4}
+                      step={0.01}
+                      value={soundVolume}
+                      onChange={(event) => {
+                        const next = Number(event.target.value);
+                        setSoundVolume(next);
+                        setVolume(next);
+                      }}
+                      className="h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--copper)]/40"
+                      aria-label="Sound volume"
+                    />
                   </ControlRow>
                 </div>
-                <ControlRow label="Volume">
-                  <input
-                    type="range"
-                    min={0}
-                    max={0.4}
-                    step={0.01}
-                    value={soundVolume}
-                    onChange={(event) => {
-                      const next = Number(event.target.value);
-                      setSoundVolume(next);
-                      setVolume(next);
-                    }}
-                    className="h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--copper)]/40"
-                    aria-label="Sound volume"
-                  />
-                </ControlRow>
-              </section>
+              </details>
             </div>
           </aside>
         </div>
@@ -345,69 +330,24 @@ export function NavBar() {
 function ControlRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <div className="text-[0.55rem] uppercase tracking-[0.28em] text-[color:var(--mist)]">
-        {label}
-      </div>
+      <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--mist)]">{label}</div>
       <div>{children}</div>
     </div>
   );
 }
 
 function controlToggleClass(active: boolean) {
-  return `rounded-full border px-3 py-2 text-[0.58rem] uppercase tracking-[0.24em] transition ${
+  return `min-h-[44px] border px-3 py-2 text-xs uppercase tracking-[0.18em] transition ${
     active
       ? "border-[color:var(--gilt)] text-[color:var(--bone)]"
       : "border-[color:var(--copper)]/60 text-[color:var(--mist)] hover:border-[color:var(--gilt)]"
   }`;
 }
 
-function SoundOnIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M2.5 6.5h2.5l3-2.5v8l-3-2.5H2.5V6.5Z"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M11 5c1.2 1.2 1.2 4.8 0 6"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function SoundOffIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M2.5 6.5h2.5l3-2.5v8l-3-2.5H2.5V6.5Z"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M11.5 6.5l2.5 3M14 6.5l-2.5 3"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 function MenuIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M2.5 4h11M2.5 8h11M2.5 12h11"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-      />
+      <path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
