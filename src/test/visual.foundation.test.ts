@@ -15,7 +15,7 @@ describe("illuminated archive visual foundation", () => {
     expect(globals).toMatch(/--stone:\s*var\(--muted\);/);
     expect(globals).toMatch(/--font-ritual-serif:\s*var\(--font-ritual\);/);
 
-    expect(globals).toMatch(/\.type-body\s*{[^}]*font-size:\s*var\(--type-body\)/s);
+    expect(globals).toMatch(/\.type-body\s*{[\s\S]*?font-size:\s*var\(--type-body\)/);
     for (const fontImport of [
       '@fontsource/cormorant-garamond/400.css',
       '@fontsource/cormorant-garamond/400-italic.css',
