@@ -5,8 +5,10 @@ import type { ComponentProps, ImgHTMLAttributes } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/image", () => ({
-  default: ({ alt, priority, ...props }: ImgHTMLAttributes<HTMLImageElement> & { priority?: boolean }) => {
+  default: ({ alt, priority, fill, unoptimized, ...props }: ImgHTMLAttributes<HTMLImageElement> & { priority?: boolean; fill?: boolean; unoptimized?: boolean }) => {
     void priority;
+    void fill;
+    void unoptimized;
     return (
       // The production component is covered through its public image semantics.
       // eslint-disable-next-line @next/next/no-img-element
@@ -144,6 +146,21 @@ describe("illuminated archive editorial primitives", () => {
       "oracle-panel",
       "trust-note",
     ]);
+    expect(
+      Array.from(container.querySelectorAll("[data-qa-tarot-fixture]")).map((section) =>
+        section.getAttribute("data-qa-tarot-fixture"),
+      ),
+    ).toEqual(["tarot-entry", "tarot-reading"]);
+    expect(screen.getByRole("heading", { level: 2, name: "Tarot entry fixture" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Reading chamber fixture" })).toBeTruthy();
+    const tarotReadingFixture = container.querySelector('[data-qa-tarot-fixture="tarot-reading"]');
+    expect(tarotReadingFixture?.querySelectorAll('img')).toHaveLength(3);
+    for (const image of tarotReadingFixture?.querySelectorAll('img') ?? []) {
+      expect(image.getAttribute('src')).toMatch(/^\/tarot\/rider-waite\//);
+    }
+    const fixtureSource = readFileSync(resolve(process.cwd(), "src/components/dev/VisualQaFixtures.tsx"), "utf8");
+    expect(fixtureSource).not.toContain("generateInterpretation");
+    expect(fixtureSource).not.toContain("/api/tarot");
     for (const variant of ["image-left", "image-right", "quote", "map"]) {
       expect(container.querySelectorAll(`.editorial-spread--${variant}`)).toHaveLength(1);
     }

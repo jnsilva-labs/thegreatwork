@@ -199,7 +199,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
             <ArrowLeft size={14} /> Return
           </button>
           <div className="text-center">
-            <p className="font-ritual text-2xl text-[color:var(--bone)] sm:text-3xl">{spread.name}</p>
+            <h1 className="font-ritual text-2xl text-[color:var(--bone)] sm:text-3xl">{spread.name}</h1>
             <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Awareness Session</p>
           </div>
           <div className="w-[92px]" />
@@ -308,7 +308,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                   <div className="mb-4 inline-flex h-11 w-11 items-center justify-center border border-[color:var(--gilt)]/35">
                     <Sparkles size={16} className="text-[color:var(--gilt)]" />
                   </div>
-                  <p className="font-ritual text-3xl leading-snug text-[color:var(--bone)] md:text-5xl">&quot;{interpretation.mirrorStatement}&quot;</p>
+                  <h2 className="font-ritual text-3xl leading-snug text-[color:var(--bone)] md:text-5xl">&quot;{interpretation.mirrorStatement}&quot;</h2>
                 </header>
 
                 <section className="mt-14 border-y border-[color:var(--copper)]/24 py-10">

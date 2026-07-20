@@ -1,10 +1,39 @@
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import CardVisual from '@/features/tarot/components/CardVisual';
+import { PhaseArc } from '@/features/tarot/components/PhaseArc';
 import Home from '@/features/tarot/pages/Home';
 import { DEFAULT_DECK } from '@/features/tarot/constants';
+
+const { completedInterpretation } = vi.hoisted(() => ({
+  completedInterpretation: {
+    mirrorStatement: 'The mirror clarifies the question.',
+    archetypeShadow: 'Name the pattern before acting on it.',
+    alchemicalPhase: 'Clarification through reflection.',
+    phase: 'albedo' as const,
+    phaseReason: 'The reading asks for clear seeing.',
+    practicalGuidance: ['Write down what is known.'],
+    journalPrompts: ['What becomes visible when urgency falls away?'],
+    mantra: 'I make room for clarity.',
+  },
+}));
+
+vi.mock('@/features/tarot/services/geminiService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/tarot/services/geminiService')>();
+  return {
+    ...actual,
+    generateInterpretation: vi.fn().mockResolvedValue(completedInterpretation),
+  };
+});
+
+vi.mock('@/features/tarot/services/storageService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/tarot/services/storageService')>();
+  return { ...actual, saveReading: vi.fn() };
+});
+
+import Reading from '@/features/tarot/pages/Reading';
 
 const readSource = (relativePath: string) =>
   readFileSync(resolve(process.cwd(), relativePath), 'utf8');
@@ -18,6 +47,11 @@ const upgradedFiles = [
   'src/features/tarot/components/PhaseArc.tsx',
   'src/features/tarot/pages/Reading.tsx',
 ] as const;
+
+afterEach(() => {
+  vi.useRealTimers();
+  window.localStorage.clear();
+});
 
 describe('tarot reading chamber visual system', () => {
   it('uses the authentic Rider-Waite 7:12 proportion for every card presentation', () => {
@@ -63,6 +97,26 @@ describe('tarot reading chamber visual system', () => {
     expect(labels).toMatch(/min-h-\[44px\]/);
   });
 
+  it('lays out all four phase steps in a narrow-safe grid with overlay connectors', () => {
+    const { container } = render(
+      <div data-testid="phase-320" style={{ width: 320 }}>
+        <PhaseArc phase="albedo" />
+      </div>,
+    );
+    const arc = screen.getByLabelText(/alchemical stage: albedo/i);
+
+    expect(screen.getByTestId('phase-320').style.width).toBe('320px');
+    expect(arc.className).toContain('grid-cols-4');
+    expect(arc.className).toContain('w-full');
+    expect(container.querySelectorAll('[data-phase-step]')).toHaveLength(4);
+    for (const step of container.querySelectorAll('[data-phase-step]')) {
+      expect(step.className).toContain('min-w-0');
+    }
+    const connectors = Array.from(container.querySelectorAll('[data-phase-connector]'));
+    expect(connectors).toHaveLength(3);
+    expect(connectors.every((connector) => connector.className.includes('absolute'))).toBe(true);
+  });
+
   it('presents a labelled, high-contrast question field with persistent narrow-screen guidance', () => {
     render(<Home onNavigate={vi.fn()} onStartReading={vi.fn()} />);
 
@@ -94,5 +148,26 @@ describe('tarot reading chamber visual system', () => {
       expect(nextIndex, landmark).toBeGreaterThan(previousIndex);
       previousIndex = nextIndex;
     }
+  });
+
+  it('renders a coherent h1, h2, h3 outline for a completed reading', async () => {
+    vi.useFakeTimers();
+    render(
+      <Reading
+        request={{ question: 'What needs attention?', intention: 'General', spreadId: 'one-card' }}
+        onNavigate={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { level: 1, name: 'The Focal Point' })).toBeTruthy();
+
+    act(() => vi.advanceTimersByTime(2_500));
+    fireEvent.click(screen.getByRole('button', { name: /turn this card/i }));
+    vi.useRealTimers();
+    fireEvent.click(screen.getByRole('button', { name: /reveal guidance/i }));
+
+    expect(await screen.findByRole('heading', { level: 2, name: /the mirror clarifies the question/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 3, name: /where you stand in the work/i })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 3, name: /archetype & shadow/i })).toBeTruthy();
   });
 });

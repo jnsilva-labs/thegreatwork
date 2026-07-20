@@ -19,43 +19,42 @@ export function PhaseArc({ phase, reason }: PhaseArcProps) {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-center gap-0" aria-label={`Alchemical stage: ${phase}`}>
+      <div className="mx-auto grid w-full max-w-lg grid-cols-4 gap-1 sm:gap-2" aria-label={`Alchemical stage: ${phase}`}>
         {greatWork.stages.map((stage, index) => {
           const isActive = stage.id === phase;
           const isPassed = index < activeIndex;
           return (
-            <div key={stage.id} className="flex items-center">
+            <div key={stage.id} data-phase-step={stage.id} className="relative flex min-w-0 flex-col items-center gap-2 px-0.5 sm:px-1">
               {index > 0 && (
                 <span
                   aria-hidden="true"
-                  className={`block h-px w-6 sm:w-10 ${isPassed || isActive ? 'bg-[color:var(--gilt)]/45' : 'bg-[color:var(--copper)]/25'}`}
+                  data-phase-connector=""
+                  className={`absolute right-1/2 top-5 z-0 block h-px w-[calc(100%+0.25rem)] sm:w-[calc(100%+0.5rem)] ${isPassed || isActive ? 'bg-[color:var(--gilt)]/45' : 'bg-[color:var(--copper)]/25'}`}
                 />
               )}
-              <div className="flex flex-col items-center gap-2 px-1.5 sm:px-2">
-                <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border font-ritual text-sm transition-[background-color,border-color,color,box-shadow] ${
-                    isActive
-                      ? 'border-[color:var(--gilt)]/80 bg-[color:var(--gilt)]/18 text-[color:var(--bone)]'
-                      : 'border-[color:var(--copper)]/30 text-[color:var(--mist)]/60'
-                  }`}
-                  style={
-                    isActive
-                      ? {
-                          boxShadow: '0 0 18px color-mix(in srgb, var(--glow) 35%, transparent)',
-                        }
-                      : undefined
-                  }
-                >
-                  {NUMERALS[index]}
-                </span>
-                <span
-                  className={`text-xs uppercase tracking-[0.1em] sm:tracking-[0.16em] ${
-                    isActive ? 'text-[color:var(--gilt)]' : 'text-[color:var(--mist)]/50'
-                  }`}
-                >
-                  {stage.title}
-                </span>
-              </div>
+              <span
+                className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border bg-[color:var(--bg)] font-ritual text-sm transition-[background-color,border-color,color,box-shadow] ${
+                  isActive
+                    ? 'border-[color:var(--gilt)]/80 bg-[color:var(--gilt)]/18 text-[color:var(--bone)]'
+                    : 'border-[color:var(--copper)]/30 text-[color:var(--mist)]/60'
+                }`}
+                style={
+                  isActive
+                    ? {
+                        boxShadow: '0 0 18px color-mix(in srgb, var(--glow) 35%, transparent)',
+                      }
+                    : undefined
+                }
+              >
+                {NUMERALS[index]}
+              </span>
+              <span
+                className={`w-full break-words text-center text-xs leading-tight uppercase tracking-[0.06em] sm:tracking-[0.12em] ${
+                  isActive ? 'text-[color:var(--gilt)]' : 'text-[color:var(--mist)]/50'
+                }`}
+              >
+                {stage.title}
+              </span>
             </div>
           );
         })}
