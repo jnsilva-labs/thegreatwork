@@ -11,15 +11,6 @@ type PhaseArcProps = {
 
 const NUMERALS = ['I', 'II', 'III', 'IV'];
 
-// Numeral color readable against each stage tone (albedo and citrinitas
-// tones are light; nigredo and rubedo are dark).
-const ACTIVE_TEXT: Record<AlchemicalStage, string> = {
-  nigredo: 'var(--bone)',
-  albedo: '#1e1b22',
-  citrinitas: '#141110',
-  rubedo: 'var(--bone)',
-};
-
 // Compact four-stage arc of the Great Work with the reading's stage lit.
 // Repetition across readings becomes legible location on a shared map, and
 // the stage links into the site's Great Work page.
@@ -42,16 +33,14 @@ export function PhaseArc({ phase, reason }: PhaseArcProps) {
               )}
               <div className="flex flex-col items-center gap-2 px-1.5 sm:px-2">
                 <span
-                  className={`flex h-9 w-9 items-center justify-center rounded-full border font-ritual text-sm transition sm:h-10 sm:w-10 ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border font-ritual text-sm transition-[background-color,border-color,color,box-shadow] ${
                     isActive
-                      ? 'border-[color:var(--gilt)]/80'
+                      ? 'border-[color:var(--gilt)]/80 bg-[color:var(--gilt)]/18 text-[color:var(--bone)]'
                       : 'border-[color:var(--copper)]/30 text-[color:var(--mist)]/60'
                   }`}
                   style={
                     isActive
                       ? {
-                          backgroundColor: stage.tone,
-                          color: ACTIVE_TEXT[stage.id],
                           boxShadow: '0 0 18px color-mix(in srgb, var(--glow) 35%, transparent)',
                         }
                       : undefined
@@ -60,7 +49,7 @@ export function PhaseArc({ phase, reason }: PhaseArcProps) {
                   {NUMERALS[index]}
                 </span>
                 <span
-                  className={`text-[9px] uppercase tracking-[0.22em] sm:text-[10px] ${
+                  className={`text-xs uppercase tracking-[0.1em] sm:tracking-[0.16em] ${
                     isActive ? 'text-[color:var(--gilt)]' : 'text-[color:var(--mist)]/50'
                   }`}
                 >
@@ -73,13 +62,13 @@ export function PhaseArc({ phase, reason }: PhaseArcProps) {
       </div>
 
       {reason && (
-        <p className="mx-auto max-w-md text-center text-sm leading-relaxed text-[color:#D5D0C6]">{reason}</p>
+        <p className="mx-auto max-w-md text-center text-sm leading-relaxed text-[color:var(--mist)]">{reason}</p>
       )}
 
       <p className="text-center">
         <Link
           href={`/great-work#${phase}`}
-          className="inline-flex min-h-[44px] items-center text-[10px] uppercase tracking-[0.28em] text-[color:var(--mist)]/72 underline-offset-4 transition hover:text-[color:var(--gilt)] hover:underline"
+          className="inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]/72 underline-offset-4 transition-[color,text-decoration-color] hover:text-[color:var(--gilt)] hover:underline sm:tracking-[0.18em]"
         >
           Read about this stage of the Great Work
         </Link>
