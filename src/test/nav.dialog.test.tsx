@@ -134,6 +134,6 @@ describe('navigation menu dialog', () => {
     await user.click(within(dialog).getByText(/^environment$/i));
     const volume = within(dialog).getByRole('slider', { name: /sound volume/i });
 
-    expect(volume.parentElement?.className).toContain('min-h-[44px]');
+    expect(volume.className).toMatch(/(?:min-h-\[44px\]|h-11)/);
   });
 });

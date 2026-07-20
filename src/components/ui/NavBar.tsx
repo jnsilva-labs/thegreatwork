@@ -314,7 +314,7 @@ export function NavBar() {
                           setSoundVolume(next);
                           setVolume(next);
                         }}
-                        className="h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--copper)]/40"
+                        className="h-11 w-full cursor-pointer bg-transparent accent-[color:var(--gilt)]"
                         aria-label="Sound volume"
                       />
                     </div>
