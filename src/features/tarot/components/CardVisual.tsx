@@ -55,7 +55,7 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
         <div className="absolute w-full h-full backface-hidden rounded shadow-2xl bg-void-900 border border-alchemy-gold/30 flex items-center justify-center overflow-hidden">
           
           {/* Layered Geometry */}
-          <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(197,160,89,0.28)_0.75px,transparent_0.75px)] [background-size:12px_12px]"></div>
+          <div className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(color-mix(in_srgb,var(--gilt)_28%,transparent)_0.75px,transparent_0.75px)] [background-size:12px_12px]"></div>
           
           <div className="absolute inset-2 border border-alchemy-gold/20 rounded-sm"></div>
           <div className="absolute inset-1.5 border-[0.5px] border-alchemy-gold/10"></div>

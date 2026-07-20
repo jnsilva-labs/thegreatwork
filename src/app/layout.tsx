@@ -8,7 +8,6 @@ import { Footer } from "@/components/ui/Footer";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/seo/schema";
 import "@fontsource/cormorant-garamond/400.css";
-import "@fontsource/cormorant-garamond/600.css";
 import "@fontsource/manrope/400.css";
 import "@fontsource/manrope/500.css";
 import "@fontsource/manrope/600.css";

@@ -146,6 +146,11 @@ body.nav-panel-open {
   line-height: 1.3;
 }
 
+.type-body {
+  font-size: var(--type-body);
+  line-height: 1.7;
+}
+
 .type-eyebrow {
   font-size: var(--type-eyebrow);
   letter-spacing: var(--tracking-eyebrow);

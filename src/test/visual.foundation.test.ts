@@ -14,8 +14,10 @@ describe("illuminated archive visual foundation", () => {
       expect(globals).toContain(token);
     }
 
+    expect(globals).toMatch(/\.type-body\s*{[^}]*font-size:\s*var\(--type-body\)/s);
     expect(layout).toContain('@fontsource/cormorant-garamond/');
     expect(layout).toContain('@fontsource/manrope/');
+    expect(layout).not.toContain('@fontsource/cormorant-garamond/600.css');
   });
 
   it("keeps these visual surfaces free of broad transitions and remote textures", () => {
@@ -28,5 +30,13 @@ describe("illuminated archive visual foundation", () => {
     expect(surfaces).not.toMatch(/transition:\s*all\b/);
     expect(surfaces).not.toContain("transition-all");
     expect(surfaces).not.toContain("transparenttextures.com");
+  });
+
+  it("keeps the Tarot texture decorative and theme-derived", () => {
+    const card = readSource("src/features/tarot/components/CardVisual.tsx");
+
+    expect(card).toMatch(/pointer-events-none[^\n]*background-image:radial-gradient/);
+    expect(card).toContain("var(--gilt)");
+    expect(card).not.toContain("rgba(197,160,89");
   });
 });
