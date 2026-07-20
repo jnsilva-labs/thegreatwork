@@ -176,7 +176,7 @@ export function NatalReadingResult({
           </div>
         </details>
 
-        <footer className="astro-reveal space-y-5 text-xs leading-relaxed text-[color:var(--mist)]"><p>{result.reading.disclaimer}</p><div>{lettersIsExternal ? <a className="ritual-link min-h-[44px]" href={lettersHref} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("astro_month_ahead_cta_click", { target: "substack" })}>Receive astrology letters</a> : <Link className="ritual-link min-h-[44px]" href={lettersHref} onClick={() => trackEvent("astro_month_ahead_cta_click", { target: "letters" })}>Receive astrology letters</Link>}</div></footer>
+        <footer className="astro-reveal space-y-5 text-xs leading-relaxed text-[color:var(--mist)]"><p>{result.reading.disclaimer}</p><div>{lettersIsExternal ? <a className="ritual-link min-h-[44px]" href={lettersHref} target="_blank" rel="noopener noreferrer" onClick={monthAheadResult ? () => trackEvent("astro_month_ahead_cta_click", { target: "substack" }) : undefined}>Receive astrology letters</a> : <Link className="ritual-link min-h-[44px]" href={lettersHref} onClick={monthAheadResult ? () => trackEvent("astro_month_ahead_cta_click", { target: "letters" }) : undefined}>Receive astrology letters</Link>}</div></footer>
       </div>
     </section>
   );

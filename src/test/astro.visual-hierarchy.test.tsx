@@ -199,6 +199,18 @@ describe("astrology celestial instrument visual hierarchy", () => {
     });
   });
 
+  it("does not emit month-ahead CTA telemetry before a month-ahead result exists", () => {
+    const analyticsWindow = window as Window & { __apAnalyticsQueue?: Array<Record<string, unknown>> };
+    analyticsWindow.__apAnalyticsQueue = [];
+    render(<NatalReadingResult result={natalResult("First reading")} sharePreviewEnabled={false} />);
+
+    fireEvent.click(screen.getByRole("link", { name: /receive astrology letters/i }));
+
+    expect(analyticsWindow.__apAnalyticsQueue).not.toContainEqual(
+      expect.objectContaining({ event: "astro_month_ahead_cta_click" }),
+    );
+  });
+
   it("resets copied status when a new reading replaces the previous one", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
