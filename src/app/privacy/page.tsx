@@ -9,14 +9,29 @@ export const metadata = buildPageMetadata({
 
 const dataFlows = [
   {
-    id: "tarot",
-    title: "Tarot readings",
-    body: "Tarot questions, intentions, selected cards, and spread context are processed by the relevant interpretation service to generate a reading. Saved journal entries and tarot settings are stored in your browser unless you remove them.",
+    id: "browser-storage",
+    title: "Browser storage",
+    body: "Tarot journal entries, Tarot settings, and custom decks are stored in browser localStorage. Settings can include an optional personal Gemini key, stored as plain text JSON rather than encrypted by this application. To remove it, clear the key field and press Save. You can delete journal entries in the app or clear this site's browser storage.",
   },
   {
-    id: "astrology",
-    title: "Astrology readings",
-    body: "Birth date, birth time when supplied, birthplace, and calculated chart data are processed by the relevant chart and interpretation services to generate natal or timing readings.",
+    id: "tarot-providers",
+    title: "Tarot interpretation providers",
+    body: "Tarot questions, intentions, selected cards, and spread context are processed by the interpretation service. Shared readings use Vercel AI Gateway with Google Gemini as the primary model and Anthropic Claude as a fallback. If you use a personal Gemini key, your browser sends the key and reading prompt directly to Google Gemini.",
+  },
+  {
+    id: "astrology-providers",
+    title: "Astrology calculation and interpretation",
+    body: "Birth details and chart data are processed by several services. A birthplace search goes to OpenCage or OpenStreetMap Nominatim; converted time and coordinates go to the configured astrology calculation service; the resulting chart data and optional name go to OpenAI for interpretive text.",
+  },
+  {
+    id: "cookies-verification",
+    title: "Usage cookies and verification",
+    body: "A signed daily-usage cookie stores a random visitor ID, UTC day, and Tarot and natal usage counts. When astrology verification is required, Cloudflare Turnstile receives a verification token and may receive an IP address and user-agent; a successful check creates a short-lived astrology session cookie containing a signed expiry time.",
+  },
+  {
+    id: "analytics",
+    title: "Site analytics",
+    body: "Vercel Analytics is loaded to measure site use. When configured, PostHog records page views and explicit site actions and uses its default browser persistence in localStorage and cookies; PostHog autocapture and session recording are disabled in the application configuration.",
   },
   {
     id: "choice",

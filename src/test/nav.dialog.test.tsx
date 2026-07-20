@@ -83,6 +83,24 @@ describe('navigation menu dialog', () => {
     expect(document.activeElement).toBe(trigger);
   });
 
+  it('recovers forward Tab into the dialog when focus escapes outside it', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <button type="button">Outside control</button>
+        <NavBar />
+      </>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /open menu/i }));
+    const dialog = screen.getByRole('dialog', { name: /^menu$/i });
+    const firstFocusable = within(dialog).getByRole('link', { name: /awareness paradox home/i });
+    screen.getByRole('button', { name: /outside control/i }).focus();
+
+    await user.tab();
+    expect(document.activeElement).toBe(firstFocusable);
+  });
+
   it('keeps environment controls in a secondary disclosure with pressed state', async () => {
     const user = userEvent.setup();
     render(<NavBar />);
@@ -95,16 +113,18 @@ describe('navigation menu dialog', () => {
 
     const environment = summary!.parentElement!;
     expect(within(environment).getByRole('combobox', { name: /theme/i })).toBeTruthy();
-    for (const control of [
-      within(environment).getByRole('button', { name: /play sound|mute sound/i }),
-      within(environment).getByRole('button', { name: /^quality auto$/i }),
-      within(environment).getByRole('button', { name: /^quality high$/i }),
-      within(environment).getByRole('button', { name: /^quality low$/i }),
-      within(environment).getByRole('button', { name: /^motion$/i }),
-      within(environment).getByRole('button', { name: /^interface overlay$/i }),
-    ]) {
-      expect(control.hasAttribute('aria-pressed')).toBe(true);
-    }
+    expect(within(environment).getByRole('button', { name: /play sound/i }).getAttribute('aria-pressed')).toBe('false');
+    expect(within(environment).getByRole('button', { name: /^quality auto$/i }).getAttribute('aria-pressed')).toBe('true');
+    expect(within(environment).getByRole('button', { name: /^quality high$/i }).getAttribute('aria-pressed')).toBe('false');
+    expect(within(environment).getByRole('button', { name: /^quality low$/i }).getAttribute('aria-pressed')).toBe('false');
+    expect(within(environment).getByRole('button', { name: /^motion$/i }).getAttribute('aria-pressed')).toBe('true');
+
+    const interfaceToggle = within(environment).getByRole('button', { name: /^interface overlay$/i });
+    expect(interfaceToggle.getAttribute('aria-pressed')).toBe('true');
+    await user.click(interfaceToggle);
+    expect(interfaceToggle.getAttribute('aria-pressed')).toBe('false');
+    await user.click(interfaceToggle);
+    expect(interfaceToggle.getAttribute('aria-pressed')).toBe('true');
   });
 
   it('tabs to the closed Environment summary and opens it from the keyboard', async () => {

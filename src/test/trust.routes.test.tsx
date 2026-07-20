@@ -20,9 +20,9 @@ describe('global trust architecture', () => {
     const layout = readSource('src/app/layout.tsx');
     const bodyMarkup = layout.slice(layout.indexOf('<body'), layout.indexOf('</body>'));
 
-    expect(bodyMarkup).toMatch(/<body[^>]*>\s*<a[^>]*href="#main-content"[^>]*>\s*Skip to content\s*<\/a>/s);
+    expect(bodyMarkup).toMatch(/<body[^>]*>[\t\r\n ]*<a[^>]*href="#main-content"[^>]*>[\t\r\n ]*Skip to content[\t\r\n ]*<\/a>/);
     expect(layout.match(/<main\b/g)).toHaveLength(1);
-    expect(layout).toMatch(/<main[^>]*id="main-content"[^>]*tabIndex=\{-1\}/s);
+    expect(layout).toMatch(/<main[^>]*id="main-content"[^>]*tabIndex=\{-1\}/);
     expect(readSource('src/app/page.tsx')).not.toMatch(/<\/?main\b/);
     expect(readSource('src/app/ripley-scroll/page.tsx')).not.toMatch(/<\/?main\b/);
   });
@@ -82,11 +82,29 @@ describe('global trust architecture', () => {
     if (!exists) return;
 
     const privacy = readSource(relativePath);
-    expect(privacy).toMatch(/Tarot questions.*cards.*processed.*service/is);
-    expect(privacy).toMatch(/birth.*chart data.*processed.*services/is);
-    expect(privacy).toMatch(/enter only.*needed/i);
+    expect(privacy).toMatch(/Tarot questions[\s\S]*cards[\s\S]*processed[\s\S]*service/i);
+    expect(privacy).toMatch(/birth[\s\S]*chart data[\s\S]*processed[\s\S]*services/i);
+    expect(privacy).toMatch(/enter only[\s\S]*needed/i);
     expect(privacy).toMatch(/AI-assisted reflective guidance/i);
     expect(privacy).toMatch(/not medical, legal, financial, or other professional advice/i);
+    expect(privacy).toMatch(/personal Gemini key/i);
+    expect(privacy).toMatch(/localStorage/i);
+    expect(privacy).toMatch(/plain text/i);
+    expect(privacy).toMatch(/clear the key field and (?:press|select) Save/i);
+    expect(privacy).toMatch(/Tarot journal[\s\S]*settings/i);
+    expect(privacy).toMatch(/Vercel Analytics/i);
+    expect(privacy).toMatch(/PostHog/i);
+    expect(privacy).toMatch(/PostHog[\s\S]*(?:localStorage|local storage)[\s\S]*cookies/i);
+    expect(privacy).toMatch(/signed daily-usage cookie/i);
+    expect(privacy).toMatch(/astrology session cookie/i);
+    expect(privacy).toMatch(/Cloudflare Turnstile/i);
+    expect(privacy).toMatch(/Vercel AI Gateway/i);
+    expect(privacy).toMatch(/Google Gemini/i);
+    expect(privacy).toMatch(/Anthropic Claude/i);
+    expect(privacy).toMatch(/OpenAI/i);
+    expect(privacy).toMatch(/OpenCage/i);
+    expect(privacy).toMatch(/OpenStreetMap Nominatim/i);
+    expect(privacy).toMatch(/configured astrology calculation service/i);
     expect(privacy).not.toMatch(/raw birth data (?:is|are) never (?:stored|retained)/i);
   });
 });
