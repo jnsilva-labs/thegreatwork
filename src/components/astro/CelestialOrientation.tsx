@@ -3,7 +3,20 @@
 import { useId } from "react";
 import { useMotionPreference } from "@/components/motion/useMotionPreference";
 
-const zodiac = ["Ar", "Ta", "Ge", "Ca", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
+const zodiac = [
+  { abbreviation: "Ar", name: "Aries" },
+  { abbreviation: "Ta", name: "Taurus" },
+  { abbreviation: "Ge", name: "Gemini" },
+  { abbreviation: "Ca", name: "Cancer" },
+  { abbreviation: "Le", name: "Leo" },
+  { abbreviation: "Vi", name: "Virgo" },
+  { abbreviation: "Li", name: "Libra" },
+  { abbreviation: "Sc", name: "Scorpio" },
+  { abbreviation: "Sg", name: "Sagittarius" },
+  { abbreviation: "Cp", name: "Capricorn" },
+  { abbreviation: "Aq", name: "Aquarius" },
+  { abbreviation: "Pi", name: "Pisces" },
+] as const;
 
 const pointOnCircle = (index: number, radius: number) => {
   const angle = (index / zodiac.length) * Math.PI * 2 - Math.PI / 2;
@@ -35,9 +48,10 @@ export function CelestialOrientation() {
         </a>
       </div>
 
-      <figure className="relative mx-auto aspect-square w-full max-w-[34rem]" aria-labelledby="celestial-wheel-caption">
-        <div className="pointer-events-none absolute inset-[8%] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--gilt)_14%,transparent),transparent_68%)]" />
-        <svg
+      <figure className="relative mx-auto grid w-full max-w-[34rem] gap-3" aria-labelledby="celestial-wheel-caption">
+        <div className="relative aspect-square">
+          <div className="pointer-events-none absolute inset-[8%] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--gilt)_14%,transparent),transparent_68%)]" />
+          <svg
           viewBox="0 0 100 100"
           role="img"
           aria-labelledby="celestial-wheel-title celestial-wheel-desc"
@@ -60,10 +74,10 @@ export function CelestialOrientation() {
               const inner = pointOnCircle(index, 35);
               const label = pointOnCircle(index, 40.5);
               return (
-                <g key={sign}>
+                <g key={sign.name}>
                   <line x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y} stroke="currentColor" strokeOpacity="0.32" strokeWidth="0.3" />
                   <text x={label.x} y={label.y} dy="0.9" textAnchor="middle" fontSize="2.8" fill="currentColor" opacity="0.8">
-                    {sign}
+                    {sign.abbreviation}
                   </text>
                 </g>
               );
@@ -76,10 +90,19 @@ export function CelestialOrientation() {
           <circle cx="57" cy="25" r="1.25" fill="var(--gilt)" />
           <circle cx="74" cy="49" r="1.4" fill="var(--copper)" />
           <circle cx="50" cy="50" r="2.2" fill="var(--bg)" stroke="currentColor" strokeWidth="0.5" />
-        </svg>
-        <figcaption id="celestial-wheel-caption" className="absolute inset-x-0 bottom-2 text-center text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">
-          Twelve signs · four angles · one field of relation
-        </figcaption>
+          </svg>
+          <figcaption id="celestial-wheel-caption" className="absolute inset-x-0 bottom-2 text-center text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">
+            Twelve signs · four angles · one field of relation
+          </figcaption>
+        </div>
+        <ul aria-label="Zodiac stations" className="grid grid-cols-4 border-y border-[color:var(--copper)]/24 py-2 sm:grid-cols-6">
+          {zodiac.map((sign) => (
+            <li key={sign.name} className="text-xs leading-6 text-[color:var(--mist)]">
+              <span className="mr-1 font-ritual text-base text-[color:var(--gilt)]" aria-hidden="true">{sign.abbreviation}</span>
+              {sign.name}
+            </li>
+          ))}
+        </ul>
       </figure>
     </section>
   );

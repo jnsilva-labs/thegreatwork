@@ -18,6 +18,7 @@ const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "
 const lunarPhaseLabels: Record<string, string> = { newMoon: "New Moon", firstQuarter: "First Quarter", fullMoon: "Full Moon", lastQuarter: "Last Quarter" };
 
 const sentenceCase = (value: string) => value ? value.slice(0, 1).toUpperCase() + value.slice(1) : value;
+const eventTypeLabel = (value: string) => sentenceCase(value.replace(/([A-Z])/g, " $1").trim().toLowerCase());
 const formatUtcDate = (timestampUtc: string) => new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(timestampUtc));
 const signFromLongitude = (longitude: number) => {
   const normalized = ((longitude % 360) + 360) % 360;
@@ -46,7 +47,11 @@ export function NatalReadingResult({
   sharePreviewEnabled = true,
   defaultOpenAdvanced = false,
 }: NatalReadingResultProps) {
-  const [copyState, setCopyState] = useState<"idle" | "done" | "failed">("idle");
+  const [copyState, setCopyState] = useState<{
+    result: AstroNatalResponse;
+    status: "idle" | "done" | "failed";
+  }>({ result, status: "idle" });
+  const currentCopyState = copyState.result === result ? copyState.status : "idle";
   const placements = useMemo(() => Object.entries(result.chart.points)
     .filter(([, value]) => typeof value === "number")
     .map(([planet, value]) => {
@@ -69,10 +74,10 @@ export function NatalReadingResult({
     ].join("\n");
     try {
       await navigator.clipboard.writeText(shareText);
-      setCopyState("done");
+      setCopyState({ result, status: "done" });
       trackEvent("astro_share_export", { method: "copy_text" });
     } catch {
-      setCopyState("failed");
+      setCopyState({ result, status: "failed" });
     }
   };
 
@@ -94,10 +99,10 @@ export function NatalReadingResult({
               ["Moon", result.reading.bigThree.moon],
               ["Rising", result.reading.bigThree.rising ?? "Birth time unknown. Rising sign and houses are intentionally omitted."],
             ].map(([label, body], index) => (
-              <article key={label} className="border-b border-[color:var(--copper)]/24 py-6 sm:border-b-0 sm:border-l sm:px-6 sm:first:border-l-0">
+              <div key={label} className="border-b border-[color:var(--copper)]/24 py-6 sm:border-b-0 sm:border-l sm:px-6 sm:first:border-l-0">
                 <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)]">{String(index + 1).padStart(2, "0")} · {label}</p>
                 <p className="mt-3 text-base leading-relaxed text-[color:var(--bone)]">{body}</p>
-              </article>
+              </div>
             ))}
           </div>
         </section>
@@ -159,7 +164,7 @@ export function NatalReadingResult({
 
         <section className="astro-reveal space-y-6" aria-label="Share this chart">
           <SharePanel chart={result.chart} previewEnabled={sharePreviewEnabled} />
-          <div className="flex flex-wrap items-center gap-3"><button type="button" onClick={onCopyShare} className="min-h-[44px] border border-[color:var(--copper)]/45 px-4 py-2 text-xs uppercase tracking-[0.12em] text-[color:var(--bone)]">Copy share text</button><span className="text-xs text-[color:var(--mist)]" aria-live="polite">{copyState === "done" ? "Copied." : copyState === "failed" ? "Copy failed." : ""}</span></div>
+          <div className="flex flex-wrap items-center gap-3"><button type="button" onClick={onCopyShare} className="min-h-[44px] border border-[color:var(--copper)]/45 px-4 py-2 text-xs uppercase tracking-[0.12em] text-[color:var(--bone)]">Copy share text</button><span className="text-xs text-[color:var(--mist)]" aria-live="polite">{currentCopyState === "done" ? "Copied." : currentCopyState === "failed" ? "Copy failed." : ""}</span></div>
         </section>
 
         <details data-result-section="advanced-details" open={defaultOpenAdvanced || undefined} className="astro-reveal border-y border-[color:var(--copper)]/28 py-5">
@@ -167,11 +172,11 @@ export function NatalReadingResult({
           <div className="mt-6 space-y-8">
             <section aria-labelledby="placement-details"><h3 id="placement-details" className="font-ritual text-2xl text-[color:var(--bone)]">Placements</h3><div className="mt-3 overflow-x-auto"><table className="w-full min-w-[34rem] text-left text-sm"><thead className="text-[color:var(--mist)]"><tr><th className="py-2">Planet</th><th>Sign</th><th>Degree</th><th>Longitude</th></tr></thead><tbody>{placements.map((placement) => <tr key={placement.planet} className="border-t border-[color:var(--copper)]/20 text-[color:var(--bone)]"><td className="py-2">{placement.label}</td><td>{placement.sign}</td><td>{placement.degree}</td><td>{placement.longitude.toFixed(2)}°</td></tr>)}</tbody></table></div></section>
             <div className="grid gap-8 md:grid-cols-2"><section aria-labelledby="aspect-details"><h3 id="aspect-details" className="font-ritual text-2xl text-[color:var(--bone)]">Aspects</h3><ul className="mt-3 space-y-2 text-sm text-[color:var(--mist)]">{result.chart.aspects.map((aspect, index) => <li key={`${aspect.a}-${aspect.type}-${aspect.b}-${index}`}>{planetLabels[aspect.a] ?? sentenceCase(aspect.a)} {aspect.type} {planetLabels[aspect.b] ?? sentenceCase(aspect.b)} · orb {aspect.orb.toFixed(2)}°</li>)}</ul></section><section aria-labelledby="house-details"><h3 id="house-details" className="font-ritual text-2xl text-[color:var(--bone)]">Houses & angles</h3>{result.chart.houses ? <ul className="mt-3 space-y-2 text-sm text-[color:var(--mist)]"><li>Cusps: {result.chart.houses.cusps.map((cusp) => `${cusp.toFixed(2)}°`).join(" · ")}</li><li>Asc: {typeof result.chart.points.asc === "number" ? `${result.chart.points.asc.toFixed(2)}°` : "—"} · MC: {typeof result.chart.points.mc === "number" ? `${result.chart.points.mc.toFixed(2)}°` : "—"}</li></ul> : <p className="mt-3 text-sm text-[color:var(--mist)]">Houses and angles omitted because exact birth time is unknown.</p>}</section></div>
-            {monthAheadResult ? <details className="border-t border-[color:var(--copper)]/20 pt-4"><summary className="min-h-[44px] cursor-pointer py-3 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">Computed month-ahead sky events</summary><div className="mt-4 grid gap-6 md:grid-cols-3"><section><h4 className="text-xs uppercase tracking-[0.1em] text-[color:var(--gilt)]">Lunar stages</h4><ul className="mt-2 space-y-1 text-sm text-[color:var(--mist)]">{monthAheadResult.lunarStages.map((event) => <li key={`${event.phase}-${event.timestampUtc}`}>{lunarPhaseLabels[event.phase]} · {formatUtcDate(event.timestampUtc)}</li>)}</ul></section><section><h4 className="text-xs uppercase tracking-[0.1em] text-[color:var(--gilt)]">Sky shifts</h4><ul className="mt-2 space-y-1 text-sm text-[color:var(--mist)]">{monthAheadResult.skyShifts.map((event) => <li key={`${event.eventType}-${event.planet}-${event.timestampUtc}`}>{sentenceCase(event.planet)} · {sentenceCase(event.eventType)} · {formatUtcDate(event.timestampUtc)}</li>)}</ul></section><section><h4 className="text-xs uppercase tracking-[0.1em] text-[color:var(--gilt)]">Chart contacts</h4><ul className="mt-2 space-y-1 text-sm text-[color:var(--mist)]">{monthAheadResult.transitContacts.map((event) => <li key={`${event.transitPlanet}-${event.natalPoint}-${event.timestampUtc}`}>{sentenceCase(event.transitPlanet)} {event.aspect} {sentenceCase(event.natalPoint)} · {formatUtcDate(event.timestampUtc)}</li>)}</ul></section></div></details> : null}
+            {monthAheadResult ? <details className="border-t border-[color:var(--copper)]/20 pt-4"><summary className="min-h-[44px] cursor-pointer py-3 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">Computed month-ahead sky events</summary><div className="mt-4 grid gap-6 md:grid-cols-3"><section><h4 className="text-xs uppercase tracking-[0.1em] text-[color:var(--gilt)]">Lunar stages</h4><ul className="mt-2 space-y-1 text-sm text-[color:var(--mist)]">{monthAheadResult.lunarStages.map((event) => <li key={`${event.phase}-${event.timestampUtc}`}>{lunarPhaseLabels[event.phase]} · {formatUtcDate(event.timestampUtc)} · orb {event.orb.toFixed(3)}°</li>)}</ul></section><section><h4 className="text-xs uppercase tracking-[0.1em] text-[color:var(--gilt)]">Sky shifts</h4><ul className="mt-2 space-y-1 text-sm text-[color:var(--mist)]">{monthAheadResult.skyShifts.map((event) => <li key={`${event.eventType}-${event.planet}-${event.timestampUtc}`}>{sentenceCase(event.planet)} · {eventTypeLabel(event.eventType)} · {formatUtcDate(event.timestampUtc)}{event.transitHouse ? ` · House ${event.transitHouse}` : ""}</li>)}</ul></section><section><h4 className="text-xs uppercase tracking-[0.1em] text-[color:var(--gilt)]">Chart contacts</h4><ul className="mt-2 space-y-1 text-sm text-[color:var(--mist)]">{monthAheadResult.transitContacts.map((event) => <li key={`${event.transitPlanet}-${event.natalPoint}-${event.timestampUtc}`}>{sentenceCase(event.transitPlanet)} {event.aspect} {sentenceCase(event.natalPoint)} · {formatUtcDate(event.timestampUtc)}{event.transitHouse ? ` · House ${event.transitHouse}` : ""} · orb {event.orb.toFixed(3)}°</li>)}</ul></section></div></details> : null}
           </div>
         </details>
 
-        <footer className="astro-reveal space-y-5 text-xs leading-relaxed text-[color:var(--mist)]"><p>{result.reading.disclaimer}</p><div>{lettersIsExternal ? <a className="ritual-link min-h-[44px]" href={lettersHref} target="_blank" rel="noopener noreferrer">Receive astrology letters</a> : <Link className="ritual-link min-h-[44px]" href={lettersHref}>Receive astrology letters</Link>}</div></footer>
+        <footer className="astro-reveal space-y-5 text-xs leading-relaxed text-[color:var(--mist)]"><p>{result.reading.disclaimer}</p><div>{lettersIsExternal ? <a className="ritual-link min-h-[44px]" href={lettersHref} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("astro_month_ahead_cta_click", { target: "substack" })}>Receive astrology letters</a> : <Link className="ritual-link min-h-[44px]" href={lettersHref} onClick={() => trackEvent("astro_month_ahead_cta_click", { target: "letters" })}>Receive astrology letters</Link>}</div></footer>
       </div>
     </section>
   );

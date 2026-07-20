@@ -253,6 +253,7 @@ export function SharePanel({ chart, previewEnabled = true }: SharePanelProps) {
             <div className="flex gap-2">
               <button
                 type="button"
+                aria-pressed={style === "bigThree"}
                 className={`min-h-[44px] rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] ${
                   style === "bigThree"
                     ? "border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 text-[color:var(--bone)]"
@@ -264,6 +265,7 @@ export function SharePanel({ chart, previewEnabled = true }: SharePanelProps) {
               </button>
               <button
                 type="button"
+                aria-pressed={style === "constellation"}
                 className={`min-h-[44px] rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] ${
                   style === "constellation"
                     ? "border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 text-[color:var(--bone)]"
@@ -304,6 +306,7 @@ export function SharePanel({ chart, previewEnabled = true }: SharePanelProps) {
                 <button
                   key={mode}
                   type="button"
+                  aria-pressed={background === mode}
                   onClick={() => setBackground(mode)}
                   disabled={style !== "constellation"}
                   className={`min-h-[44px] rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] ${
