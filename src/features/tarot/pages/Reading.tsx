@@ -66,14 +66,14 @@ export function CardDetailsDialog({
         aria-modal="true"
         aria-labelledby={headingId}
         tabIndex={-1}
-        className="relative grid h-[100dvh] w-full overflow-y-auto border border-[color:var(--copper)]/28 bg-[color:var(--panel)] shadow-2xl md:h-[min(85vh,52rem)] md:max-w-6xl md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:overflow-hidden"
+        className="relative grid h-[100dvh] w-full overflow-y-auto overscroll-contain border border-[color:var(--copper)]/28 bg-[color:var(--panel)] shadow-2xl md:h-[min(85vh,52rem)] md:max-w-6xl md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:overflow-hidden"
       >
         <button
           ref={initialFocusRef}
           type="button"
           aria-label="Close card details"
           onClick={onClose}
-          className="absolute right-[max(0.75rem,env(safe-area-inset-right))] top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex min-h-[44px] min-w-[44px] items-center justify-center border border-[color:var(--copper)]/30 bg-[color:var(--bg)]/80 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] sm:right-5 sm:top-5"
+          className="absolute right-[max(0.75rem,env(safe-area-inset-right))] top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex min-h-[44px] min-w-[44px] items-center justify-center border border-[color:var(--copper)]/30 bg-[color:var(--bg)]/80 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] md:right-5 md:top-5"
         >
           <X size={22} aria-hidden="true" />
         </button>
@@ -108,7 +108,7 @@ export function CardDetailsDialog({
           </div>
         </div>
 
-        <div className="bg-[color:var(--panel)] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-9 sm:px-10 sm:pb-10 sm:pt-12 md:overflow-y-auto lg:px-12">
+        <div className="bg-[color:var(--panel)] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-9 sm:px-10 sm:pt-12 md:overflow-y-auto md:overscroll-contain md:pb-10 lg:px-12">
           <div className="space-y-9">
             <header className="border-b border-[color:var(--copper)]/18 pb-7 pr-12">
               <div className="mb-4 flex flex-wrap items-center gap-3">

@@ -56,13 +56,18 @@ export function useFocusDialog({ open, onClose }: UseFocusDialogOptions) {
         return;
       }
 
-      if (!dialog.contains(document.activeElement)) {
+      const activeElement = document.activeElement;
+      if (
+        !activeElement ||
+        !dialog.contains(activeElement) ||
+        !focusable.includes(activeElement as HTMLElement)
+      ) {
         event.preventDefault();
         (event.shiftKey ? last : first).focus();
-      } else if (event.shiftKey && document.activeElement === first) {
+      } else if (event.shiftKey && activeElement === first) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && activeElement === last) {
         event.preventDefault();
         first.focus();
       }

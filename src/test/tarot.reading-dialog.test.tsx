@@ -96,4 +96,49 @@ describe('tarot card details dialog', () => {
     expect(screen.queryByRole('dialog', { name: /card details/i })).toBeNull();
     expect(document.activeElement).toBe(trigger);
   });
+
+  it('recovers the Tab loop when card navigation disables the focused boundary control', () => {
+    vi.useFakeTimers();
+    openFirstCardDetails();
+    const dialog = screen.getByRole('dialog', { name: /card details/i });
+    const controls = within(dialog);
+    const close = controls.getByRole('button', { name: /close card details/i });
+    const previous = controls.getByRole('button', { name: /previous card/i }) as HTMLButtonElement;
+    const next = controls.getByRole('button', { name: /next card/i }) as HTMLButtonElement;
+
+    next.focus();
+    fireEvent.click(next);
+    fireEvent.click(next);
+    expect(next.disabled).toBe(true);
+    expect(document.activeElement).toBe(next);
+
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(document.activeElement).toBe(close);
+
+    previous.focus();
+    fireEvent.click(previous);
+    fireEvent.click(previous);
+    expect(previous.disabled).toBe(true);
+    expect(document.activeElement).toBe(previous);
+
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(next);
+  });
+
+  it('contains mobile and desktop scrolling while retaining safe-area values through the sm breakpoint', () => {
+    vi.useFakeTimers();
+    openFirstCardDetails();
+    const dialog = screen.getByRole('dialog', { name: /card details/i });
+    const close = within(dialog).getByRole('button', { name: /close card details/i });
+    const scrollContent = dialog.lastElementChild as HTMLElement;
+
+    expect(dialog.className).toContain('overscroll-contain');
+    expect(scrollContent.className).toContain('md:overscroll-contain');
+    expect(close.className).not.toMatch(/sm:(?:right|top)-/);
+    expect(close.className).toContain('md:right-5');
+    expect(close.className).toContain('md:top-5');
+    expect(scrollContent.className).toContain('pb-[max(2rem,env(safe-area-inset-bottom))]');
+    expect(scrollContent.className).not.toMatch(/sm:pb-/);
+    expect(scrollContent.className).toContain('md:pb-10');
+  });
 });
