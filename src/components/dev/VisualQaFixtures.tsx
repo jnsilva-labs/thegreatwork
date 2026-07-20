@@ -1,3 +1,6 @@
+"use client";
+
+import { useCallback, useState } from "react";
 import {
   ArchivalFigure,
   EditorialSpread,
@@ -10,8 +13,10 @@ import {
 import CardVisual from "@/features/tarot/components/CardVisual";
 import { PhaseArc } from "@/features/tarot/components/PhaseArc";
 import TarotShell from "@/features/tarot/components/TarotShell";
-import { DEFAULT_DECK } from "@/features/tarot/constants";
+import { DEFAULT_DECK, SPREADS } from "@/features/tarot/constants";
+import { CardDetailsDialog } from "@/features/tarot/pages/Reading";
 import type { DrawnCard } from "@/features/tarot/types";
+import { useFocusDialog } from "@/components/ui/useFocusDialog";
 
 const pathItems = [
   { id: "observe", title: "Observe", body: "Meet the symbol before assigning it a meaning." },
@@ -26,6 +31,18 @@ const chamberCards: DrawnCard[] = DEFAULT_DECK.cards.slice(0, 3).map((card, inde
 }));
 
 export function VisualQaFixtures() {
+  const [selectedFixtureCardIndex, setSelectedFixtureCardIndex] = useState<number | null>(null);
+  const closeFixtureDialog = useCallback(() => setSelectedFixtureCardIndex(null), []);
+  const {
+    triggerRef: fixtureDialogTriggerRef,
+    dialogRef: fixtureDialogRef,
+    initialFocusRef: fixtureDialogInitialFocusRef,
+  } = useFocusDialog({
+    open: selectedFixtureCardIndex !== null,
+    onClose: closeFixtureDialog,
+  });
+  const selectedFixtureCard = selectedFixtureCardIndex === null ? null : chamberCards[selectedFixtureCardIndex];
+
   return (
     <div className="space-y-24" data-visual-qa-fixtures="editorial-primitives">
       <section data-qa-section="editorial-spread" aria-label="Editorial spread fixture">
@@ -192,6 +209,63 @@ export function VisualQaFixtures() {
           </div>
         </TarotShell>
       </section>
+
+      <section data-qa-tarot-fixture="tarot-one-card-revealed" aria-label="One-card revealed fixture" className="overflow-hidden border border-[color:var(--copper)]/30">
+        <TarotShell depth="reading">
+          <div className="mx-auto max-w-3xl space-y-8 px-5 py-14 text-center sm:px-10">
+            <header className="space-y-3 border-b border-[color:var(--copper)]/24 pb-7">
+              <p className="text-xs uppercase tracking-[0.14em] text-[color:var(--gilt)]">Local one-card state · no request</p>
+              <h2 className="font-ritual text-4xl text-[color:var(--bone)]">One-card revealed fixture</h2>
+            </header>
+            <div className="mx-auto flex max-w-sm flex-col items-center gap-5">
+              <CardVisual card={chamberCards[0]} isFaceUp className="w-48 sm:w-56" />
+              <p className="font-ritual text-2xl text-[color:var(--gilt)]">{chamberCards[0].name}</p>
+              <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">{chamberCards[0].keywords.join(" · ")}</p>
+            </div>
+          </div>
+        </TarotShell>
+      </section>
+
+      <section data-qa-tarot-fixture="tarot-three-card-dialog" aria-label="Three-card dialog fixture" className="overflow-hidden border border-[color:var(--copper)]/30">
+        <TarotShell depth="reading">
+          <div className="mx-auto max-w-5xl space-y-9 px-5 py-14 text-center sm:px-10">
+            <header className="space-y-3 border-b border-[color:var(--copper)]/24 pb-7">
+              <p className="text-xs uppercase tracking-[0.14em] text-[color:var(--gilt)]">Local three-card state · no request</p>
+              <h2 className="font-ritual text-4xl text-[color:var(--bone)]">Three-card dialog fixture</h2>
+            </header>
+            <div className="grid grid-cols-3 items-start gap-3 sm:gap-8">
+              {chamberCards.map((card, index) => (
+                <div key={card.id} className="flex min-w-0 flex-col items-center gap-3">
+                  <p className="text-xs uppercase tracking-[0.08em] text-[color:var(--mist)]">{["Context", "Focus", "Outcome"][index]}</p>
+                  <CardVisual card={card} isFaceUp className="w-full max-w-48" />
+                </div>
+              ))}
+            </div>
+            <button
+              ref={fixtureDialogTriggerRef}
+              type="button"
+              onClick={() => setSelectedFixtureCardIndex(0)}
+              className="inline-flex min-h-[44px] items-center justify-center border border-[color:var(--gilt)]/60 px-6 py-3 text-xs uppercase tracking-[0.14em] text-[color:var(--bone)] transition-[background-color,border-color] hover:border-[color:var(--gilt)] hover:bg-[color:var(--gilt)]/12"
+            >
+              Open three-card dialog fixture
+            </button>
+          </div>
+        </TarotShell>
+      </section>
+
+      {selectedFixtureCard && selectedFixtureCardIndex !== null && (
+        <CardDetailsDialog
+          card={selectedFixtureCard}
+          position={SPREADS["three-card"].positions[selectedFixtureCardIndex]}
+          currentIndex={selectedFixtureCardIndex}
+          cardCount={chamberCards.length}
+          onClose={closeFixtureDialog}
+          onPrevious={() => setSelectedFixtureCardIndex((index) => Math.max(0, (index ?? 0) - 1))}
+          onNext={() => setSelectedFixtureCardIndex((index) => Math.min(chamberCards.length - 1, (index ?? 0) + 1))}
+          dialogRef={fixtureDialogRef}
+          initialFocusRef={fixtureDialogInitialFocusRef}
+        />
+      )}
     </div>
   );
 }

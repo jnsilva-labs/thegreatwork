@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useId, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useFocusDialog } from '@/components/ui/useFocusDialog';
 import { AlertTriangle, ArrowLeft, ChevronLeft, ChevronRight, Eye, Loader2, Save, Sparkles, X } from '../icons';
 import { DEFAULT_DECK, SPREADS } from '../constants';
 import SpreadLayout from '../components/SpreadLayout';
@@ -9,7 +11,7 @@ import TarotShell from '../components/TarotShell';
 import { PhaseArc } from '../components/PhaseArc';
 import { generateInterpretation, TarotInterpretationError } from '../services/geminiService';
 import { getDecks, getSettings, saveReading } from '../services/storageService';
-import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, SpreadType, TarotView } from '../types';
+import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, SpreadPosition, SpreadType, TarotView } from '../types';
 
 type ReadingStage = 'shuffling' | 'drawing' | 'interpreting' | 'complete';
 
@@ -23,6 +25,139 @@ const LOADING_MESSAGES = [
 interface ReadingProps {
   request: ReadingRequest | null;
   onNavigate: (view: TarotView) => void;
+}
+
+interface CardDetailsDialogProps {
+  card: DrawnCard;
+  position?: SpreadPosition | null;
+  currentIndex: number;
+  cardCount: number;
+  onClose: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  dialogRef: React.Ref<HTMLElement>;
+  initialFocusRef: React.Ref<HTMLButtonElement>;
+}
+
+export function CardDetailsDialog({
+  card,
+  position,
+  currentIndex,
+  cardCount,
+  onClose,
+  onPrevious,
+  onNext,
+  dialogRef,
+  initialFocusRef,
+}: CardDetailsDialogProps) {
+  const headingId = useId();
+
+  return createPortal(
+    <div
+      data-testid="card-dialog-backdrop"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-[color:var(--bg)]/92 backdrop-blur-xl md:items-center md:p-6"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        tabIndex={-1}
+        className="relative grid h-[100dvh] w-full overflow-y-auto border border-[color:var(--copper)]/28 bg-[color:var(--panel)] shadow-2xl md:h-[min(85vh,52rem)] md:max-w-6xl md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:overflow-hidden"
+      >
+        <button
+          ref={initialFocusRef}
+          type="button"
+          aria-label="Close card details"
+          onClick={onClose}
+          className="absolute right-[max(0.75rem,env(safe-area-inset-right))] top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex min-h-[44px] min-w-[44px] items-center justify-center border border-[color:var(--copper)]/30 bg-[color:var(--bg)]/80 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] sm:right-5 sm:top-5"
+        >
+          <X size={22} aria-hidden="true" />
+        </button>
+
+        <div className="relative flex min-h-[19rem] items-center justify-center border-b border-[color:var(--copper)]/18 bg-[color:var(--bg)] px-6 pb-16 pt-14 md:min-h-0 md:border-b-0 md:border-r md:p-10">
+          <div className={`aspect-[7/12] h-[min(34svh,17rem)] md:h-auto md:w-[min(68%,19rem)] ${card.isReversed ? 'rotate-180' : ''}`}>
+            <TarotCardFace card={card} className="shadow-2xl" />
+          </div>
+
+          <div className="absolute inset-x-4 bottom-3 flex items-center justify-between gap-4 md:inset-x-8 md:bottom-6">
+            <button
+              type="button"
+              aria-label="Previous card"
+              onClick={onPrevious}
+              disabled={currentIndex === 0}
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 px-2 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] transition-[color] hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-25"
+            >
+              <ChevronLeft size={18} aria-hidden="true" /> <span className="hidden lg:inline">Previous</span>
+            </button>
+            <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]" aria-live="polite">
+              {currentIndex + 1} / {cardCount}
+            </p>
+            <button
+              type="button"
+              aria-label="Next card"
+              onClick={onNext}
+              disabled={currentIndex === cardCount - 1}
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 px-2 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] transition-[color] hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-25"
+            >
+              <span className="hidden lg:inline">Next</span> <ChevronRight size={18} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-[color:var(--panel)] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-9 sm:px-10 sm:pb-10 sm:pt-12 md:overflow-y-auto lg:px-12">
+          <div className="space-y-9">
+            <header className="border-b border-[color:var(--copper)]/18 pb-7 pr-12">
+              <div className="mb-4 flex flex-wrap items-center gap-3">
+                {position && (
+                  <span className="border border-[color:var(--gilt)]/30 px-3 py-1 text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)]">
+                    Position {position.id}
+                  </span>
+                )}
+                <span className="text-xs uppercase tracking-[0.14em] text-[color:var(--mist)]">{position?.name}</span>
+              </div>
+              <h2 id={headingId} className="font-ritual text-4xl leading-tight text-[color:var(--bone)] sm:text-5xl">
+                {card.name}<span className="sr-only"> — Card details</span>
+              </h2>
+              <p className="mt-3 font-ritual text-sm italic text-[color:var(--mist)]">
+                {card.isReversed ? 'Inverted Energy (Reversed)' : 'Direct Energy (Upright)'}
+              </p>
+            </header>
+
+            <section className="space-y-3" aria-labelledby={`${headingId}-interpretation`}>
+              <h3 id={`${headingId}-interpretation`} className="text-xs uppercase tracking-[0.16em] text-[color:var(--mist)]">Interpretation</h3>
+              <p className="font-ritual text-2xl leading-relaxed text-[color:var(--mist)]">
+                {card.isReversed ? card.meaningReversed : card.meaningUpright}
+              </p>
+            </section>
+
+            <div className="grid gap-7 border-t border-[color:var(--copper)]/14 pt-7 sm:grid-cols-2 sm:gap-9">
+              <section aria-labelledby={`${headingId}-shadow`}>
+                <h3 id={`${headingId}-shadow`} className="mb-3 text-xs uppercase tracking-[0.14em] text-[color:var(--gilt)]">The Shadow</h3>
+                <p className="text-sm leading-relaxed text-[color:var(--mist)]">{card.shadow}</p>
+              </section>
+              <section aria-labelledby={`${headingId}-gift`}>
+                <h3 id={`${headingId}-gift`} className="mb-3 text-xs uppercase tracking-[0.14em] text-[color:var(--gilt)]">The Gift</h3>
+                <p className="text-sm leading-relaxed text-[color:var(--mist)]">{card.gift}</p>
+              </section>
+            </div>
+
+            <ul aria-label="Card keywords" className="flex flex-wrap gap-3 border-t border-[color:var(--copper)]/14 pt-7">
+              {card.keywords.map((keyword) => (
+                <li key={keyword} className="border border-[color:var(--copper)]/24 bg-[color:var(--bg)]/45 px-4 py-1.5 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">
+                  {keyword}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>,
+    document.body,
+  );
 }
 
 const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
@@ -40,6 +175,15 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const closeCardDialog = useCallback(() => setSelectedCardId(null), []);
+  const {
+    triggerRef: cardDialogTriggerRef,
+    dialogRef: cardDialogRef,
+    initialFocusRef: cardDialogInitialFocusRef,
+  } = useFocusDialog({
+    open: selectedCardId !== null,
+    onClose: closeCardDialog,
+  });
 
   useEffect(() => {
     if (!isLoadingAI) {
@@ -104,19 +248,27 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
     setFlippedIds(new Set(drawnCards.map((card) => card.id)));
   };
 
-  const handlePrevCard = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handlePrevCard = () => {
     const currentIndex = drawnCards.findIndex((card) => card.id === selectedCardId);
     if (currentIndex > 0) {
       setSelectedCardId(drawnCards[currentIndex - 1].id);
     }
   };
 
-  const handleNextCard = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleNextCard = () => {
     const currentIndex = drawnCards.findIndex((card) => card.id === selectedCardId);
     if (currentIndex < drawnCards.length - 1) {
       setSelectedCardId(drawnCards[currentIndex + 1].id);
+    }
+  };
+
+  const rememberCardDialogTrigger = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target;
+    if (
+      target instanceof HTMLButtonElement &&
+      target.getAttribute('aria-label')?.endsWith('open details')
+    ) {
+      cardDialogTriggerRef.current = target;
     }
   };
 
@@ -221,7 +373,11 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
         {stage !== 'shuffling' && (
           <>
-            <section aria-label="Reading table" className="mb-14 mt-4 w-full border-y border-[color:var(--copper)]/28 px-1 py-6 sm:px-6 sm:py-8">
+            <section
+              aria-label="Reading table"
+              className="mb-14 mt-4 w-full border-y border-[color:var(--copper)]/28 px-1 py-6 sm:px-6 sm:py-8"
+              onClickCapture={rememberCardDialogTrigger}
+            >
               <div className="mb-6 grid gap-6 border-b border-[color:var(--copper)]/20 pb-6 lg:grid-cols-[1.08fr_0.92fr]">
                 <div className="space-y-3">
                   <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Question</p>
@@ -371,92 +527,17 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
       </div>
 
       {selectedCard && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[color:var(--bg)]/95 p-4 backdrop-blur-xl" onClick={() => setSelectedCardId(null)}>
-          <div className="relative flex h-[85vh] w-full max-w-6xl flex-col overflow-hidden border border-[color:var(--copper)]/24 bg-[color:var(--panel)] shadow-2xl md:flex-row" onClick={(event) => event.stopPropagation()}>
-            <button onClick={() => setSelectedCardId(null)} className="absolute right-5 top-5 z-20 flex min-h-[44px] min-w-[44px] items-center justify-center text-[color:var(--mist)] transition-[color] hover:text-[color:var(--bone)]">
-              <X size={24} />
-            </button>
-
-            <div className="relative flex h-1/2 items-center justify-center border-r border-[color:var(--copper)]/16 bg-[color:var(--bg)] p-10 md:h-full md:w-1/2">
-              <div className={`aspect-[7/12] w-[min(100%,19rem)] ${selectedCard.isReversed ? 'rotate-180' : ''}`}>
-                <TarotCardFace card={selectedCard} className="shadow-2xl" />
-              </div>
-
-              <div className="absolute inset-x-0 bottom-6 flex justify-center gap-12 md:hidden">
-                <button onClick={handlePrevCard} className="flex min-h-[44px] min-w-[44px] items-center justify-center text-[color:var(--bone)] disabled:opacity-20" disabled={drawnCards.indexOf(selectedCard) === 0}>
-                  <ChevronLeft size={32} />
-                </button>
-                <button onClick={handleNextCard} className="flex min-h-[44px] min-w-[44px] items-center justify-center text-[color:var(--bone)] disabled:opacity-20" disabled={drawnCards.indexOf(selectedCard) === drawnCards.length - 1}>
-                  <ChevronRight size={32} />
-                </button>
-              </div>
-            </div>
-
-            <div className="relative h-1/2 overflow-y-auto bg-[color:var(--panel)] p-12 md:h-full md:w-1/2">
-              <div className="space-y-10">
-                <div>
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="rounded-full border border-[color:var(--gilt)]/30 px-3 py-1 text-xs uppercase tracking-[0.16em] text-[color:var(--gilt)]">
-                      Position {activePosition?.id}
-                    </span>
-                    <span className="text-xs uppercase tracking-widest text-[color:var(--mist)]">{activePosition?.name}</span>
-                  </div>
-
-                  <h2 className="mb-4 font-ritual text-5xl text-[color:var(--bone)]">{selectedCard.name}</h2>
-
-                  <div className="text-sm font-ritual italic text-[color:var(--mist)]">
-                    {selectedCard.isReversed ? 'Inverted Energy (Reversed)' : 'Direct Energy (Upright)'}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-xs uppercase tracking-[0.2em] text-[color:var(--mist)]">Interpretation</h3>
-                  <p className="font-ritual text-2xl leading-relaxed text-[color:var(--mist)]">
-                    {selectedCard.isReversed ? selectedCard.meaningReversed : selectedCard.meaningUpright}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-12 border-t border-[color:var(--copper)]/10 pt-8">
-                  <div>
-                    <span className="mb-3 block text-xs uppercase tracking-[0.16em] text-[color:var(--gilt)]">The Shadow</span>
-                    <p className="text-sm leading-relaxed text-[color:var(--mist)]">{selectedCard.shadow}</p>
-                  </div>
-                  <div>
-                    <span className="mb-3 block text-xs uppercase tracking-[0.16em] text-[color:var(--gilt)]">The Gift</span>
-                    <p className="text-sm leading-relaxed text-[color:var(--mist)]">{selectedCard.gift}</p>
-                  </div>
-                </div>
-
-                <div className="pt-6">
-                  <div className="flex flex-wrap gap-3">
-                    {selectedCard.keywords.map((keyword) => (
-                      <span key={keyword} className="border border-[color:var(--copper)]/24 bg-[color:var(--bg)]/45 px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-[color:var(--mist)]">
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-16 hidden justify-between border-t border-[color:var(--copper)]/10 pt-8 md:flex">
-                <button
-                  onClick={handlePrevCard}
-                  disabled={drawnCards.indexOf(selectedCard) === 0}
-                  className="flex min-h-[44px] items-center gap-3 text-xs uppercase tracking-widest text-[color:var(--mist)] transition-[color] hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-20"
-                >
-                  <ChevronLeft size={14} /> Previous
-                </button>
-                <button
-                  onClick={handleNextCard}
-                  disabled={drawnCards.indexOf(selectedCard) === drawnCards.length - 1}
-                  className="flex min-h-[44px] items-center gap-3 text-xs uppercase tracking-widest text-[color:var(--mist)] transition-[color] hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-20"
-                >
-                  Next <ChevronRight size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CardDetailsDialog
+          card={selectedCard}
+          position={activePosition}
+          currentIndex={drawnCards.indexOf(selectedCard)}
+          cardCount={drawnCards.length}
+          onClose={closeCardDialog}
+          onPrevious={handlePrevCard}
+          onNext={handleNextCard}
+          dialogRef={cardDialogRef}
+          initialFocusRef={cardDialogInitialFocusRef}
+        />
       )}
     </TarotShell>
   );

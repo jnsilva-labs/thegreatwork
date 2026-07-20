@@ -1,33 +1,63 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Reading from '@/features/tarot/pages/Reading';
 
 afterEach(() => {
   vi.useRealTimers();
+  window.localStorage.clear();
+  document.body.style.overflow = '';
+  document.body.classList.remove('nav-panel-open');
 });
 
-describe('tarot card details dialog', () => {
-  it('moves focus into the real card dialog, cycles Tab in both directions, and restores the card trigger', async () => {
-    vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    render(
-      <Reading
-        request={{ question: 'What should I see?', intention: 'General', spreadId: 'three-card' }}
-        onNavigate={vi.fn()}
-      />,
-    );
+function openFirstCardDetails() {
+  render(
+    <Reading
+      request={{ question: 'What should I see?', intention: 'General', spreadId: 'three-card' }}
+      onNavigate={vi.fn()}
+    />,
+  );
 
-    act(() => vi.advanceTimersByTime(2_500));
-    const card = screen.getAllByRole('button', { name: /turn this card/i })[0];
-    fireEvent.click(card);
-    const trigger = screen.getByRole('button', { name: /open details/i });
-    fireEvent.click(trigger);
+  act(() => vi.advanceTimersByTime(2_500));
+  const card = screen.getAllByRole('button', { name: /turn this card/i })[0];
+  expect(card.tagName).toBe('BUTTON');
+  expect(card.getAttribute('type')).toBe('button');
+  fireEvent.click(card);
+
+  const trigger = screen.getByRole('button', { name: /open details/i });
+  expect(trigger).toBe(card);
+  fireEvent.click(trigger);
+  return trigger;
+}
+
+describe('tarot card details dialog', () => {
+  it('labels the modal, traps focus in both directions, closes on Escape, and restores the exact card trigger', async () => {
+    vi.useFakeTimers();
+    const trigger = openFirstCardDetails();
+    vi.useRealTimers();
+    const user = userEvent.setup();
 
     const dialog = screen.getByRole('dialog', { name: /card details/i });
-    const close = screen.getByRole('button', { name: /close card details/i });
-    expect(document.body.contains(dialog)).toBe(true);
+    const controls = within(dialog);
+    const close = controls.getByRole('button', { name: /close card details/i });
+    const previous = controls.getByRole('button', { name: /previous card/i });
+    const next = controls.getByRole('button', { name: /next card/i });
+    const labelledBy = dialog.getAttribute('aria-labelledby');
+
+    expect(screen.getByTestId('card-dialog-backdrop').parentElement).toBe(document.body);
     expect(dialog.getAttribute('aria-modal')).toBe('true');
+    expect(labelledBy).toBeTruthy();
+    expect(document.getElementById(labelledBy ?? '')?.textContent).toMatch(/card details/i);
+    expect(dialog.className).toContain('h-[100dvh]');
+    expect(dialog.className).toContain('md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]');
+    expect(dialog.className).not.toContain('sm:grid-cols-');
+    for (const control of [close, previous, next]) {
+      expect(control.className).toContain('min-h-[44px]');
+      expect(control.className).toContain('min-w-[44px]');
+    }
+    expect(close.className).toContain('top-[max(0.75rem,env(safe-area-inset-top))]');
+    expect(close.className).toContain('right-[max(0.75rem,env(safe-area-inset-right))]');
+    expect(document.body.style.overflow).toBe('hidden');
     expect(document.activeElement).toBe(close);
 
     const focusables = dialog.querySelectorAll<HTMLElement>(
@@ -36,7 +66,7 @@ describe('tarot card details dialog', () => {
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
 
-    expect(first).toBeTruthy();
+    expect(first).toBe(close);
     expect(last).toBeTruthy();
     await user.tab({ shift: true });
     expect(document.activeElement).toBe(last);
@@ -44,6 +74,25 @@ describe('tarot card details dialog', () => {
     expect(document.activeElement).toBe(first);
 
     await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog', { name: /card details/i })).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('preserves card navigation, ignores inside clicks, and dismisses only from the backdrop', () => {
+    vi.useFakeTimers();
+    const trigger = openFirstCardDetails();
+    const dialog = screen.getByRole('dialog', { name: /card details/i });
+    const initialHeading = within(dialog).getByRole('heading', { level: 2 }).textContent;
+
+    fireEvent.click(within(dialog).getByRole('button', { name: /next card/i }));
+    expect(within(dialog).getByRole('heading', { level: 2 }).textContent).not.toBe(initialHeading);
+    fireEvent.click(within(dialog).getByRole('button', { name: /previous card/i }));
+    expect(within(dialog).getByRole('heading', { level: 2 }).textContent).toBe(initialHeading);
+
+    fireEvent.click(dialog);
+    expect(screen.getByRole('dialog', { name: /card details/i })).toBeTruthy();
+    fireEvent.click(screen.getByTestId('card-dialog-backdrop'));
     expect(screen.queryByRole('dialog', { name: /card details/i })).toBeNull();
     expect(document.activeElement).toBe(trigger);
   });

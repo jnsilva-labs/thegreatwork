@@ -64,12 +64,14 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
            )}
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onClick}
-        aria-label={isFaceUp && card ? `${card.name}${card.isReversed ? ', reversed' : ''} — open details` : 'Turn this card'}
-        className="absolute inset-0 z-20 cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--gilt)]"
-      />
+      {onClick && (
+        <button
+          type="button"
+          onClick={onClick}
+          aria-label={isFaceUp && card ? `${card.name}${card.isReversed ? ', reversed' : ''} — open details` : 'Turn this card'}
+          className="absolute inset-0 z-20 cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--gilt)]"
+        />
+      )}
     </div>
   );
 };

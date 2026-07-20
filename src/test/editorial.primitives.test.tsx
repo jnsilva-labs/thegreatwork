@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ComponentProps, ImgHTMLAttributes } from "react";
@@ -150,14 +150,26 @@ describe("illuminated archive editorial primitives", () => {
       Array.from(container.querySelectorAll("[data-qa-tarot-fixture]")).map((section) =>
         section.getAttribute("data-qa-tarot-fixture"),
       ),
-    ).toEqual(["tarot-entry", "tarot-reading"]);
+    ).toEqual(["tarot-entry", "tarot-reading", "tarot-one-card-revealed", "tarot-three-card-dialog"]);
     expect(screen.getByRole("heading", { level: 2, name: "Tarot entry fixture" })).toBeTruthy();
     expect(screen.getByRole("heading", { level: 2, name: "Reading chamber fixture" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "One-card revealed fixture" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Three-card dialog fixture" })).toBeTruthy();
     const tarotReadingFixture = container.querySelector('[data-qa-tarot-fixture="tarot-reading"]');
     expect(tarotReadingFixture?.querySelectorAll('img')).toHaveLength(3);
     for (const image of tarotReadingFixture?.querySelectorAll('img') ?? []) {
       expect(image.getAttribute('src')).toMatch(/^\/tarot\/rider-waite\//);
     }
+    const oneCardFixture = container.querySelector('[data-qa-tarot-fixture="tarot-one-card-revealed"]');
+    expect(oneCardFixture?.querySelectorAll('img')).toHaveLength(1);
+    expect(within(oneCardFixture as HTMLElement).queryByRole('button', { name: /open details/i })).toBeNull();
+    const dialogFixture = container.querySelector('[data-qa-tarot-fixture="tarot-three-card-dialog"]');
+    expect(dialogFixture?.querySelectorAll('img')).toHaveLength(3);
+    const openFixtureDialog = within(dialogFixture as HTMLElement).getByRole('button', { name: /open three-card dialog fixture/i });
+    fireEvent.click(openFixtureDialog);
+    expect(screen.getByRole('dialog', { name: /card details/i })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /close card details/i }));
+    expect(document.activeElement).toBe(openFixtureDialog);
     const fixtureSource = readFileSync(resolve(process.cwd(), "src/components/dev/VisualQaFixtures.tsx"), "utf8");
     expect(fixtureSource).not.toContain("generateInterpretation");
     expect(fixtureSource).not.toContain("/api/tarot");
