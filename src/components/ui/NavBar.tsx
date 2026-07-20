@@ -302,20 +302,22 @@ export function NavBar() {
                     </ControlRow>
                   </div>
                   <ControlRow label="Volume">
-                    <input
-                      type="range"
-                      min={0}
-                      max={0.4}
-                      step={0.01}
-                      value={soundVolume}
-                      onChange={(event) => {
-                        const next = Number(event.target.value);
-                        setSoundVolume(next);
-                        setVolume(next);
-                      }}
-                      className="h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--copper)]/40"
-                      aria-label="Sound volume"
-                    />
+                    <div className="flex min-h-[44px] items-center">
+                      <input
+                        type="range"
+                        min={0}
+                        max={0.4}
+                        step={0.01}
+                        value={soundVolume}
+                        onChange={(event) => {
+                          const next = Number(event.target.value);
+                          setSoundVolume(next);
+                          setVolume(next);
+                        }}
+                        className="h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--copper)]/40"
+                        aria-label="Sound volume"
+                      />
+                    </div>
                   </ControlRow>
                 </div>
               </details>

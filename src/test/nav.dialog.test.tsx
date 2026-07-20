@@ -50,7 +50,10 @@ describe('navigation menu dialog', () => {
       dialog.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])',
       ),
-    ).filter((element) => !element.closest('details:not([open])'));
+    ).filter((element) => {
+      const closedDetails = element.parentElement?.closest('details:not([open])');
+      return !closedDetails || (element.tagName === 'SUMMARY' && closedDetails === element.parentElement);
+    });
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
 
@@ -102,5 +105,35 @@ describe('navigation menu dialog', () => {
     ]) {
       expect(control.hasAttribute('aria-pressed')).toBe(true);
     }
+  });
+
+  it('tabs to the closed Environment summary and opens it from the keyboard', async () => {
+    const user = userEvent.setup();
+    render(<NavBar />);
+
+    await user.click(screen.getByRole('button', { name: /open menu/i }));
+    const dialog = screen.getByRole('dialog', { name: /^menu$/i });
+    const environmentSummary = within(dialog).getByText(/^environment$/i).closest('summary');
+    const firstFocusable = within(dialog).getByRole('link', { name: /awareness paradox home/i });
+
+    expect(environmentSummary).toBeTruthy();
+    firstFocusable.focus();
+    await user.tab({ shift: true });
+    expect(document.activeElement).toBe(environmentSummary);
+
+    await user.click(environmentSummary!);
+    expect(environmentSummary!.parentElement!.hasAttribute('open')).toBe(true);
+  });
+
+  it('gives the delicate volume rail a 44px minimum interaction area', async () => {
+    const user = userEvent.setup();
+    render(<NavBar />);
+
+    await user.click(screen.getByRole('button', { name: /open menu/i }));
+    const dialog = screen.getByRole('dialog', { name: /^menu$/i });
+    await user.click(within(dialog).getByText(/^environment$/i));
+    const volume = within(dialog).getByRole('slider', { name: /sound volume/i });
+
+    expect(volume.parentElement?.className).toContain('min-h-[44px]');
   });
 });

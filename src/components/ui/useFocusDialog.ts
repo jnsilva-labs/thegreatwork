@@ -43,7 +43,10 @@ export function useFocusDialog({ open, onClose }: UseFocusDialogOptions) {
       if (event.key !== "Tab" || !dialog) return;
 
       const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector)).filter(
-        (element) => !element.closest("details:not([open])"),
+        (element) => {
+          const closedDetails = element.parentElement?.closest("details:not([open])");
+          return !closedDetails || (element.tagName === "SUMMARY" && closedDetails === element.parentElement);
+        },
       );
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
