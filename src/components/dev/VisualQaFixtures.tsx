@@ -17,6 +17,8 @@ import { DEFAULT_DECK, SPREADS } from "@/features/tarot/constants";
 import { CardDetailsDialog } from "@/features/tarot/pages/Reading";
 import type { DrawnCard } from "@/features/tarot/types";
 import { useFocusDialog } from "@/components/ui/useFocusDialog";
+import { NatalReadingResult } from "@/components/astro/NatalChartWidget";
+import type { AstroMonthAheadReadingResponse, AstroNatalResponse } from "@/lib/astro/types";
 
 const pathItems = [
   { id: "observe", title: "Observe", body: "Meet the symbol before assigning it a meaning." },
@@ -29,6 +31,76 @@ const chamberCards: DrawnCard[] = DEFAULT_DECK.cards.slice(0, 3).map((card, inde
   isReversed: index === 2,
   positionId: index + 1,
 }));
+
+const natalResultFixture: AstroNatalResponse = {
+  chart: {
+    meta: { fixture: true, calculation: "deterministic visual QA" },
+    points: { sun: 222.4, moon: 128.9, mercury: 238.2, venus: 197.6, mars: 84.1, jupiter: 301.7, saturn: 273.4, uranus: 276.9, neptune: 282.3, pluto: 226.8, node: 291.2, chiron: 111.6 },
+    houses: null,
+    aspects: [
+      { a: "sun", b: "moon", type: "square", orb: 3.5 },
+      { a: "venus", b: "saturn", type: "sextile", orb: 1.8 },
+      { a: "mercury", b: "jupiter", type: "sextile", orb: 3.5 },
+    ],
+  },
+  reading: {
+    title: "The Keeper of the Unfinished Threshold",
+    bigThree: {
+      sun: "Your solar center works through Scorpio: patient with complexity, loyal to what is true, and unwilling to confuse a polished surface with an honest answer.",
+      moon: "The Leo Moon asks the inner life to remain warm and expressive, even when your instinct is to protect what matters by keeping it private.",
+      rising: null,
+    },
+    snapshot: "You are learning to let depth become visible without turning revelation into performance. The chart holds a long conversation between privacy and radiance, asking for forms of expression sturdy enough to carry what you actually know.",
+    coreThemes: ["Depth that becomes useful", "Creative courage without spectacle", "Discernment at emotional thresholds"],
+    strengths: ["Sustained attention", "Loyalty under pressure", "A precise instinct for hidden structure"],
+    shadows: ["Withholding until certainty arrives", "Mistaking control for safety", "Carrying complexity alone"],
+    relationships: "You meet others most honestly when trust grows through consistent action rather than accelerated disclosure. Intimacy becomes spacious when privacy is named instead of defended in silence.",
+    careerCalling: "Work becomes meaningful when research, craft, and interpretation converge. You are less interested in occupying a role than in making a difficult field more intelligible.",
+    growthKeys: [
+      { label: "Make one thing visible", practice: "Choose a small finished form for an idea you have protected too long." },
+      { label: "Name the boundary", practice: "State what you need before distance begins doing the speaking for you." },
+      { label: "Let warmth count", practice: "Treat pleasure and play as sources of information, not rewards postponed until the work is complete." },
+    ],
+    paradox: { tension: "You want to be fully known while preserving the private chamber where meaning ripens.", gift: "You can reveal truth with timing, neither hiding it nor spending it before it has form." },
+    mantra: "I let what is ready become visible.",
+    disclaimer: "This symbolic reflection is for self-inquiry and does not replace medical, legal, financial, or mental-health guidance.",
+  },
+  meta: { timeUnknown: true, houseSystem: "wholeSign", zodiac: "tropical" },
+};
+
+const monthAheadFixture: AstroMonthAheadReadingResponse = {
+  meta: { startDateUtc: "2030-01-01T00:00:00.000Z", endDateUtc: "2030-01-31T00:00:00.000Z", durationDays: 30, generatedAt: "2030-01-01T00:00:00.000Z", sampleHours: 6, zodiac: "tropical" },
+  lunarStages: [
+    { kind: "lunarStage", phase: "newMoon", timestampUtc: "2030-01-04T12:00:00.000Z", orb: 0.1, priority: 1 },
+    { kind: "lunarStage", phase: "firstQuarter", timestampUtc: "2030-01-11T12:00:00.000Z", orb: 0.2, priority: 2 },
+    { kind: "lunarStage", phase: "fullMoon", timestampUtc: "2030-01-18T12:00:00.000Z", orb: 0.1, priority: 1 },
+    { kind: "lunarStage", phase: "lastQuarter", timestampUtc: "2030-01-26T12:00:00.000Z", orb: 0.3, priority: 2 },
+  ],
+  skyShifts: [{ kind: "skyShift", eventType: "ingress", planet: "venus", timestampUtc: "2030-01-09T18:00:00.000Z", longitude: 300, speed: 1.1, priority: 2, fromSign: "Capricorn", toSign: "Aquarius" }],
+  transitContacts: [{ kind: "transitContact", transitPlanet: "saturn", natalPoint: "sun", aspect: "trine", timestampUtc: "2030-01-21T09:00:00.000Z", orb: 0.4, transitLongitude: 342.4, natalLongitude: 222.4, priority: 1 }],
+  highlights: [{ kind: "lunarStage", phase: "fullMoon", timestampUtc: "2030-01-18T12:00:00.000Z", orb: 0.1, priority: 1 }],
+  reading: {
+    title: "A month for giving the hidden work a vessel",
+    timeframe: "January 1–31, 2030",
+    overview: "The month favors deliberate visibility. Build the container before increasing the signal, and let each public gesture remain proportionate to the work it carries.",
+    majorThemes: ["Measured visibility", "Durable agreements", "Rest before revision"],
+    transitHighlights: [
+      { title: "Venus changes the social temperature", window: "January 8–11", guidance: "Notice which collaborations allow difference without demanding distance." },
+      { title: "The full Moon reveals the cost of silence", window: "January 17–19", guidance: "Name one need plainly, without supplying an argument for why it deserves to exist." },
+      { title: "Saturn steadies the central work", window: "January 20–23", guidance: "Choose the repeatable practice over the dramatic correction." },
+    ],
+    lunarStages: [
+      { phase: "newMoon", window: "January 4", cue: "Set one private intention that can be tested through action." },
+      { phase: "firstQuarter", window: "January 11", cue: "Make a small commitment visible to another person." },
+      { phase: "fullMoon", window: "January 18", cue: "Observe where attention is nourishing the work and where it is replacing it." },
+      { phase: "lastQuarter", window: "January 26", cue: "Remove one obligation that no longer belongs to the experiment." },
+    ],
+    practiceSuggestions: ["Finish a single page before widening the project.", "Schedule one conversation you have been rehearsing alone.", "Keep one evening free of optimization."],
+    cautions: ["Do not mistake urgency for clarity.", "Avoid offering more access than the relationship can hold."],
+    closingLine: "Give the hidden work a vessel, then let the vessel speak quietly.",
+    disclaimer: "Month-ahead symbolism is reflective, not predictive, and should not replace practical judgment.",
+  },
+};
 
 export function VisualQaFixtures() {
   const [selectedFixtureCardIndex, setSelectedFixtureCardIndex] = useState<number | null>(null);
@@ -251,6 +323,19 @@ export function VisualQaFixtures() {
             </button>
           </div>
         </TarotShell>
+      </section>
+
+      <section data-qa-astro-fixture="natal-result" aria-label="Complete unknown-time natal result fixture" className="border border-[color:var(--copper)]/30 px-5 py-12 sm:px-10">
+        <header className="mb-10 space-y-2">
+          <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)]">Deterministic fixture · no network requests</p>
+          <h2 className="font-ritual text-4xl text-[color:var(--bone)]">Complete natal result fixture</h2>
+        </header>
+        <NatalReadingResult
+          result={natalResultFixture}
+          monthAheadResult={monthAheadFixture}
+          defaultOpenAdvanced
+          sharePreviewEnabled={false}
+        />
       </section>
 
       {selectedFixtureCard && selectedFixtureCardIndex !== null && (

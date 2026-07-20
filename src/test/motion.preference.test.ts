@@ -21,4 +21,17 @@ describe('isMotionOk', () => {
   it('blocks motion when multiple signals combine', () => {
     expect(isMotionOk(true, true, true)).toBe(false);
   });
+
+  it.each([
+    [false, false, false, true],
+    [true, false, false, false],
+    [false, true, false, false],
+    [false, false, true, false],
+    [true, true, false, false],
+    [true, false, true, false],
+    [false, true, true, false],
+    [true, true, true, false],
+  ])('preserves the complete motion truth table for %s/%s/%s', (reduced, stillness, lowPower, expected) => {
+    expect(isMotionOk(reduced, stillness, lowPower)).toBe(expected);
+  });
 });
