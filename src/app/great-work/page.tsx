@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import type { MouseEvent } from "react";
 import { ArchivalFigure } from "@/components/editorial";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { greatWork } from "@/data/greatWork";
@@ -8,9 +9,22 @@ import { AlchemyGlyph } from "@/components/AlchemyGlyph";
 import { EtchHeading } from "@/components/motion/EtchHeading";
 import { EtchRule } from "@/components/motion/EtchRule";
 import { Reveal } from "@/components/motion/Reveal";
+import { useFocusDialog } from "@/components/ui/useFocusDialog";
 
 export default function GreatWorkPage() {
   const [activeGlyph, setActiveGlyph] = useState<string | null>(null);
+  const closeGlyph = useCallback(() => setActiveGlyph(null), []);
+  const { triggerRef, dialogRef, initialFocusRef } = useFocusDialog({
+    open: activeGlyph !== null,
+    onClose: closeGlyph,
+  });
+  const openGlyph = useCallback(
+    (glyphId: string, event: MouseEvent<HTMLButtonElement>) => {
+      triggerRef.current = event.currentTarget;
+      setActiveGlyph(glyphId);
+    },
+    [triggerRef],
+  );
   const glyph = greatWork.glyphs.find((item) => item.id === activeGlyph);
 
   return (
@@ -136,7 +150,7 @@ export default function GreatWorkPage() {
                 <button
                   type="button"
                   aria-label={`Open ${item.title} glyph`}
-                  onClick={() => setActiveGlyph(item.id)}
+                  onClick={(event) => openGlyph(item.id, event)}
                   className="group flex min-h-[112px] w-full items-center gap-4 px-4 py-5 text-left transition-colors hover:bg-[color:var(--char)]/14 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
                 >
                   <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[color:var(--copper)]/28 text-[color:var(--gilt)] transition-colors group-hover:text-[color:var(--bone)]">
@@ -184,31 +198,36 @@ export default function GreatWorkPage() {
       {glyph && (
         <div
           className="fixed inset-0 z-40 flex items-center justify-center bg-[color:var(--obsidian)]/80 px-6 py-10"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setActiveGlyph(null)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) closeGlyph();
+          }}
         >
-          <div
+          <section
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="great-work-glyph-title"
+            tabIndex={-1}
             className="w-full max-w-md border border-[color:var(--copper)]/26 bg-[color:var(--char)]/92 p-5 sm:p-6"
-            onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--copper)]/40 text-[color:var(--gilt)]">
                   <AlchemyGlyph id={glyph.id} className="h-7 w-7" />
                 </div>
-                <h3 className="font-ritual text-2xl">{glyph.title}</h3>
+                <h3 id="great-work-glyph-title" className="font-ritual text-2xl">{glyph.title}</h3>
               </div>
               <button
                 type="button"
-                onClick={() => setActiveGlyph(null)}
+                ref={initialFocusRef}
+                onClick={closeGlyph}
                 className="inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.35em] text-[color:var(--mist)] transition-colors hover:text-[color:var(--bone)]"
               >
                 Close
               </button>
             </div>
             <p className="mt-4 text-sm text-[color:var(--mist)]">{glyph.description}</p>
-          </div>
+          </section>
         </div>
       )}
     </div>

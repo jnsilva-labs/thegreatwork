@@ -35,7 +35,12 @@ export function ArchivalFigure({
       <figcaption className="plate-caption">
         <span>{figure.caption}</span>
         {figure.sourceHref ? (
-          <a href={figure.sourceHref} target="_blank" rel="noopener noreferrer">
+          <a
+            href={figure.sourceHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center"
+          >
             {figure.sourceLabel} source
           </a>
         ) : (

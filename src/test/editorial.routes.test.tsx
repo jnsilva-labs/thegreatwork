@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ComponentProps, ImgHTMLAttributes } from "react";
@@ -192,6 +193,37 @@ describe("illuminated archive editorial routes", () => {
     const cta = screen.getByRole("region", { name: "Email call to action" });
     expect(cta.getAttribute("data-source")).toBe("great-work-page");
     expect(cta.getAttribute("data-interests")).toBe("beginner-hermetic");
+  });
+
+  it("opens a labelled Great Work glyph dialog, traps focus, and restores the exact trigger", async () => {
+    const user = userEvent.setup();
+    render(<GreatWorkPage />);
+
+    const trigger = screen.getByRole("button", { name: "Open Ouroboros glyph" });
+    await user.click(trigger);
+
+    const dialog = screen.getByRole("dialog", { name: "Ouroboros" });
+    const close = within(dialog).getByRole("button", { name: "Close" });
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(document.activeElement).toBe(close);
+    expect(document.body.style.overflow).toBe("hidden");
+
+    await user.tab();
+    expect(document.activeElement).toBe(close);
+    await user.tab({ shift: true });
+    expect(document.activeElement).toBe(close);
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: "Ouroboros" })).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+
+    await user.click(trigger);
+    const reopenedDialog = screen.getByRole("dialog", { name: "Ouroboros" });
+    await user.click(within(reopenedDialog).getByText(greatWork.glyphs[0].description));
+    expect(screen.getByRole("dialog", { name: "Ouroboros" })).toBeTruthy();
+    await user.click(reopenedDialog.parentElement!);
+    expect(screen.queryByRole("dialog", { name: "Ouroboros" })).toBeNull();
+    expect(document.activeElement).toBe(trigger);
   });
 
   it("renders Principles as a numbered manuscript index and continuous ruled commentary", () => {

@@ -46,9 +46,9 @@ describe("illuminated archive editorial primitives", () => {
     ).toBeTruthy();
     expect(screen.getByRole("img").getAttribute("sizes")).toBe("(max-width: 767px) 100vw, 50vw");
     expect(screen.getByText(/splendor solis, bl harley ms 3469/i)).toBeTruthy();
-    expect(screen.getByRole("link", { name: /british library source/i }).getAttribute("href")).toMatch(
-      /^https:/,
-    );
+    const sourceLink = screen.getByRole("link", { name: /british library source/i });
+    expect(sourceLink.getAttribute("href")).toMatch(/^https:/);
+    expect(sourceLink.className).toContain("min-h-[44px]");
   });
 
   it("keeps the spread heading before subordinate content for visual variants", () => {
