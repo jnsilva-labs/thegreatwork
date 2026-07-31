@@ -20,7 +20,11 @@ const zodiac = [
 
 const pointOnCircle = (index: number, radius: number) => {
   const angle = (index / zodiac.length) * Math.PI * 2 - Math.PI / 2;
-  return { x: 50 + Math.cos(angle) * radius, y: 50 + Math.sin(angle) * radius };
+  const stabilize = (value: number) => Number(value.toFixed(6));
+  return {
+    x: stabilize(50 + Math.cos(angle) * radius),
+    y: stabilize(50 + Math.sin(angle) * radius),
+  };
 };
 
 export function CelestialOrientation() {

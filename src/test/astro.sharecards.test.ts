@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { generateConstellationSvg } from "../lib/astro/sharecards/constellation";
 import { generateTotemSvg } from "../lib/astro/sharecards/totem";
+import type { AstroChart } from "../lib/astro/types";
 
-const baseChart = {
+const baseChart: AstroChart = {
   meta: {},
   points: {
     sun: 223.15,

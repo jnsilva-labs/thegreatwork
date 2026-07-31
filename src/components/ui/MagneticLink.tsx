@@ -2,8 +2,7 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
-import { useUiStore } from "@/lib/uiStore";
+import { useMotionPreference } from "@/components/motion/useMotionPreference";
 
 type MagneticLinkProps = {
   href: string;
@@ -18,6 +17,17 @@ type MagneticLinkProps = {
 };
 
 export function MagneticLink({
+  ...props
+}: MagneticLinkProps) {
+  const { motionOk } = useMotionPreference();
+  const disabled =
+    !motionOk ||
+    (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches);
+
+  return <MagneticLinkBody key={disabled ? "disabled" : "enabled"} {...props} disabled={disabled} />;
+}
+
+function MagneticLinkBody({
   href,
   children,
   className,
@@ -27,15 +37,9 @@ export function MagneticLink({
   target,
   rel,
   onClick,
-}: MagneticLinkProps) {
-  const reducedMotion = usePrefersReducedMotion();
-  const stillness = useUiStore((state) => state.stillness);
+  disabled,
+}: MagneticLinkProps & { disabled: boolean }) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const disabled =
-    reducedMotion ||
-    stillness ||
-    (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches);
-
   const style = useMemo(() => {
     if (disabled) return undefined;
     return {

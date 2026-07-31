@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { HeroSigil } from "@/components/ui/HeroSigil";
 import { MagneticLink } from "@/components/ui/MagneticLink";
+import { useMotionPreference } from "@/components/motion/useMotionPreference";
 import { useHermeticStore } from "@/lib/hermeticStore";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
-import { useUiStore } from "@/lib/uiStore";
 
 type PathDoor = {
   title: string;
@@ -32,10 +31,9 @@ export function HomepageHero({
   pathDoors,
 }: HomepageHeroProps) {
   const heroProgress = useHermeticStore((state) => state.heroProgress);
-  const reducedMotion = usePrefersReducedMotion();
-  const stillness = useUiStore((state) => state.stillness);
+  const { motionOk } = useMotionPreference();
   const [entered, setEntered] = useState(false);
-  const motionBlocked = reducedMotion || stillness;
+  const motionBlocked = !motionOk;
 
   useEffect(() => {
     if (motionBlocked) {
@@ -74,6 +72,7 @@ export function HomepageHero({
   return (
     <section
       id="hero"
+      data-motion={motionOk ? "on" : "off"}
       className={`homepage-hero relative min-h-[100svh] overflow-hidden px-6 pt-20 pb-12 sm:min-h-screen sm:px-10 sm:py-24 lg:px-20 ${
         entered ? "is-entered" : ""
       }`}
@@ -84,7 +83,7 @@ export function HomepageHero({
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col justify-center gap-5 sm:min-h-[72vh] sm:gap-8">
-        <div className="hero-intro-row flex items-center gap-3 text-xs uppercase tracking-[0.34em] text-[color:var(--mist)] sm:tracking-[0.4em]">
+        <div className="hero-intro-row flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-[color:var(--mist)] sm:tracking-[0.4em]">
           <span className="hero-label-line h-px w-12 bg-[color:var(--copper)]" />
           <span className="hero-label-copy">A Digital Temple</span>
         </div>
@@ -100,13 +99,13 @@ export function HomepageHero({
         </div>
 
         <div className="hero-copy-stack space-y-4 sm:space-y-7" style={copyTransform}>
-          <p className="hero-subtitle max-w-2xl text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] sm:text-sm sm:tracking-[0.35em]">
+          <p className="hero-subtitle max-w-2xl text-xs uppercase tracking-[0.18em] text-[color:var(--gilt)] sm:text-sm sm:tracking-[0.35em]">
             {subtitle}
           </p>
           <p className="hero-body max-w-2xl text-base leading-relaxed text-[color:var(--mist)] sm:text-[1.05rem]">
             {body}
           </p>
-          <p className="hero-audience max-w-3xl text-xs uppercase tracking-[0.24em] text-[color:var(--mist)] sm:text-sm sm:tracking-[0.28em]">
+          <p className="hero-audience max-w-3xl text-xs uppercase tracking-[0.18em] text-[color:var(--mist)] sm:text-sm sm:tracking-[0.28em]">
             For the spiritually curious, the disciplined seeker, and the serious student of the esoteric arts.
           </p>
         </div>
@@ -139,7 +138,7 @@ export function HomepageHero({
                       location="home:hero-door"
                       label={action.label}
                       variant={door.title}
-                      className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-[0.65rem] uppercase tracking-[0.26em] transition focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                      className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.18em] transition-[background-color,border-color,color,transform] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
                     >
                       {action.label}
                     </MagneticLink>
@@ -156,7 +155,7 @@ export function HomepageHero({
             location="home:hero-secondary"
             label="Explore The Path"
             variant="secondary"
-            className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.26em] text-[color:var(--bone)] transition"
+            className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.18em] text-[color:var(--bone)] transition-[background-color,border-color,color,transform]"
           >
             Explore The Path
           </MagneticLink>
@@ -165,13 +164,13 @@ export function HomepageHero({
             location="home:hero-secondary"
             label="Read the Letters"
             variant="secondary"
-            className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.26em] transition"
+            className="home-cta inline-flex min-h-[48px] items-center rounded-full border px-5 py-3 text-xs uppercase tracking-[0.18em] transition-[background-color,border-color,color,transform]"
           >
             Read the Letters
           </MagneticLink>
         </div>
 
-        <div className="hero-scroll-cue mt-3 text-center text-xs uppercase tracking-[0.3em] text-[color:var(--mist)] sm:mt-8 sm:tracking-[0.5em]">
+        <div className="hero-scroll-cue mt-3 text-center text-xs uppercase tracking-[0.18em] text-[color:var(--mist)] sm:mt-8 sm:tracking-[0.5em]">
           Continue into the archive
         </div>
       </div>

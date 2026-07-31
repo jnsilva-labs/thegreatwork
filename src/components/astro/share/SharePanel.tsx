@@ -325,7 +325,7 @@ export function SharePanel({ chart, previewEnabled = true }: SharePanelProps) {
             <button
               type="button"
               onClick={onDownloadPng}
-              className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/16 px-4 py-2 text-xs uppercase tracking-[0.22em] text-[color:var(--bone)]"
+              className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/16 px-4 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--bone)]"
             >
               {style === "bigThree" ? "Download Big Three (PNG)" : "Download PNG"}
             </button>
@@ -333,7 +333,7 @@ export function SharePanel({ chart, previewEnabled = true }: SharePanelProps) {
               type="button"
               onClick={onDownloadSvg}
               disabled={style === "bigThree"}
-              className="min-h-[44px] rounded-full border border-[color:var(--copper)]/45 px-4 py-2 text-xs uppercase tracking-[0.22em] text-[color:var(--bone)]"
+              className="min-h-[44px] rounded-full border border-[color:var(--copper)]/45 px-4 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--bone)]"
             >
               Download SVG
             </button>

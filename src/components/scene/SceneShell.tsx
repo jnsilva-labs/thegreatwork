@@ -2,12 +2,13 @@
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { MathUtils, Vector3 } from "three";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Group } from "three";
 import { SigilCore } from "@/components/scene/SigilCore";
 import { VellumPlane } from "@/components/scene/VellumPlane";
 import { SacredGeometrySigil } from "@/components/scene/SacredGeometrySigil";
 import { useHermeticStore } from "@/lib/hermeticStore";
+import { useThemeStore, type ThemeName } from "@/lib/themeStore";
 import { AetherField } from "@/components/scene/AetherField";
 import { FractalVeil } from "@/components/scene/FractalVeil";
 
@@ -30,6 +31,8 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
   const cameraOverride = useHermeticStore((state) => state.cameraOverride);
   const lineOpacityScale = useHermeticStore((state) => state.lineOpacityScale);
   const lineRadiusScale = useHermeticStore((state) => state.lineRadiusScale);
+  const theme = useThemeStore((state) => state.theme);
+  const sceneColors = useSceneColors(theme);
   const cameraTargets = useMemo(
     () => [
       new Vector3(0, 0, 7),
@@ -49,21 +52,27 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
     if (!group) return;
 
     const settle = 1 - overallProgress * 0.85;
-    const targetX = pointer.x * 0.15;
-    const targetY = pointer.y * 0.12;
-    const horizontalDrift = MathUtils.lerp(-0.2, 0.65, overallProgress);
+    const targetX = reducedMotion ? 0 : pointer.x * 0.15;
+    const targetY = reducedMotion ? 0 : pointer.y * 0.12;
+    const horizontalDrift = reducedMotion ? 0 : MathUtils.lerp(-0.2, 0.65, overallProgress);
     const breathe = reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.8) * 0.02;
 
-    group.rotation.y = MathUtils.lerp(group.rotation.y, targetX, 0.08);
-    group.rotation.x = MathUtils.lerp(group.rotation.x, targetY, 0.08);
-    group.position.x = MathUtils.lerp(
-      group.position.x,
-      state.pointer.x * 0.24 + horizontalDrift,
-      0.05
-    );
-    group.position.y = MathUtils.lerp(group.position.y, state.pointer.y * 0.2, 0.05);
-    group.position.z = MathUtils.lerp(group.position.z, -0.4 + overallProgress * 0.8, 0.05);
-    group.scale.setScalar(MathUtils.lerp(group.scale.x, 1 + breathe, 0.08));
+    if (reducedMotion) {
+      group.rotation.set(0, 0, 0);
+      group.position.set(horizontalDrift, 0, -0.4 + overallProgress * 0.8);
+      group.scale.setScalar(1);
+    } else {
+      group.rotation.y = MathUtils.lerp(group.rotation.y, targetX, 0.08);
+      group.rotation.x = MathUtils.lerp(group.rotation.x, targetY, 0.08);
+      group.position.x = MathUtils.lerp(
+        group.position.x,
+        state.pointer.x * 0.24 + horizontalDrift,
+        0.05
+      );
+      group.position.y = MathUtils.lerp(group.position.y, state.pointer.y * 0.2, 0.05);
+      group.position.z = MathUtils.lerp(group.position.z, -0.4 + overallProgress * 0.8, 0.05);
+      group.scale.setScalar(MathUtils.lerp(group.scale.x, 1 + breathe, 0.08));
+    }
 
     if (!reducedMotion) {
       group.rotation.z += delta * 0.03 * settle;
@@ -83,7 +92,11 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
       tempVector.current.x += Math.sin(state.clock.elapsedTime * 0.4) * 0.15;
       tempVector.current.y += Math.cos(state.clock.elapsedTime * 0.35) * 0.12;
     }
-    camera.position.lerp(tempVector.current, reducedMotion ? 0.04 : 0.08);
+    if (reducedMotion) {
+      camera.position.copy(tempVector.current);
+    } else {
+      camera.position.lerp(tempVector.current, 0.08);
+    }
     if (cameraOverride) {
       camera.lookAt(
         cameraOverride.target[0],
@@ -99,11 +112,11 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
 
   return (
     <>
-      <color attach="background" args={["#0b0c10"]} />
-      <fog attach="fog" args={["#0b0c10", 8, 22]} />
-      <ambientLight intensity={0.3} color="#cbb894" />
-      <directionalLight position={[5, 6, 4]} intensity={0.9} color="#f0d7a5" />
-      <directionalLight position={[-6, -3, -2]} intensity={0.4} color="#6c4a2a" />
+      <color attach="background" args={[sceneColors.background]} />
+      <fog attach="fog" args={[sceneColors.background, 8, 22]} />
+      <ambientLight intensity={0.3} color={sceneColors.ambient} />
+      <directionalLight position={[5, 6, 4]} intensity={0.9} color={sceneColors.key} />
+      <directionalLight position={[-6, -3, -2]} intensity={0.4} color={sceneColors.fill} />
       <group ref={groupRef}>
         <VellumPlane />
         <FractalVeil />
@@ -125,6 +138,45 @@ export function SceneShell({ reducedMotion }: SceneShellProps) {
       </group>
     </>
   );
+}
+
+type SceneColors = {
+  background: string;
+  ambient: string;
+  key: string;
+  fill: string;
+};
+
+const sceneColorFallbacks: SceneColors = {
+  background: "#0b0c10",
+  ambient: "#c8c1b5",
+  key: "#b89b5e",
+  fill: "#2b6f6a",
+};
+
+export function useSceneColors(theme: ThemeName): SceneColors {
+  const [colors, setColors] = useState<SceneColors>(sceneColorFallbacks);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const computed = window.getComputedStyle(document.documentElement);
+      setColors(resolveSceneColors((name) => computed.getPropertyValue(name)));
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [theme]);
+
+  return colors;
+}
+
+export function resolveSceneColors(read: (name: string) => string): SceneColors {
+  const value = (name: string, fallback: string) => read(name).trim() || fallback;
+  return {
+    background: value("--bg", sceneColorFallbacks.background),
+    ambient: value("--muted", sceneColorFallbacks.ambient),
+    key: value("--accent", sceneColorFallbacks.key),
+    fill: value("--border", sceneColorFallbacks.fill),
+  };
 }
 
 function easeBreath(value: number) {

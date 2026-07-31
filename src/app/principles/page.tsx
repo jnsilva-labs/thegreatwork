@@ -240,11 +240,11 @@ export default function PrinciplesIndexPage() {
 
         <footer className="border-t border-[color:var(--copper)]/24 pt-6 text-xs uppercase tracking-[0.35em] text-[color:var(--mist)]">
           Axioms and sequence follow The Kybalion (1908). Pair this page with the{" "}
-          <Link href="/gallery" className="underline decoration-[color:var(--copper)]/50 underline-offset-4">
+          <Link href="/gallery" className="inline-flex min-h-[44px] items-center underline decoration-[color:var(--copper)]/50 underline-offset-4">
             Sacred Geometry Gallery
           </Link>{" "}
           or the{" "}
-          <Link href="/journey" className="underline decoration-[color:var(--copper)]/50 underline-offset-4">
+          <Link href="/journey" className="inline-flex min-h-[44px] items-center underline decoration-[color:var(--copper)]/50 underline-offset-4">
             interactive journey
           </Link>
           .

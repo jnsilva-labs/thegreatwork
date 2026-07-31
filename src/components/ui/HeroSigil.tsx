@@ -1,23 +1,21 @@
 "use client";
 
 import { useHermeticStore } from "@/lib/hermeticStore";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
-import { useUiStore } from "@/lib/uiStore";
+import { useMotionPreference } from "@/components/motion/useMotionPreference";
 
 const HOMEPAGE_HYBRID_SIGIL = true;
 
 export function HeroSigil() {
   const heroProgress = useHermeticStore((state) => state.heroProgress);
-  const reducedMotion = usePrefersReducedMotion();
-  const stillness = useUiStore((state) => state.stillness);
-  const motionBlocked = reducedMotion || stillness;
+  const { motionOk } = useMotionPreference();
 
   return (
     <div
       className={`hero-sigil-shell ${HOMEPAGE_HYBRID_SIGIL ? "hero-sigil-shell--hybrid" : ""}`}
+      data-motion={motionOk ? "on" : "off"}
       aria-hidden="true"
       style={
-        motionBlocked
+        !motionOk
           ? undefined
           : {
               transform: `translate3d(${heroProgress * 24}px, ${heroProgress * 16}px, 0) scale(${1 - heroProgress * 0.06})`,

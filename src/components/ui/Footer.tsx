@@ -29,7 +29,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-6 py-14 sm:px-10 lg:px-20">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr_1.25fr]">
           <section aria-labelledby="footer-purpose" className="space-y-4">
-            <h2 id="footer-purpose" className="text-xs font-semibold uppercase tracking-[0.28em] text-[color:var(--gilt)]">Purpose</h2>
+            <h2 id="footer-purpose" className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--gilt)]">Purpose</h2>
             <TrackedLink
               href="/"
               location="footer:purpose"
@@ -50,7 +50,7 @@ export function Footer() {
           <FooterNav id="footer-practice" title="Practice" links={practiceLinks} />
 
           <section aria-labelledby="footer-trust" className="space-y-4">
-            <h2 id="footer-trust" className="text-xs font-semibold uppercase tracking-[0.28em] text-[color:var(--gilt)]">Trust</h2>
+            <h2 id="footer-trust" className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--gilt)]">Trust</h2>
             <ul className="space-y-1">
               {trustLinks.map((link) => <FooterLink key={link.href} {...link} />)}
             </ul>
@@ -60,7 +60,7 @@ export function Footer() {
           </section>
         </div>
 
-        <div className="mt-12 border-t border-[color:var(--copper)]/20 pb-[max(0rem,env(safe-area-inset-bottom))] pt-6 text-xs uppercase tracking-[0.25em] text-[color:var(--mist)]">
+        <div className="mt-12 border-t border-[color:var(--copper)]/20 pb-[max(0rem,env(safe-area-inset-bottom))] pt-6 text-xs uppercase tracking-[0.18em] text-[color:var(--mist)]">
           &copy; {new Date().getFullYear()} Awareness Paradox
         </div>
       </div>
@@ -71,7 +71,7 @@ export function Footer() {
 function FooterNav({ id, title, links }: { id: string; title: string; links: readonly { href: string; label: string }[] }) {
   return (
     <nav aria-labelledby={id} className="space-y-4">
-      <h2 id={id} className="text-xs font-semibold uppercase tracking-[0.28em] text-[color:var(--gilt)]">{title}</h2>
+      <h2 id={id} className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--gilt)]">{title}</h2>
       <ul className="space-y-1">
         {links.map((link) => <FooterLink key={link.href} {...link} />)}
       </ul>

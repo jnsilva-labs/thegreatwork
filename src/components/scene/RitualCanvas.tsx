@@ -10,14 +10,12 @@ import {
   Vignette,
 } from "@react-three/postprocessing";
 import { Suspense, useEffect, useState } from "react";
+import { useMotionPreference } from "@/components/motion/useMotionPreference";
 import { SceneShell } from "@/components/scene/SceneShell";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
-import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
 
 export function RitualCanvas() {
-  const reducedMotion = usePrefersReducedMotion();
-  const stillness = useUiStore((state) => state.stillness);
+  const { motionOk } = useMotionPreference();
   const clarity = useHermeticStore((state) => state.clarity);
   const intensity = useHermeticStore((state) => state.intensity);
   const stillnessMode = useHermeticStore((state) => state.stillnessMode);
@@ -35,7 +33,7 @@ export function RitualCanvas() {
     const update = () => {
       const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
-      const maxDpr = reducedMotion || memory <= 4 || isMobile ? 1.25 : 1.6;
+      const maxDpr = !motionOk || memory <= 4 || isMobile ? 1.25 : 1.6;
       setDpr([1, maxDpr]);
       if (autoQuality) {
         const qualityTier = memory <= 4 || isMobile ? "low" : memory <= 6 ? "medium" : "high";
@@ -46,7 +44,7 @@ export function RitualCanvas() {
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, [autoQuality, reducedMotion]);
+  }, [autoQuality, motionOk]);
 
   useEffect(() => {
     const update = () => setPaused(document.hidden);
@@ -55,7 +53,7 @@ export function RitualCanvas() {
     return () => document.removeEventListener("visibilitychange", update);
   }, []);
 
-  const motionDisabled = reducedMotion || stillness || stillnessMode;
+  const motionDisabled = !motionOk || stillnessMode;
   const noiseOpacity = motionDisabled ? 0.05 : Math.max(0.06, 0.16 - clarity * 0.1);
   const bloomIntensityBase =
     motionDisabled || qualityTier === "low" ? 0.12 : 0.2 + intensity * 0.2;

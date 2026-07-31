@@ -181,7 +181,7 @@ export default function StartHerePage() {
                     location="start-here:reading-order"
                     label={`Open ${entry.title}`}
                     variant="open"
-                    className="inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition-colors hover:text-[color:var(--bone)]"
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition-colors hover:text-[color:var(--bone)]"
                   >
                     Open
                   </TrackedLink>

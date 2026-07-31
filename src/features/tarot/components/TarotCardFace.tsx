@@ -59,20 +59,20 @@ export const TarotCardFace: React.FC<TarotCardFaceProps> = ({ card, className = 
 
           <div className="absolute inset-0 flex flex-col justify-between px-4 py-5 text-center">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.14em] text-[color:var(--mist)]/80 sm:tracking-[0.18em]">{accent.label}</p>
+              <p className="text-xs uppercase tracking-[0.14em] text-[color:var(--mist)] sm:tracking-[0.18em]">{accent.label}</p>
               <p className="font-ritual text-xl leading-none text-[color:var(--bone)]">{card.name}</p>
             </div>
 
             <div className="flex flex-col items-center gap-3">
               <span className="font-ritual text-4xl leading-none text-[color:var(--gilt)]/85">{accent.glyph}</span>
               <div className="h-14 w-14 rounded-full border border-[color:var(--copper)]/45 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--gilt)_22%,transparent)]" />
-              <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]/72 sm:tracking-[0.16em]">
+              <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] sm:tracking-[0.16em]">
                 {card.arcana === 'major' ? `Arcana ${card.number}` : `${card.number} · ${accent.label}`}
               </p>
             </div>
 
             <div className="space-y-2">
-              <div className="flex flex-wrap justify-center gap-1.5 text-xs uppercase tracking-[0.1em] text-[color:var(--mist)]/72 sm:tracking-[0.14em]">
+              <div className="flex flex-wrap justify-center gap-1.5 text-xs uppercase tracking-[0.1em] text-[color:var(--mist)] sm:tracking-[0.14em]">
                 {card.keywords.slice(0, 2).map((keyword) => (
                   <span key={keyword} className="border border-[color:var(--copper)]/28 px-2 py-1">
                     {keyword}
@@ -85,7 +85,7 @@ export const TarotCardFace: React.FC<TarotCardFaceProps> = ({ card, className = 
       )}
 
       {!showIllustration && imgError && (
-        <div className="absolute bottom-3 right-3 flex items-center gap-2 border border-[color:var(--copper)]/28 bg-[color:var(--bg)]/75 px-2 py-1 text-xs uppercase tracking-[0.1em] text-[color:var(--mist)]/72">
+        <div className="absolute bottom-3 right-3 flex items-center gap-2 border border-[color:var(--copper)]/28 bg-[color:var(--bg)]/75 px-2 py-1 text-xs uppercase tracking-[0.1em] text-[color:var(--mist)]">
           <ImageOff size={12} />
           Archive unavailable
         </div>

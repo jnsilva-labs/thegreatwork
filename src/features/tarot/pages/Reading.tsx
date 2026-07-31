@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFocusDialog } from '@/components/ui/useFocusDialog';
+import { useMotionPreference } from '@/components/motion/useMotionPreference';
 import { AlertTriangle, ArrowLeft, ChevronLeft, ChevronRight, Eye, Loader2, Save, Sparkles, X } from '../icons';
 import { DEFAULT_DECK, SPREADS } from '../constants';
 import SpreadLayout from '../components/SpreadLayout';
@@ -165,6 +166,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
   const question = request?.question ?? '';
   const intention = request?.intention ?? 'General';
   const spread = SPREADS[spreadId];
+  const { motionOk } = useMotionPreference();
 
   const [stage, setStage] = useState<ReadingStage>('shuffling');
   const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
@@ -227,10 +229,10 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
       setDrawnCards(drawn);
       setStage('drawing');
-    }, 2500);
+    }, motionOk ? 2500 : 0);
 
     return () => window.clearTimeout(timer);
-  }, [spread.positions, stage]);
+  }, [motionOk, spread.positions, stage]);
 
   const allFlipped = drawnCards.length > 0 && drawnCards.every((card) => flippedIds.has(card.id));
 
@@ -339,6 +341,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
   const selectedCard = drawnCards.find((card) => card.id === selectedCardId);
   const activePosition = selectedCard ? spread.positions.find((position) => position.id === selectedCard.positionId) : null;
+  const readingStatus = getReadingStatus(stage, isLoadingAI, loadingMessageIndex);
 
   return (
     <TarotShell depth="reading">
@@ -358,13 +361,17 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
         </div>
       </nav>
 
+      <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {readingStatus}
+      </p>
+
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center overflow-x-hidden px-4 py-8 sm:px-8 lg:px-12">
         {stage === 'shuffling' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-8 py-16 animate-pulse-slow">
+          <div className={`flex flex-1 flex-col items-center justify-center gap-8 py-16 ${motionOk ? 'animate-pulse-slow' : ''}`}>
             <div className="relative">
-              <div className="absolute inset-0 rounded-full border border-[color:var(--gilt)]/25 animate-spin-slow" />
+              <div className={`absolute inset-0 rounded-full border border-[color:var(--gilt)]/25 ${motionOk ? 'animate-spin-slow' : ''}`} />
               <div className="flex aspect-[7/12] w-36 items-center justify-center border border-[color:var(--copper)]/30 bg-[color:var(--panel)]">
-                <Sparkles className="text-[color:var(--gilt)] animate-bounce" size={24} />
+                <Sparkles className={`text-[color:var(--gilt)] ${motionOk ? 'animate-bounce' : ''}`} size={24} />
               </div>
             </div>
             <p className="font-ritual text-2xl tracking-[0.08em] text-[color:var(--gilt)] sm:tracking-[0.14em]">Shuffling the symbolic field</p>
@@ -394,13 +401,13 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
             </section>
 
             {!interpretation && !apiKeyMissing && !apiError && !allFlipped && (
-              <div className="sticky bottom-4 z-40 mt-4 flex flex-col items-center gap-2 animate-fade-in pb-2 text-center">
+              <div className={`sticky bottom-4 z-40 mt-4 flex flex-col items-center gap-2 pb-2 text-center ${motionOk ? 'animate-fade-in' : ''}`}>
                 <p className="border-y border-[color:var(--copper)]/30 bg-[color:var(--bg)]/92 px-6 py-3 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] sm:tracking-[0.18em]">
                   Turn each card when you are ready
                 </p>
                 <button
                   onClick={turnAllCards}
-                  className="min-h-[44px] text-xs uppercase tracking-[0.1em] text-[color:var(--mist)]/72 underline underline-offset-4 transition-[color] hover:text-[color:var(--gilt)] sm:tracking-[0.14em]"
+                  className="min-h-[44px] text-xs uppercase tracking-[0.1em] text-[color:var(--mist)] underline underline-offset-4 transition-[color] hover:text-[color:var(--gilt)] sm:tracking-[0.14em]"
                 >
                   Turn them all at once
                 </button>
@@ -408,20 +415,20 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
             )}
 
             {!interpretation && !apiKeyMissing && !apiError && allFlipped && (
-              <div className="sticky bottom-6 z-40 mt-4 flex justify-center animate-fade-in pb-2">
+              <div className={`sticky bottom-6 z-40 mt-4 flex justify-center pb-2 ${motionOk ? 'animate-fade-in' : ''}`}>
                 <button
                   onClick={triggerInterpretation}
                   disabled={isLoadingAI}
                   className="inline-flex min-h-[56px] items-center gap-4 border border-[color:var(--gilt)]/60 bg-[color:var(--bg)]/95 px-8 py-4 text-sm uppercase tracking-[0.16em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[color:var(--gilt)]/14 hover:text-[color:var(--bone)] disabled:opacity-50 sm:tracking-[0.22em]"
                 >
-                  {isLoadingAI ? <Loader2 className="animate-spin" /> : <Eye size={20} />}
-                  {isLoadingAI ? LOADING_MESSAGES[loadingMessageIndex] : 'Reveal Guidance'}
+                  {isLoadingAI ? <Loader2 className={motionOk ? 'animate-spin' : ''} /> : <Eye size={20} />}
+                  <span>{isLoadingAI ? LOADING_MESSAGES[loadingMessageIndex] : 'Reveal Guidance'}</span>
                 </button>
               </div>
             )}
 
             {(apiKeyMissing || apiError) && (
-              <div className="fixed bottom-10 z-40 max-w-md animate-fade-in border border-[color:var(--copper)]/60 bg-[color:var(--bg)]/95 p-6 text-center shadow-xl">
+              <div className={`fixed bottom-10 z-40 max-w-md border border-[color:var(--copper)]/60 bg-[color:var(--bg)]/95 p-6 text-center shadow-xl ${motionOk ? 'animate-fade-in' : ''}`}>
                 <div className="mb-4 text-[color:var(--gilt)]">
                   <AlertTriangle size={32} />
                 </div>
@@ -452,14 +459,14 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                 <button onClick={() => {
                   setApiKeyMissing(false);
                   setApiError(null);
-                }} className="mt-3 block w-full min-h-[44px] text-xs text-[color:var(--mist)]/72 underline">
+                }} className="mt-3 block min-h-[44px] w-full text-xs text-[color:var(--mist)] underline">
                   Dismiss
                 </button>
               </div>
             )}
 
             {interpretation && (
-              <article className="relative mb-20 w-full max-w-4xl animate-fade-in border-t border-[color:var(--copper)]/30 px-1 pt-14 sm:px-8 md:px-12">
+              <article className={`relative mb-20 w-full max-w-4xl border-t border-[color:var(--copper)]/30 px-1 pt-14 sm:px-8 md:px-12 ${motionOk ? 'animate-fade-in' : ''}`}>
                 <header className="space-y-6 text-center">
                   <div className="mb-4 inline-flex h-11 w-11 items-center justify-center border border-[color:var(--gilt)]/35">
                     <Sparkles size={16} className="text-[color:var(--gilt)]" />
@@ -542,5 +549,12 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
     </TarotShell>
   );
 };
+
+function getReadingStatus(stage: ReadingStage, isLoadingAI: boolean, loadingMessageIndex: number) {
+  if (stage === 'shuffling') return 'Shuffling the symbolic field.';
+  if (isLoadingAI) return LOADING_MESSAGES[loadingMessageIndex];
+  if (stage === 'complete') return 'Guidance ready. Your interpretation is available.';
+  return 'Cards ready. Turn each card when you are ready.';
+}
 
 export default Reading;

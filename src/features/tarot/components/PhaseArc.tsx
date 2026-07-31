@@ -36,7 +36,7 @@ export function PhaseArc({ phase, reason }: PhaseArcProps) {
                 className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border bg-[color:var(--bg)] font-ritual text-sm transition-[background-color,border-color,color,box-shadow] ${
                   isActive
                     ? 'border-[color:var(--gilt)]/80 bg-[color:var(--gilt)]/18 text-[color:var(--bone)]'
-                    : 'border-[color:var(--copper)]/30 text-[color:var(--mist)]/60'
+                    : 'border-[color:var(--copper)]/30 text-[color:var(--mist)]/80'
                 }`}
                 style={
                   isActive
@@ -50,7 +50,7 @@ export function PhaseArc({ phase, reason }: PhaseArcProps) {
               </span>
               <span
                 className={`w-full break-words text-center text-xs leading-tight uppercase tracking-[0.06em] sm:tracking-[0.12em] ${
-                  isActive ? 'text-[color:var(--gilt)]' : 'text-[color:var(--mist)]/50'
+                  isActive ? 'text-[color:var(--gilt)]' : 'text-[color:var(--mist)]/80'
                 }`}
               >
                 {stage.title}
@@ -67,7 +67,7 @@ export function PhaseArc({ phase, reason }: PhaseArcProps) {
       <p className="text-center">
         <Link
           href={`/great-work#${phase}`}
-          className="inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]/72 underline-offset-4 transition-[color,text-decoration-color] hover:text-[color:var(--gilt)] hover:underline sm:tracking-[0.18em]"
+          className="inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] underline-offset-4 transition-[color,text-decoration-color] hover:text-[color:var(--gilt)] hover:underline sm:tracking-[0.18em]"
         >
           Read about this stage of the Great Work
         </Link>

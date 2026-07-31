@@ -25,7 +25,7 @@ export const metadata = buildPageMetadata({
 export default function GalleryPage() {
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">
-      <div className="mx-auto max-w-6xl space-y-12">
+      <div className="mx-auto max-w-7xl space-y-16">
         <JsonLd
           id="gallery-collection-schema"
           data={buildCollectionPageSchema({
@@ -70,32 +70,50 @@ export default function GalleryPage() {
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {GEOMETRY.map((plate) => (
-            <Link
-              key={plate.slug}
-              href={`/gallery/${plate.slug}`}
-              className="group rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/22 p-5 transition hover:border-[color:var(--gilt)]"
-            >
-              <div className="aspect-[4/3] overflow-hidden rounded-xl border border-[color:var(--copper)]/30 bg-[color:var(--obsidian)]/60">
-                <PlateSVG
-                  slug={plate.slug}
-                  variant="thumbnail"
-                  className="h-full w-full opacity-90 transition group-hover:opacity-100"
-                />
-              </div>
-              <div className="mt-4 space-y-3">
-                <h2 className="font-ritual text-2xl">{plate.title}</h2>
-                <p className="text-sm leading-relaxed text-[color:var(--mist)]">{plate.caption}</p>
-                <span className="inline-flex min-h-[40px] items-center rounded-full border border-[color:var(--copper)]/28 px-3 py-2 text-[0.62rem] uppercase tracking-[0.24em] text-[color:var(--gilt)] transition group-hover:border-[color:var(--gilt)] group-hover:text-[color:var(--bone)]">
-                  Open plate
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <section aria-labelledby="cabinet-heading" className="space-y-7">
+          <div className="flex items-end justify-between gap-6 border-b border-[color:var(--stone)]/20 pb-4">
+            <div>
+              <p className="type-eyebrow text-[color:var(--gilt)]">Cabinet I</p>
+              <h2 id="cabinet-heading" className="mt-2 font-ritual text-3xl sm:text-4xl">
+                Eight studies in proportion
+              </h2>
+            </div>
+            <p className="hidden text-xs uppercase tracking-[0.2em] text-[color:var(--mist)] sm:block">
+              Plates 01–08
+            </p>
+          </div>
+          <div className="gallery-cabinet grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:gap-x-12">
+            {GEOMETRY.map((plate, index) => (
+              <article key={plate.slug} className="gallery-plate group">
+                <figure>
+                  <div className="gallery-plate__figure aspect-[4/3] overflow-hidden border border-[color:var(--stone)]/24 bg-[color:var(--paper)]/90">
+                    <PlateSVG
+                      slug={plate.slug}
+                      variant="detail"
+                      className="h-full w-full opacity-90 transition-opacity duration-200 group-hover:opacity-100"
+                    />
+                  </div>
+                  <figcaption className="plate-caption">
+                    <span>Fig. {String(index + 1).padStart(2, "0")}</span>
+                    <span>{plate.caption}</span>
+                  </figcaption>
+                </figure>
+                <div className="mt-5 flex items-end justify-between gap-5 border-b border-[color:var(--stone)]/18 pb-5">
+                  <h3 className="font-ritual text-2xl sm:text-3xl">{plate.title}</h3>
+                  <Link
+                    href={`/gallery/${plate.slug}`}
+                    className="inline-flex min-h-[44px] shrink-0 items-center border-b border-[color:var(--gilt)]/56 px-1 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--gilt)] transition-colors hover:border-[color:var(--bone)] hover:text-[color:var(--bone)]"
+                    aria-label={`Open ${plate.title} plate`}
+                  >
+                    Open plate
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
 
-        <section className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/18 p-6">
+        <section className="open-field px-6 py-8 sm:px-8">
           <h2 className="font-ritual text-2xl">Continue the Study</h2>
           <p className="mt-2 max-w-3xl text-sm text-[color:var(--mist)] sm:text-base">
             Geometry on this site is paired with Hermetic principles and symbolic practice.

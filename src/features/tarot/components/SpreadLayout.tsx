@@ -3,6 +3,7 @@
 import React from 'react';
 import { DrawnCard, SpreadType } from '../types';
 import CardVisual from './CardVisual';
+import { useMotionPreference } from '@/components/motion/useMotionPreference';
 
 interface SpreadLayoutProps {
   type: SpreadType;
@@ -17,9 +18,10 @@ type CardWithLabelProps = {
   onClick: () => void;
   size: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  motionOk: boolean;
 };
 
-const CardWithLabel: React.FC<CardWithLabelProps> = ({ card, isFaceUp, onClick, size, className = '' }) => (
+const CardWithLabel: React.FC<CardWithLabelProps> = ({ card, isFaceUp, onClick, size, className = '', motionOk }) => (
   <div className={`group flex flex-col items-center ${className}`}>
     <CardVisual
       card={card}
@@ -29,7 +31,7 @@ const CardWithLabel: React.FC<CardWithLabelProps> = ({ card, isFaceUp, onClick, 
       className="w-full"
     />
     {card && isFaceUp && (
-      <div className="mt-3 max-w-[10rem] animate-fade-in text-center">
+      <div className={`mt-3 max-w-[10rem] text-center ${motionOk ? 'animate-fade-in' : ''}`}>
         <div className="mb-1 font-ritual text-base leading-tight text-[color:var(--gilt)]">{card.name}</div>
         <div className="hidden text-xs uppercase leading-relaxed tracking-[0.12em] text-[color:var(--mist)] md:block">
           {card.keywords.slice(0, 2).join(' • ')}
@@ -40,13 +42,14 @@ const CardWithLabel: React.FC<CardWithLabelProps> = ({ card, isFaceUp, onClick, 
 );
 
 const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedIds, onCardClick }) => {
+  const { motionOk } = useMotionPreference();
   const isRevealed = (card?: DrawnCard) => Boolean(card && revealedIds.has(card.id));
 
   if (type === 'one-card') {
     return (
       <div className="flex min-h-[28rem] items-center justify-center py-4">
         {cards[0] && (
-          <div className="flex animate-fade-in flex-col items-center gap-6">
+          <div className={`flex flex-col items-center gap-6 ${motionOk ? 'animate-fade-in' : ''}`}>
             <CardVisual
               card={cards[0]}
               isFaceUp={isRevealed(cards[0])}
@@ -75,8 +78,8 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedIds, o
         {cards.map((card, index) => (
           <div
             key={card.id}
-            className="flex w-[30%] max-w-[12rem] animate-fade-in flex-col items-center gap-2"
-            style={{ animationDelay: `${index * 200}ms` }}
+            className={`flex w-[30%] max-w-[12rem] flex-col items-center gap-2 ${motionOk ? 'animate-fade-in' : ''}`}
+            style={motionOk ? { animationDelay: `${index * 200}ms` } : undefined}
           >
             <span className="mb-1 min-h-5 text-center text-xs uppercase tracking-[0.1em] text-[color:var(--mist)] sm:tracking-[0.14em]">
               {positions[index]}
@@ -87,6 +90,7 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedIds, o
               size="lg"
               className="w-full"
               onClick={() => onCardClick(card)}
+              motionOk={motionOk}
             />
           </div>
         ))}
@@ -99,22 +103,22 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedIds, o
       <div className="flex min-h-[48rem] flex-col items-center justify-center gap-12 px-1 py-6 xl:flex-row xl:gap-20">
         <div className="relative h-[440px] w-[310px] shrink-0 origin-center scale-90 sm:scale-100 md:h-[600px] md:w-[450px]">
           <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-            {cards[0] && <CardWithLabel card={cards[0]} isFaceUp={isRevealed(cards[0])} size="sm" onClick={() => onCardClick(cards[0])} />}
+            {cards[0] && <CardWithLabel card={cards[0]} isFaceUp={isRevealed(cards[0])} size="sm" onClick={() => onCardClick(cards[0])} motionOk={motionOk} />}
           </div>
-          <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rotate-90 transition-[transform] duration-500 hover:z-30 hover:rotate-0">
+          <div className={`absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rotate-90 ${motionOk ? 'transition-[transform] duration-500 hover:z-30 hover:rotate-0' : ''}`}>
             {cards[1] && <CardVisual card={cards[1]} isFaceUp={isRevealed(cards[1])} size="sm" onClick={() => onCardClick(cards[1])} />}
           </div>
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-            {cards[2] && <CardWithLabel card={cards[2]} isFaceUp={isRevealed(cards[2])} size="sm" onClick={() => onCardClick(cards[2])} />}
+            {cards[2] && <CardWithLabel card={cards[2]} isFaceUp={isRevealed(cards[2])} size="sm" onClick={() => onCardClick(cards[2])} motionOk={motionOk} />}
           </div>
           <div className="absolute left-0 top-1/2 -ml-2 -translate-y-1/2 md:-ml-4">
-            {cards[3] && <CardWithLabel card={cards[3]} isFaceUp={isRevealed(cards[3])} size="sm" onClick={() => onCardClick(cards[3])} />}
+            {cards[3] && <CardWithLabel card={cards[3]} isFaceUp={isRevealed(cards[3])} size="sm" onClick={() => onCardClick(cards[3])} motionOk={motionOk} />}
           </div>
           <div className="absolute left-1/2 top-0 -translate-x-1/2">
-            {cards[4] && <CardWithLabel card={cards[4]} isFaceUp={isRevealed(cards[4])} size="sm" onClick={() => onCardClick(cards[4])} />}
+            {cards[4] && <CardWithLabel card={cards[4]} isFaceUp={isRevealed(cards[4])} size="sm" onClick={() => onCardClick(cards[4])} motionOk={motionOk} />}
           </div>
           <div className="absolute right-0 top-1/2 -mr-2 -translate-y-1/2 md:-mr-4">
-            {cards[5] && <CardWithLabel card={cards[5]} isFaceUp={isRevealed(cards[5])} size="sm" onClick={() => onCardClick(cards[5])} />}
+            {cards[5] && <CardWithLabel card={cards[5]} isFaceUp={isRevealed(cards[5])} size="sm" onClick={() => onCardClick(cards[5])} motionOk={motionOk} />}
           </div>
         </div>
 
@@ -126,7 +130,7 @@ const SpreadLayout: React.FC<SpreadLayoutProps> = ({ type, cards, revealedIds, o
                   <div className="shrink-0">
                     <CardVisual card={cards[index]} isFaceUp={isRevealed(cards[index])} size="sm" onClick={() => onCardClick(cards[index])} />
                   </div>
-                  <div className={`flex flex-col text-left transition-[opacity] duration-500 ${isRevealed(cards[index]) ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className={`flex flex-col text-left ${motionOk ? 'transition-[opacity] duration-500' : ''} ${isRevealed(cards[index]) ? 'opacity-100' : 'opacity-0'}`}>
                     <span className="mb-1 text-xs uppercase tracking-[0.1em] text-[color:var(--mist)] sm:tracking-[0.14em]">
                       {index === 9 ? 'Outcome' : index === 8 ? 'Hopes / Fears' : index === 7 ? 'Environment' : 'Self'}
                     </span>

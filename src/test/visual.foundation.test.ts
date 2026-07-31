@@ -6,6 +6,28 @@ const readSource = (relativePath: string) =>
   readFileSync(resolve(process.cwd(), relativePath), "utf8");
 
 describe("illuminated archive visual foundation", () => {
+  const upgradedSurfaces = [
+    "src/app/globals.css",
+    "src/components/ui/ScrollOrchestrator.tsx",
+    "src/components/scene/SceneShell.tsx",
+    "src/components/ui/NavBar.tsx",
+    "src/components/ui/Footer.tsx",
+    "src/components/ui/HomepageHero.tsx",
+    "src/components/ui/HomepageSection.tsx",
+    "src/components/astro/NatalChartWidget.tsx",
+    "src/components/astro/PlanetaryArc.tsx",
+    "src/components/astro/share/SharePanel.tsx",
+    "src/components/gallery/GalleryDetailClient.tsx",
+    "src/components/gallery/GalleryViewer.tsx",
+    "src/features/tarot/pages/Home.tsx",
+    "src/features/tarot/pages/Reading.tsx",
+    "src/features/tarot/pages/Settings.tsx",
+    "src/features/tarot/components/CardVisual.tsx",
+    "src/features/tarot/components/SpreadLayout.tsx",
+    "src/features/tarot/components/PhaseArc.tsx",
+    "src/features/tarot/components/TarotCardFace.tsx",
+  ];
+
   it("defines the visual aliases and local font foundation", () => {
     const globals = readSource("src/app/globals.css");
     const layout = readSource("src/app/layout.tsx");
@@ -51,5 +73,43 @@ describe("illuminated archive visual foundation", () => {
     expect(card).toMatch(/pointer-events-none[^\n]*background-image:radial-gradient/);
     expect(card).toContain("var(--gilt)");
     expect(card).not.toContain("rgba(197,160,89");
+  });
+
+  it("keeps every upgraded surface free of broad transitions and remote visual assets", () => {
+    const surfaces = upgradedSurfaces.map(readSource).join("\n");
+    const remoteVisualPattern = /(?:background|background-image)\s*[:=][^\n]*url\(["']?https?:\/\/|\b(?:src|poster)\s*=\s*["']https?:\/\//;
+
+    expect(surfaces).not.toMatch(/transition:\s*all\b/);
+    expect(surfaces).not.toContain("transition-all");
+    expect('src="https://example.com/remote-plate.jpg"').toMatch(remoteVisualPattern);
+    expect('href="https://example.com/source"').not.toMatch(remoteVisualPattern);
+    expect('src="data:image/svg+xml,%3Csvg%3E"').not.toMatch(remoteVisualPattern);
+    expect(surfaces).not.toMatch(remoteVisualPattern);
+    expect(surfaces).not.toContain("transparenttextures.com");
+  });
+
+  it("keeps essential labels at twelve pixels with restrained mobile tracking", () => {
+    const surfaces = upgradedSurfaces.map(readSource).join("\n");
+
+    expect(surfaces).not.toMatch(/text-\[(?:9|10|11)px\]/);
+    expect(surfaces).not.toMatch(/["'`\s]tracking-\[0\.(?:2[1-9]|[3-9]\d*)em\]/);
+    expect(surfaces).not.toMatch(/text-\[color:var\(--mist\)\]\/(?:[1-6]\d|7[0-5])\b/);
+  });
+
+  it("keeps the Tarot settings key field and gallery calibration controls touch-safe", () => {
+    const settings = readSource("src/features/tarot/pages/Settings.tsx");
+    const gallery = readSource("src/components/gallery/GalleryDetailClient.tsx");
+
+    expect(settings).toMatch(/id="personal-api-key"[\s\S]*?className="[^"]*min-h-\[44px\]/);
+    expect(gallery).toMatch(/className="flex min-h-\[44px\] items-center"/);
+  });
+
+  it("gates Tarot settings transitions through the shared motion preference and semantic materials", () => {
+    const settings = readSource("src/features/tarot/pages/Settings.tsx");
+
+    expect(settings).toContain("useMotionPreference");
+    expect(settings).toContain("motionOk ? 'transition-colors' : ''");
+    expect(settings).toContain("motionOk ? 'transition-transform' : ''");
+    expect(settings).not.toContain("bg-[rgba(184,155,94,0.06)]");
   });
 });

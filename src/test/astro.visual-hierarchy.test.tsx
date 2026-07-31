@@ -177,6 +177,21 @@ describe("astrology celestial instrument visual hierarchy", () => {
     for (const label of labels) expect(label.className).toContain("text-xs");
   });
 
+  it("stabilizes generated SVG coordinates for server hydration", () => {
+    const { container } = render(<CelestialOrientation />);
+    const coordinateNames = ["x", "y", "x1", "y1", "x2", "y2"];
+    const coordinateValues = Array.from(container.querySelectorAll("line, text")).flatMap((node) =>
+      coordinateNames
+        .map((name) => node.getAttribute(name))
+        .filter((value): value is string => value !== null),
+    );
+
+    expect(coordinateValues.length).toBeGreaterThan(0);
+    for (const value of coordinateValues) {
+      expect(value.split(".")[1]?.length ?? 0).toBeLessThanOrEqual(6);
+    }
+  });
+
   it("preserves complete computed event facts and prior month-ahead CTA telemetry", () => {
     render(
       <NatalReadingResult

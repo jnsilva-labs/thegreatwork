@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { CircleDot, ExternalLink, Infinity, Triangle } from '../icons';
 import { INTENTIONS, ReadingRequest, SpreadType, TarotView } from '../types';
 import TarotShell from '../components/TarotShell';
+import { useMotionPreference } from '@/components/motion/useMotionPreference';
 import { normalizeTarotQuestion, TAROT_QUESTION_REQUIRED_MESSAGE } from '@/lib/tarot/question';
 
 interface HomeProps {
@@ -17,6 +18,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onStartReading }) => {
   const [intention, setIntention] = useState('General');
   const [selectedSpread, setSelectedSpread] = useState<SpreadType>('one-card');
   const [questionError, setQuestionError] = useState('');
+  const { motionOk } = useMotionPreference();
 
   const startReading = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,7 +36,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onStartReading }) => {
   return (
     <TarotShell>
       <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center gap-12 px-6 py-20 text-center sm:px-10">
-        <header className="space-y-6 animate-fade-in">
+        <header className={`space-y-6 ${motionOk ? 'animate-fade-in' : ''}`}>
           <div className="inline-flex flex-col items-center gap-3">
             <div className="h-16 w-px bg-gradient-to-b from-transparent via-[color:var(--gilt)] to-transparent opacity-50" />
             <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--mist)] sm:tracking-[0.28em]">Tarot Oracle</p>
@@ -51,7 +53,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onStartReading }) => {
           </p>
         </header>
 
-        <section className="relative w-full max-w-3xl animate-fade-in border-y border-[color:var(--copper)]/30 bg-[color:var(--panel)]/55 text-left">
+        <section className={`relative w-full max-w-3xl border-y border-[color:var(--copper)]/30 bg-[color:var(--panel)]/55 text-left ${motionOk ? 'animate-fade-in' : ''}`}>
           <div className="pointer-events-none absolute left-0 top-0 h-12 w-px bg-[color:var(--gilt)]/60" />
           <div className="pointer-events-none absolute right-0 top-0 h-px w-12 bg-[color:var(--gilt)]/60" />
 

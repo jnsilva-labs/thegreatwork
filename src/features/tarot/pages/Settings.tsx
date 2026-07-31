@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useMotionPreference } from '@/components/motion/useMotionPreference';
 import { ArrowLeft, ExternalLink, Key, Save, ShieldCheck, Zap } from '../icons';
 import TarotShell from '../components/TarotShell';
 import { getSettings, saveSettings } from '../services/storageService';
@@ -13,6 +14,7 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
   const [settings, setSettings] = useState<AppSettings>(() => getSettings());
   const [isSaved, setIsSaved] = useState(false);
+  const { motionOk } = useMotionPreference();
 
   const handleSave = () => {
     saveSettings(settings);
@@ -28,13 +30,13 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--gilt)]">Tarot settings</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--gilt)] sm:tracking-[0.28em]">Tarot settings</p>
             <h1 className="font-ritual text-4xl text-[color:var(--bone)]">Attunement</h1>
           </div>
         </header>
 
         <div className="space-y-8">
-          <div className="relative overflow-hidden border border-[color:var(--gilt)]/22 bg-[rgba(6,11,19,0.72)] p-8 space-y-6">
+          <div className="relative space-y-6 overflow-hidden border border-[color:var(--gilt)]/22 bg-[color:var(--panel)]/72 p-8">
             <div className="absolute right-0 top-0 p-4 opacity-10">
               <Key size={100} />
             </div>
@@ -46,14 +48,14 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
               <p className="mb-2 text-sm leading-relaxed text-[color:var(--mist)]">
                 Readings use the app&apos;s shared AI service first. Add your own Gemini key only as a fallback if shared quota is reached.
               </p>
-              <div className="flex items-start gap-2 border border-[color:var(--gilt)]/10 bg-[rgba(184,155,94,0.06)] p-3 text-xs text-[color:var(--gilt)]/88">
+              <div className="flex items-start gap-2 border border-[color:var(--gilt)]/10 bg-[color:var(--gilt)]/6 p-3 text-xs text-[color:var(--gilt)]/88">
                 <Zap size={14} className="mt-0.5 shrink-0" />
                 <span>Your personal key bypasses shared limits and keeps your readings available during peak traffic.</span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="personal-api-key" className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mist)]">Personal API Key (Optional)</label>
+              <label htmlFor="personal-api-key" className="text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--mist)]">Personal API Key (Optional)</label>
               <input
                 id="personal-api-key"
                 name="apiKey"
@@ -62,7 +64,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
                 onChange={(event) => setSettings({ ...settings, apiKey: event.target.value })}
                 placeholder="AIzaSy..."
                 autoComplete="off"
-                className="w-full border border-[color:var(--copper)]/16 bg-[#050810] p-4 font-mono text-sm text-[color:#D5D0C6] outline-none transition-[border-color] focus:border-[color:var(--gilt)]"
+                className="min-h-[44px] w-full border border-[color:var(--copper)]/28 bg-[color:var(--bg)] p-4 font-mono text-sm text-[color:var(--bone)] outline-none transition-[border-color] focus:border-[color:var(--gilt)]"
               />
             </div>
 
@@ -78,7 +80,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="space-y-6 border border-[color:var(--copper)]/14 bg-[rgba(6,11,19,0.62)] p-8">
+          <div className="space-y-6 border border-[color:var(--copper)]/24 bg-[color:var(--panel)]/62 p-8">
             <h2 className="mb-2 font-ritual text-2xl text-[color:var(--bone)]">Reading Preferences</h2>
 
             <div className="flex items-center justify-between">
@@ -91,9 +93,9 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
                 onClick={() => setSettings({ ...settings, reversalsEnabled: !settings.reversalsEnabled })}
                 aria-pressed={settings.reversalsEnabled}
                 aria-label="Enable reversals"
-                className={`relative h-11 w-12 rounded-full transition-colors ${settings.reversalsEnabled ? 'bg-[color:var(--gilt)]' : 'border border-[color:var(--copper)]/16 bg-[#050810]'}`}
+                className={`relative h-11 w-12 rounded-full ${motionOk ? 'transition-colors' : ''} ${settings.reversalsEnabled ? 'bg-[color:var(--gilt)]' : 'border border-[color:var(--copper)]/28 bg-[color:var(--bg)]'}`}
               >
-                <div className={`absolute left-1 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white transition-transform ${settings.reversalsEnabled ? 'translate-x-6' : ''}`}></div>
+                <div className={`absolute left-1 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white ${motionOk ? 'transition-transform' : ''} ${settings.reversalsEnabled ? 'translate-x-6' : ''}`}></div>
               </button>
             </div>
           </div>
@@ -101,7 +103,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate }) => {
           <button
             type="button"
             onClick={handleSave}
-            className="flex min-h-12 w-full items-center justify-center gap-3 border border-[color:var(--gilt)]/45 bg-[rgba(6,11,19,0.86)] py-4 text-sm uppercase tracking-[0.3em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[rgba(184,155,94,0.12)] hover:text-[color:var(--bone)]"
+            className="flex min-h-12 w-full items-center justify-center gap-3 border border-[color:var(--gilt)]/45 bg-[color:var(--bg)]/86 py-4 text-sm uppercase tracking-[0.18em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[color:var(--gilt)]/12 hover:text-[color:var(--bone)] sm:tracking-[0.26em]"
           >
             {isSaved ? <ShieldCheck size={20} /> : <Save size={20} />}
             {isSaved ? 'Attunement Complete' : 'Save Settings'}

@@ -8,7 +8,7 @@ import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
 import { createEngine, setVolume, start, stop } from "@/lib/audio/engine";
 import { getStoredTheme, useThemeStore } from "@/lib/themeStore";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { useMotionPreference } from "@/components/motion/useMotionPreference";
 import { getSubstackUrl } from "@/lib/substack";
 
 const navLinks = [
@@ -22,7 +22,7 @@ const navLinks = [
 
 export function NavBar() {
   const [panelOpen, setPanelOpen] = useState(false);
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const { motionOk } = useMotionPreference();
   const pathname = usePathname();
   const previousPathname = useRef(pathname);
   const closePanel = useCallback(() => setPanelOpen(false), []);
@@ -56,11 +56,17 @@ export function NavBar() {
   }, [setTheme]);
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
     const root = document.documentElement;
+    if (!motionOk) {
+      root.classList.remove("theme-transition");
+      return;
+    }
     const id = window.setTimeout(() => root.classList.add("theme-transition"), 50);
-    return () => window.clearTimeout(id);
-  }, [prefersReducedMotion]);
+    return () => {
+      window.clearTimeout(id);
+      root.classList.remove("theme-transition");
+    };
+  }, [motionOk]);
 
   useEffect(() => {
     if (previousPathname.current !== pathname) {
@@ -106,9 +112,9 @@ export function NavBar() {
           location="nav:brand"
           label="Awareness Paradox"
           variant="brand"
-          className="group flex min-h-[44px] items-center gap-3 text-xs uppercase tracking-[0.22em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)] sm:tracking-[0.3em]"
+          className="group flex min-h-[44px] items-center gap-3 text-xs uppercase tracking-[0.18em] text-[color:var(--mist)] transition-colors hover:text-[color:var(--bone)] sm:tracking-[0.3em]"
         >
-          <span className="h-px w-7 bg-[color:var(--copper)] transition group-hover:bg-[color:var(--gilt)] sm:w-8" />
+          <span className="h-px w-7 bg-[color:var(--copper)] transition-colors group-hover:bg-[color:var(--gilt)] sm:w-8" />
           <span className="leading-[1.08]">Awareness<br />Paradox</span>
         </TrackedLink>
 
@@ -120,7 +126,7 @@ export function NavBar() {
               location="nav:desktop"
               label={link.label}
               variant="nav"
-              className="nav-desktop-link inline-flex min-h-[44px] items-center px-2 py-2 transition hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+              className="nav-desktop-link inline-flex min-h-[44px] items-center px-2 py-2 transition-colors hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             >
               {link.label}
             </TrackedLink>
@@ -133,7 +139,7 @@ export function NavBar() {
             location="nav:utility"
             label="Free Guide"
             variant="guide"
-            className="hidden min-h-[44px] items-center border border-[color:var(--gilt)]/55 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] sm:inline-flex"
+            className="hidden min-h-[44px] items-center border border-[color:var(--gilt)]/55 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[color:var(--bone)] transition-colors hover:border-[color:var(--gilt)] sm:inline-flex"
           >
             Free Guide
           </TrackedLink>
@@ -141,7 +147,7 @@ export function NavBar() {
             ref={triggerRef}
             type="button"
             onClick={() => setPanelOpen(true)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/55 text-[color:var(--bone)] transition hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--copper)]/55 text-[color:var(--bone)] transition-colors hover:border-[color:var(--gilt)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
             aria-label="Open menu"
             aria-expanded={panelOpen}
             aria-controls="site-menu-dialog"
@@ -167,7 +173,7 @@ export function NavBar() {
             aria-modal="true"
             aria-labelledby="site-menu-title"
             tabIndex={-1}
-            className="absolute inset-x-0 bottom-0 top-0 overflow-y-auto border-l border-[color:var(--copper)]/24 bg-[color:var(--char)]/96 px-5 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-xs uppercase tracking-[0.22em] text-[color:var(--mist)] sm:left-auto sm:max-w-[29rem] sm:px-7"
+            className="absolute inset-x-0 bottom-0 top-0 overflow-y-auto border-l border-[color:var(--copper)]/24 bg-[color:var(--char)]/96 px-5 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-xs uppercase tracking-[0.18em] text-[color:var(--mist)] sm:left-auto sm:max-w-[29rem] sm:px-7"
           >
             <div className="flex items-center justify-between gap-5 border-b border-[color:var(--copper)]/24 pb-5">
               <div>
@@ -187,7 +193,7 @@ export function NavBar() {
                 ref={initialFocusRef}
                 type="button"
                 onClick={closePanel}
-                className="min-h-[44px] border border-[color:var(--copper)]/48 px-3 text-xs tracking-[0.22em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                className="min-h-[44px] border border-[color:var(--copper)]/48 px-3 text-xs tracking-[0.18em] text-[color:var(--mist)] transition-colors hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
               >
                 Close
               </button>
@@ -195,7 +201,7 @@ export function NavBar() {
 
             <div className="mt-7 space-y-7">
               <nav aria-label="Menu navigation" className="space-y-3">
-                <p className="text-xs tracking-[0.28em] text-[color:var(--gilt)]">Navigate</p>
+                <p className="text-xs tracking-[0.18em] text-[color:var(--gilt)]">Navigate</p>
                 <div className="border-y border-[color:var(--copper)]/24">
                   {navLinks.map((link, index) => (
                     <TrackedLink
@@ -205,7 +211,7 @@ export function NavBar() {
                       label={link.label}
                       variant="nav"
                       onClick={closePanel}
-                      className={`flex min-h-[48px] items-center justify-between px-1 text-xs tracking-[0.22em] text-[color:var(--bone)] transition hover:text-[color:var(--gilt)] ${index ? "border-t border-[color:var(--copper)]/18" : ""}`}
+                      className={`flex min-h-[48px] items-center justify-between px-1 text-xs tracking-[0.18em] text-[color:var(--bone)] transition-colors hover:text-[color:var(--gilt)] ${index ? "border-t border-[color:var(--copper)]/18" : ""}`}
                     >
                       {link.label}<span aria-hidden="true">↗</span>
                     </TrackedLink>
@@ -214,7 +220,7 @@ export function NavBar() {
               </nav>
 
               <section aria-labelledby="menu-invitations" className="space-y-3">
-                <h3 id="menu-invitations" className="text-xs font-normal tracking-[0.28em] text-[color:var(--gilt)]">Invitations</h3>
+                <h3 id="menu-invitations" className="text-xs font-normal tracking-[0.18em] text-[color:var(--gilt)]">Invitations</h3>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <TrackedLink
                     href="/guides/hermetic-principles-starter-guide"
@@ -222,7 +228,7 @@ export function NavBar() {
                     label="Free Guide"
                     variant="guide"
                     onClick={closePanel}
-                    className="inline-flex min-h-[44px] items-center border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/8 px-4 py-2 text-xs tracking-[0.18em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+                    className="inline-flex min-h-[44px] items-center border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/8 px-4 py-2 text-xs tracking-[0.18em] text-[color:var(--bone)] transition-colors hover:border-[color:var(--gilt)]"
                   >
                     Free Guide
                   </TrackedLink>
@@ -234,7 +240,7 @@ export function NavBar() {
                     onClick={closePanel}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/45 px-4 py-2 text-xs tracking-[0.18em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                    className="inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/45 px-4 py-2 text-xs tracking-[0.18em] text-[color:var(--mist)] transition-colors hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
                   >
                     Open Substack
                   </TrackedLink>
@@ -242,7 +248,7 @@ export function NavBar() {
               </section>
 
               <details className="border-y border-[color:var(--copper)]/28 py-1">
-                <summary className="flex min-h-[44px] cursor-pointer items-center justify-between text-xs tracking-[0.24em] text-[color:var(--bone)]">
+                <summary className="flex min-h-[44px] cursor-pointer items-center justify-between text-xs tracking-[0.18em] text-[color:var(--bone)]">
                   Environment
                   <span aria-hidden="true" className="text-[color:var(--gilt)]">+</span>
                 </summary>
@@ -339,7 +345,7 @@ function ControlRow({ label, children }: { label: string; children: React.ReactN
 }
 
 function controlToggleClass(active: boolean) {
-  return `min-h-[44px] border px-3 py-2 text-xs uppercase tracking-[0.18em] transition ${
+  return `min-h-[44px] border px-3 py-2 text-xs uppercase tracking-[0.18em] transition-colors ${
     active
       ? "border-[color:var(--gilt)] text-[color:var(--bone)]"
       : "border-[color:var(--copper)]/60 text-[color:var(--mist)] hover:border-[color:var(--gilt)]"

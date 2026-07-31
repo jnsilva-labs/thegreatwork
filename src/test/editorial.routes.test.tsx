@@ -154,6 +154,9 @@ describe("illuminated archive editorial routes", () => {
     const trackLink = screen.getByRole("link", { name: "Start with the Principles" });
     expect(trackLink.getAttribute("data-location")).toBe("start-here:track");
     expect(trackLink.getAttribute("data-variant")).toBe("Hermetic Foundations");
+    for (const openLink of screen.getAllByRole("link", { name: "Open" })) {
+      expect(openLink.className).toContain("min-w-[44px]");
+    }
     expect(screen.getByRole("region", { name: "Email call to action" })).toBeTruthy();
   });
 
@@ -241,6 +244,8 @@ describe("illuminated archive editorial routes", () => {
     const cta = screen.getByRole("region", { name: "Email call to action" });
     expect(cta.getAttribute("data-source")).toBe("principles-index");
     expect(cta.getAttribute("data-interests")).toBe("beginner-hermetic");
+    expect(screen.getByRole("link", { name: "Sacred Geometry Gallery" }).className).toContain("min-h-[44px]");
+    expect(screen.getByRole("link", { name: "interactive journey" }).className).toContain("min-h-[44px]");
   });
 
   it("preserves principle static params, metadata, schemas, ruled keys/practice, and sequence navigation", async () => {
@@ -276,5 +281,10 @@ describe("illuminated archive editorial routes", () => {
       expect(source, routeSource).not.toContain("min-h-[40px]");
       expect(source, routeSource).not.toContain("transition-all");
     }
+
+    const chromeSource = readSource("src/components/ui/CodexChrome.tsx");
+    expect(chromeSource).toContain("min-h-[44px]");
+    expect(chromeSource).toContain("min-w-[44px]");
+    expect(chromeSource).not.toContain("text-[0.65rem]");
   });
 });

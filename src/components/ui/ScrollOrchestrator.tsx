@@ -2,9 +2,8 @@
 
 import Lenis from "lenis";
 import { useEffect, useRef } from "react";
-import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { useMotionPreference } from "@/components/motion/useMotionPreference";
 import { useHermeticStore } from "@/lib/hermeticStore";
-import { useUiStore } from "@/lib/uiStore";
 
 type SectionMeasure = {
   id: string;
@@ -29,13 +28,11 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
   const rafRef = useRef<number | null>(null);
   const activeChapterRef = useRef(0);
   const setState = useHermeticStore((state) => state.setState);
-  const reducedMotion = usePrefersReducedMotion();
-  const stillness = useUiStore((state) => state.stillness);
+  const { motionOk } = useMotionPreference();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const motionDisabled = reducedMotion || stillness;
+    let hashTimer: number | null = null;
 
     const measure = () => {
       heroMeasureRef.current = measureElement("hero");
@@ -107,7 +104,7 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
       const element = slug ? document.getElementById(slug) : null;
       if (!element) return;
 
-      if (lenisRef.current && !motionDisabled) {
+      if (lenisRef.current && motionOk) {
         lenisRef.current.scrollTo(element, {
           offset: -48,
           duration: 1.2,
@@ -116,7 +113,7 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
         return;
       }
 
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      element.scrollIntoView({ behavior: resolveScrollBehavior(motionOk), block: "start" });
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -152,7 +149,7 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
 
     measure();
 
-    if (!motionDisabled) {
+    if (motionOk) {
       const lenis = new Lenis({
         duration: 1.2,
         lerp: 0.08,
@@ -174,6 +171,8 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
       rafRef.current = window.requestAnimationFrame(raf);
       updateScrollState(lenis.scroll);
     } else {
+      lenisRef.current = null;
+      delete window.__AP_LENIS__;
       const onScroll = () => updateScrollState(window.scrollY || 0);
       window.addEventListener("scroll", onScroll, { passive: true });
       onScroll();
@@ -186,10 +185,11 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
       const initialHash = window.location.hash.replace("#", "");
       const hashIndex = slugs.indexOf(initialHash);
       if (hashIndex >= 0) {
-        window.setTimeout(() => scrollToChapter(hashIndex), 40);
+        hashTimer = window.setTimeout(() => scrollToChapter(hashIndex), 40);
       }
 
       return () => {
+        if (hashTimer !== null) window.clearTimeout(hashTimer);
         window.removeEventListener("scroll", onScroll);
         window.removeEventListener("resize", onResize);
         window.removeEventListener("pointermove", onPointerMove);
@@ -206,10 +206,11 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
     const initialHash = window.location.hash.replace("#", "");
     const hashIndex = slugs.indexOf(initialHash);
     if (hashIndex >= 0) {
-      window.setTimeout(() => scrollToChapter(hashIndex), 40);
+      hashTimer = window.setTimeout(() => scrollToChapter(hashIndex), 40);
     }
 
     return () => {
+      if (hashTimer !== null) window.clearTimeout(hashTimer);
       if (rafRef.current) {
         window.cancelAnimationFrame(rafRef.current);
       }
@@ -221,9 +222,13 @@ export function ScrollOrchestrator({ slugs }: ScrollOrchestratorProps) {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [reducedMotion, setState, slugs, stillness]);
+  }, [motionOk, setState, slugs]);
 
   return null;
+}
+
+export function resolveScrollBehavior(motionOk: boolean): ScrollBehavior {
+  return motionOk ? "smooth" : "auto";
 }
 
 function clamp(value: number) {
