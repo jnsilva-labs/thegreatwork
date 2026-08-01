@@ -3,7 +3,9 @@ import { Interpretation } from '../types';
 
 export const interpretationSchema = z.object({
   mirrorStatement: z.string().describe('Direct insight in 1-2 sentences'),
-  archetypeShadow: z.string().describe('Detailed psychological analysis of the archetypes and shadow at play'),
+  archetypeShadow: z
+    .string()
+    .describe('Psychological analysis in exactly two paragraphs separated by a blank line: first the archetypes at play, then the shadow and what it asks'),
   phase: z
     .enum(['nigredo', 'albedo', 'citrinitas', 'rubedo'])
     .describe('Which of the four stages of the Great Work this reading sits in'),

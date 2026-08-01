@@ -2002,6 +2002,47 @@ body.nav-panel-open {
   }
 }
 
+/* Tarot reveal cascade: when a card turns face-up it lifts, settles, and a
+   halo of theme glow blooms and fades. Runs once per card. */
+.card-reveal-arrive {
+  animation: card-arrive 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-reveal-arrive > div {
+  animation: card-halo 1.5s ease-out;
+}
+
+@keyframes card-arrive {
+  0% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-halo {
+  0% {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  45% {
+    box-shadow: 0 0 34px color-mix(in srgb, var(--glow) calc(45% * var(--glow-strength)), transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-reveal-arrive,
+  .card-reveal-arrive > div {
+    animation: none;
+  }
+}
+
 @keyframes sigil-draw {
   0% {
     stroke-dashoffset: 240;

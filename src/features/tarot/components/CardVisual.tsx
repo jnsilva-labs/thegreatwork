@@ -25,7 +25,7 @@ const CardVisual: React.FC<CardVisualProps> = ({ card, isFaceUp, onClick, size =
   const currentSizeClass = className.includes('w-') ? className : `${sizeClasses[size]} ${className}`;
 
   return (
-    <div className={`group relative z-0 aspect-[7/12] perspective-1000 text-[color:var(--bone)] ${motionOk ? 'transition-[filter,transform] duration-300 hover:z-10 hover:-translate-y-1' : ''} ${currentSizeClass}`}>
+    <div className={`group relative z-0 aspect-[7/12] perspective-1000 text-[color:var(--bone)] ${motionOk ? 'transition-[filter,transform] duration-300 hover:z-10 hover:-translate-y-1' : ''} ${isFaceUp && motionOk ? 'card-reveal-arrive' : ''} ${currentSizeClass}`}>
       <div className={`pointer-events-none relative h-full w-full text-center transform-style-3d ${motionOk ? 'transition-transform duration-700' : ''} ${isFaceUp ? 'rotate-y-180' : ''}`}>
         
         <div className="absolute inset-0 flex backface-hidden items-center justify-center overflow-hidden rounded-[0.2rem] border border-[color:var(--copper)]/55 bg-[color:var(--panel)] shadow-2xl">

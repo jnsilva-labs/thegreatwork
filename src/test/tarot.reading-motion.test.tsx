@@ -49,6 +49,7 @@ describe('Tarot reading motion status', () => {
 
     expect(screen.getByRole('status')).toBe(status);
     expect(status.textContent).toMatch(/cards ready/i);
+    expect(screen.getByRole('button', { name: /open details/i })).toBeTruthy();
   });
 
   it('cancels the long delay and announces ready when motion becomes blocked mid-shuffle', () => {
@@ -62,6 +63,6 @@ describe('Tarot reading motion status', () => {
 
     expect(screen.getByRole('status')).toBe(status);
     expect(status.textContent).toMatch(/cards ready/i);
-    expect(screen.getByRole('button', { name: /turn this card/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /open details/i })).toBeTruthy();
   });
 });

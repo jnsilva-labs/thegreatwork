@@ -236,18 +236,34 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
   const allFlipped = drawnCards.length > 0 && drawnCards.every((card) => flippedIds.has(card.id));
 
-  // The reveal is the ritual: the first tap turns a card; once it faces up,
-  // tapping again opens its detail.
+  // The cards reveal themselves, one at a time, once they are dealt.
+  // Larger spreads cascade a little faster so the Celtic Cross doesn't drag.
+  useEffect(() => {
+    if (stage !== 'drawing' || drawnCards.length === 0) return;
+
+    if (!motionOk) {
+      setFlippedIds(new Set(drawnCards.map((card) => card.id)));
+      return;
+    }
+
+    const stagger = drawnCards.length > 5 ? 550 : 850;
+    const timers = drawnCards.map((card, index) =>
+      window.setTimeout(() => {
+        setFlippedIds((prev) => new Set(prev).add(card.id));
+      }, 900 + index * stagger),
+    );
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [stage, drawnCards, motionOk]);
+
+  // Tapping a card mid-cascade turns it early; once face-up, tapping opens
+  // its detail.
   const handleCardClick = (card: DrawnCard) => {
     if (!flippedIds.has(card.id)) {
       setFlippedIds((prev) => new Set(prev).add(card.id));
       return;
     }
     setSelectedCardId(card.id);
-  };
-
-  const turnAllCards = () => {
-    setFlippedIds(new Set(drawnCards.map((card) => card.id)));
   };
 
   const handlePrevCard = () => {
@@ -341,7 +357,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
   const selectedCard = drawnCards.find((card) => card.id === selectedCardId);
   const activePosition = selectedCard ? spread.positions.find((position) => position.id === selectedCard.positionId) : null;
-  const readingStatus = getReadingStatus(stage, isLoadingAI, loadingMessageIndex);
+  const readingStatus = getReadingStatus(stage, isLoadingAI, loadingMessageIndex, allFlipped);
 
   return (
     <TarotShell depth="reading">
@@ -399,20 +415,6 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
               </div>
               <SpreadLayout type={spreadId} cards={drawnCards} revealedIds={flippedIds} onCardClick={handleCardClick} />
             </section>
-
-            {!interpretation && !apiKeyMissing && !apiError && !allFlipped && (
-              <div className={`sticky bottom-4 z-40 mt-4 flex flex-col items-center gap-2 pb-2 text-center ${motionOk ? 'animate-fade-in' : ''}`}>
-                <p className="border-y border-[color:var(--copper)]/30 bg-[color:var(--bg)]/92 px-6 py-3 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] sm:tracking-[0.18em]">
-                  Turn each card when you are ready
-                </p>
-                <button
-                  onClick={turnAllCards}
-                  className="min-h-[44px] text-xs uppercase tracking-[0.1em] text-[color:var(--mist)] underline underline-offset-4 transition-[color] hover:text-[color:var(--gilt)] sm:tracking-[0.14em]"
-                >
-                  Turn them all at once
-                </button>
-              </div>
-            )}
 
             {!interpretation && !apiKeyMissing && !apiError && allFlipped && (
               <div className={`sticky bottom-6 z-40 mt-4 flex justify-center pb-2 ${motionOk ? 'animate-fade-in' : ''}`}>
@@ -488,7 +490,13 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                 <section className="py-12">
                   <div className="mx-auto max-w-2xl space-y-4">
                     <h3 className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Archetype & Shadow</h3>
-                    <p className="whitespace-pre-wrap text-lg leading-relaxed text-[color:var(--mist)]">{interpretation.archetypeShadow}</p>
+                    <div className="space-y-5">
+                      {interpretation.archetypeShadow.split(/\n{2,}/).map((paragraph, index) => (
+                        <p key={index} className="text-lg leading-relaxed text-[color:var(--mist)]">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </section>
 
@@ -550,11 +558,12 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
   );
 };
 
-function getReadingStatus(stage: ReadingStage, isLoadingAI: boolean, loadingMessageIndex: number) {
+function getReadingStatus(stage: ReadingStage, isLoadingAI: boolean, loadingMessageIndex: number, allFlipped: boolean) {
   if (stage === 'shuffling') return 'Shuffling the symbolic field.';
   if (isLoadingAI) return LOADING_MESSAGES[loadingMessageIndex];
   if (stage === 'complete') return 'Guidance ready. Your interpretation is available.';
-  return 'Cards ready. Turn each card when you are ready.';
+  if (allFlipped) return 'Cards ready. All cards have been revealed; guidance is available.';
+  return 'Cards ready. The cards are revealing one at a time.';
 }
 
 export default Reading;
