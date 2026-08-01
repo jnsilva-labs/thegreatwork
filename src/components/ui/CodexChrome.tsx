@@ -40,14 +40,14 @@ export function CodexChrome() {
             <li key={principle.slug}>
               <Link
                 href={`/principles/${principle.slug}`}
-                className={`group flex items-center gap-4 transition-colors hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] ${
+                className={`group flex min-h-[44px] min-w-[44px] items-center gap-4 transition-colors hover:text-[color:var(--bone)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] ${
                   activeSlug === principle.slug ? "text-[color:var(--bone)]" : ""
                 }`}
               >
                 <span className="font-ritual text-sm text-[color:var(--gilt)]">
                   {romanNumerals[index]}
                 </span>
-                <span className="hidden whitespace-nowrap text-[0.65rem] tracking-[0.4em] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 sm:inline">
+                <span className="hidden whitespace-nowrap text-xs tracking-[0.2em] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 sm:inline">
                   {principle.title}
                 </span>
               </Link>

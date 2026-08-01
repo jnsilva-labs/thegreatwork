@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useId, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useFocusDialog } from '@/components/ui/useFocusDialog';
+import { useMotionPreference } from '@/components/motion/useMotionPreference';
 import { AlertTriangle, ArrowLeft, ChevronLeft, ChevronRight, Eye, Loader2, Save, Sparkles, X } from '../icons';
 import { DEFAULT_DECK, SPREADS } from '../constants';
 import SpreadLayout from '../components/SpreadLayout';
 import TarotCardFace from '../components/TarotCardFace';
 import TarotShell from '../components/TarotShell';
 import { PhaseArc } from '../components/PhaseArc';
-import { useMotionPreference } from '@/components/motion/useMotionPreference';
 import { generateInterpretation, TarotInterpretationError } from '../services/geminiService';
 import { getDecks, getSettings, saveReading } from '../services/storageService';
-import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, SpreadType, TarotView } from '../types';
+import { DrawnCard, Interpretation, Reading as ReadingType, ReadingRequest, SpreadPosition, SpreadType, TarotView } from '../types';
 
 type ReadingStage = 'shuffling' | 'drawing' | 'interpreting' | 'complete';
 
@@ -26,11 +28,145 @@ interface ReadingProps {
   onNavigate: (view: TarotView) => void;
 }
 
+interface CardDetailsDialogProps {
+  card: DrawnCard;
+  position?: SpreadPosition | null;
+  currentIndex: number;
+  cardCount: number;
+  onClose: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  dialogRef: React.Ref<HTMLElement>;
+  initialFocusRef: React.Ref<HTMLButtonElement>;
+}
+
+export function CardDetailsDialog({
+  card,
+  position,
+  currentIndex,
+  cardCount,
+  onClose,
+  onPrevious,
+  onNext,
+  dialogRef,
+  initialFocusRef,
+}: CardDetailsDialogProps) {
+  const headingId = useId();
+
+  return createPortal(
+    <div
+      data-testid="card-dialog-backdrop"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-[color:var(--bg)]/92 backdrop-blur-xl md:items-center md:p-6"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        tabIndex={-1}
+        className="relative grid h-[100dvh] w-full overflow-y-auto overscroll-contain border border-[color:var(--copper)]/28 bg-[color:var(--panel)] shadow-2xl md:h-[min(85vh,52rem)] md:max-w-6xl md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:overflow-hidden"
+      >
+        <button
+          ref={initialFocusRef}
+          type="button"
+          aria-label="Close card details"
+          onClick={onClose}
+          className="absolute right-[max(0.75rem,env(safe-area-inset-right))] top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex min-h-[44px] min-w-[44px] items-center justify-center border border-[color:var(--copper)]/30 bg-[color:var(--bg)]/80 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] md:right-5 md:top-5"
+        >
+          <X size={22} aria-hidden="true" />
+        </button>
+
+        <div className="relative flex min-h-[19rem] items-center justify-center border-b border-[color:var(--copper)]/18 bg-[color:var(--bg)] px-6 pb-16 pt-14 md:min-h-0 md:border-b-0 md:border-r md:p-10">
+          <div className={`aspect-[7/12] h-[min(34svh,17rem)] md:h-auto md:w-[min(68%,19rem)] ${card.isReversed ? 'rotate-180' : ''}`}>
+            <TarotCardFace card={card} className="shadow-2xl" />
+          </div>
+
+          <div className="absolute inset-x-4 bottom-3 flex items-center justify-between gap-4 md:inset-x-8 md:bottom-6">
+            <button
+              type="button"
+              aria-label="Previous card"
+              onClick={onPrevious}
+              disabled={currentIndex === 0}
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 px-2 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] transition-[color] hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-25"
+            >
+              <ChevronLeft size={18} aria-hidden="true" /> <span className="hidden lg:inline">Previous</span>
+            </button>
+            <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]" aria-live="polite">
+              {currentIndex + 1} / {cardCount}
+            </p>
+            <button
+              type="button"
+              aria-label="Next card"
+              onClick={onNext}
+              disabled={currentIndex === cardCount - 1}
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 px-2 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] transition-[color] hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-25"
+            >
+              <span className="hidden lg:inline">Next</span> <ChevronRight size={18} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-[color:var(--panel)] px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-9 sm:px-10 sm:pt-12 md:overflow-y-auto md:overscroll-contain md:pb-10 lg:px-12">
+          <div className="space-y-9">
+            <header className="border-b border-[color:var(--copper)]/18 pb-7 pr-12">
+              <div className="mb-4 flex flex-wrap items-center gap-3">
+                {position && (
+                  <span className="border border-[color:var(--gilt)]/30 px-3 py-1 text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)]">
+                    Position {position.id}
+                  </span>
+                )}
+                <span className="text-xs uppercase tracking-[0.14em] text-[color:var(--mist)]">{position?.name}</span>
+              </div>
+              <h2 id={headingId} className="font-ritual text-4xl leading-tight text-[color:var(--bone)] sm:text-5xl">
+                {card.name}<span className="sr-only"> — Card details</span>
+              </h2>
+              <p className="mt-3 font-ritual text-sm italic text-[color:var(--mist)]">
+                {card.isReversed ? 'Inverted Energy (Reversed)' : 'Direct Energy (Upright)'}
+              </p>
+            </header>
+
+            <section className="space-y-3" aria-labelledby={`${headingId}-interpretation`}>
+              <h3 id={`${headingId}-interpretation`} className="text-xs uppercase tracking-[0.16em] text-[color:var(--mist)]">Interpretation</h3>
+              <p className="font-ritual text-2xl leading-relaxed text-[color:var(--mist)]">
+                {card.isReversed ? card.meaningReversed : card.meaningUpright}
+              </p>
+            </section>
+
+            <div className="grid gap-7 border-t border-[color:var(--copper)]/14 pt-7 sm:grid-cols-2 sm:gap-9">
+              <section aria-labelledby={`${headingId}-shadow`}>
+                <h3 id={`${headingId}-shadow`} className="mb-3 text-xs uppercase tracking-[0.14em] text-[color:var(--gilt)]">The Shadow</h3>
+                <p className="text-sm leading-relaxed text-[color:var(--mist)]">{card.shadow}</p>
+              </section>
+              <section aria-labelledby={`${headingId}-gift`}>
+                <h3 id={`${headingId}-gift`} className="mb-3 text-xs uppercase tracking-[0.14em] text-[color:var(--gilt)]">The Gift</h3>
+                <p className="text-sm leading-relaxed text-[color:var(--mist)]">{card.gift}</p>
+              </section>
+            </div>
+
+            <ul aria-label="Card keywords" className="flex flex-wrap gap-3 border-t border-[color:var(--copper)]/14 pt-7">
+              {card.keywords.map((keyword) => (
+                <li key={keyword} className="border border-[color:var(--copper)]/24 bg-[color:var(--bg)]/45 px-4 py-1.5 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">
+                  {keyword}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>,
+    document.body,
+  );
+}
+
 const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
   const spreadId: SpreadType = request?.spreadId ?? 'one-card';
   const question = request?.question ?? '';
   const intention = request?.intention ?? 'General';
   const spread = SPREADS[spreadId];
+  const { motionOk } = useMotionPreference();
 
   const [stage, setStage] = useState<ReadingStage>('shuffling');
   const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
@@ -41,7 +177,15 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-  const { motionOk } = useMotionPreference();
+  const closeCardDialog = useCallback(() => setSelectedCardId(null), []);
+  const {
+    triggerRef: cardDialogTriggerRef,
+    dialogRef: cardDialogRef,
+    initialFocusRef: cardDialogInitialFocusRef,
+  } = useFocusDialog({
+    open: selectedCardId !== null,
+    onClose: closeCardDialog,
+  });
 
   useEffect(() => {
     if (!isLoadingAI) {
@@ -85,10 +229,10 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
       setDrawnCards(drawn);
       setStage('drawing');
-    }, 2500);
+    }, motionOk ? 2500 : 0);
 
     return () => window.clearTimeout(timer);
-  }, [spread.positions, stage]);
+  }, [motionOk, spread.positions, stage]);
 
   const allFlipped = drawnCards.length > 0 && drawnCards.every((card) => flippedIds.has(card.id));
 
@@ -122,19 +266,27 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
     setSelectedCardId(card.id);
   };
 
-  const handlePrevCard = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handlePrevCard = () => {
     const currentIndex = drawnCards.findIndex((card) => card.id === selectedCardId);
     if (currentIndex > 0) {
       setSelectedCardId(drawnCards[currentIndex - 1].id);
     }
   };
 
-  const handleNextCard = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleNextCard = () => {
     const currentIndex = drawnCards.findIndex((card) => card.id === selectedCardId);
     if (currentIndex < drawnCards.length - 1) {
       setSelectedCardId(drawnCards[currentIndex + 1].id);
+    }
+  };
+
+  const rememberCardDialogTrigger = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target;
+    if (
+      target instanceof HTMLButtonElement &&
+      target.getAttribute('aria-label')?.endsWith('open details')
+    ) {
+      cardDialogTriggerRef.current = target;
     }
   };
 
@@ -143,7 +295,9 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
     setApiError(null);
     setApiKeyMissing(false);
 
-    const apiKey = getSettings().apiKey?.trim();
+    const settings = getSettings();
+    const apiKey = settings.apiKey?.trim();
+    const activeDeck = getDecks().find((deck) => deck.id === settings.activeDeckId) || DEFAULT_DECK;
 
     try {
       const result = await generateInterpretation({
@@ -152,6 +306,7 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
         spread,
         cards: drawnCards,
         apiKey: apiKey || undefined,
+        isCustomDeck: activeDeck.isCustom,
       });
 
       setInterpretation(result);
@@ -202,72 +357,81 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
 
   const selectedCard = drawnCards.find((card) => card.id === selectedCardId);
   const activePosition = selectedCard ? spread.positions.find((position) => position.id === selectedCard.positionId) : null;
+  const readingStatus = getReadingStatus(stage, isLoadingAI, loadingMessageIndex, allFlipped);
 
   return (
-    <TarotShell>
-      <nav className="sticky top-0 z-50 border-b border-[color:var(--copper)]/14 bg-[rgba(4,7,13,0.84)] px-6 py-5 backdrop-blur sm:px-10">
+    <TarotShell depth="reading">
+      <nav className="sticky top-0 z-50 border-b border-[color:var(--copper)]/20 bg-[color:var(--bg)]/90 px-4 py-4 backdrop-blur sm:px-10 sm:py-5">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <button
             onClick={() => onNavigate('home')}
-            className="inline-flex min-h-[40px] items-center gap-2 rounded-full border border-[color:var(--copper)]/18 px-4 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+            className="inline-flex min-h-[44px] items-center gap-2 border-b border-[color:var(--copper)]/30 px-3 py-2 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)] sm:tracking-[0.18em]"
           >
             <ArrowLeft size={14} /> Return
           </button>
           <div className="text-center">
-            <p className="font-ritual text-2xl text-[color:var(--bone)] sm:text-3xl">{spread.name}</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)]">Awareness Session</p>
+            <h1 className="font-ritual text-2xl text-[color:var(--bone)] sm:text-3xl">{spread.name}</h1>
+            <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Awareness Session</p>
           </div>
           <div className="w-[92px]" />
         </div>
       </nav>
 
+      <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {readingStatus}
+      </p>
+
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center overflow-x-hidden px-4 py-8 sm:px-8 lg:px-12">
         {stage === 'shuffling' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-8 py-16 animate-pulse-slow">
+          <div className={`flex flex-1 flex-col items-center justify-center gap-8 py-16 ${motionOk ? 'animate-pulse-slow' : ''}`}>
             <div className="relative">
-              <div className="absolute inset-0 rounded-full border border-[color:var(--gilt)]/25 animate-spin-slow" />
-              <div className="flex h-56 w-40 items-center justify-center border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.86)]">
-                <Sparkles className="text-[color:var(--gilt)] animate-bounce" size={24} />
+              <div className={`absolute inset-0 rounded-full border border-[color:var(--gilt)]/25 ${motionOk ? 'animate-spin-slow' : ''}`} />
+              <div className="flex aspect-[7/12] w-36 items-center justify-center border border-[color:var(--copper)]/30 bg-[color:var(--panel)]">
+                <Sparkles className={`text-[color:var(--gilt)] ${motionOk ? 'animate-bounce' : ''}`} size={24} />
               </div>
             </div>
-            <p className="font-ritual text-2xl tracking-[0.18em] text-[color:var(--gilt)]">Shuffling the symbolic field</p>
+            <p className="font-ritual text-2xl tracking-[0.08em] text-[color:var(--gilt)] sm:tracking-[0.14em]">Shuffling the symbolic field</p>
           </div>
         )}
 
         {stage !== 'shuffling' && (
           <>
-            <div className="mb-16 mt-4 w-full border border-[color:var(--copper)]/14 bg-[rgba(6,11,19,0.64)] px-4 py-6 sm:px-6 sm:py-8">
-              <div className="mb-6 grid gap-6 border-b border-[color:var(--copper)]/10 pb-6 lg:grid-cols-[1.08fr_0.92fr]">
+            <section
+              aria-label="Reading table"
+              className="mb-14 mt-4 w-full border-y border-[color:var(--copper)]/28 px-1 py-6 sm:px-6 sm:py-8"
+              onClickCapture={rememberCardDialogTrigger}
+            >
+              <div className="mb-6 grid gap-6 border-b border-[color:var(--copper)]/20 pb-6 lg:grid-cols-[1.08fr_0.92fr]">
                 <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Question</p>
+                  <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Question</p>
                   <p className="font-ritual text-3xl leading-snug text-[color:var(--bone)] sm:text-4xl">
                     {question || 'A general reading'}
                   </p>
                 </div>
-                <div className="space-y-3 border-l border-[color:var(--copper)]/12 pl-0 lg:pl-6">
-                  <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Intention</p>
-                  <p className="text-base leading-relaxed text-[color:#D5D0C6] sm:text-lg">{intention}</p>
+                <div className="space-y-3 border-t border-[color:var(--copper)]/16 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                  <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Intention</p>
+                  <p className="text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">{intention}</p>
                 </div>
               </div>
               <SpreadLayout type={spreadId} cards={drawnCards} revealedIds={flippedIds} onCardClick={handleCardClick} />
-            </div>
+            </section>
 
             {!interpretation && !apiKeyMissing && !apiError && allFlipped && (
-              <div className="sticky bottom-6 z-40 mt-4 flex justify-center animate-fade-in pb-2">
+              <div className={`sticky bottom-6 z-40 mt-4 flex justify-center pb-2 ${motionOk ? 'animate-fade-in' : ''}`}>
                 <button
                   onClick={triggerInterpretation}
                   disabled={isLoadingAI}
-                  className="inline-flex min-h-[56px] items-center gap-4 rounded-full border border-[color:var(--gilt)]/55 bg-[rgba(6,11,19,0.94)] px-8 py-4 text-sm uppercase tracking-[0.3em] text-[color:var(--gilt)] transition hover:bg-[rgba(184,155,94,0.12)] hover:text-[color:var(--bone)] disabled:opacity-50"
+                  className="inline-flex min-h-[56px] items-center gap-4 border border-[color:var(--gilt)]/60 bg-[color:var(--bg)]/95 px-8 py-4 text-sm uppercase tracking-[0.16em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[color:var(--gilt)]/14 hover:text-[color:var(--bone)] disabled:opacity-50 sm:tracking-[0.22em]"
                 >
-                  {isLoadingAI ? <Loader2 className="animate-spin" /> : <Eye size={20} />}
-                  {isLoadingAI ? LOADING_MESSAGES[loadingMessageIndex] : 'Reveal Guidance'}
+                  {isLoadingAI ? <Loader2 className={motionOk ? 'animate-spin' : ''} /> : <Eye size={20} />}
+                  <span>{isLoadingAI ? LOADING_MESSAGES[loadingMessageIndex] : 'Reveal Guidance'}</span>
                 </button>
               </div>
             )}
 
             {(apiKeyMissing || apiError) && (
-              <div className="fixed bottom-10 z-40 max-w-md animate-fade-in border border-[rgba(140,70,70,0.4)] bg-[rgba(6,11,19,0.96)] p-6 text-center shadow-xl">
-                <div className="mb-4 text-[rgba(187,103,103,0.85)]">
+              <div className={`fixed bottom-10 z-40 max-w-md border border-[color:var(--copper)]/60 bg-[color:var(--bg)]/95 p-6 text-center shadow-xl ${motionOk ? 'animate-fade-in' : ''}`}>
+                <div className="mb-4 text-[color:var(--gilt)]">
                   <AlertTriangle size={32} />
                 </div>
                 <h3 className="font-ritual text-2xl text-[color:var(--bone)]">{apiKeyMissing ? 'Personal Key Needed' : 'Connection Interrupted'}</h3>
@@ -281,14 +445,14 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                       setApiError(null);
                       void triggerInterpretation();
                     }}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)] px-6 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition hover:bg-[rgba(184,155,94,0.14)] hover:text-[color:var(--bone)]"
+                    className="inline-flex min-h-[44px] items-center border border-[color:var(--gilt)] px-6 py-2 text-xs uppercase tracking-[0.14em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[color:var(--gilt)]/14 hover:text-[color:var(--bone)]"
                   >
                     Try Again
                   </button>
                   {apiKeyMissing && (
                     <button
                       onClick={() => onNavigate('settings')}
-                      className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/40 px-6 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+                      className="inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/40 px-6 py-2 text-xs uppercase tracking-[0.14em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
                     >
                       Enter Personal Key
                     </button>
@@ -297,177 +461,109 @@ const Reading: React.FC<ReadingProps> = ({ request, onNavigate }) => {
                 <button onClick={() => {
                   setApiKeyMissing(false);
                   setApiError(null);
-                }} className="mt-3 block w-full min-h-[44px] text-xs text-[color:var(--mist)]/72 underline">
+                }} className="mt-3 block min-h-[44px] w-full text-xs text-[color:var(--mist)] underline">
                   Dismiss
                 </button>
               </div>
             )}
 
             {interpretation && (
-              <div className="luminous-edge relative mb-20 w-full max-w-5xl animate-fade-in bg-[rgba(6,11,19,0.9)] p-8 md:p-14 shadow-2xl">
-
-                <div className="text-center space-y-6">
-                  <div className="mb-4 inline-block rounded-full border border-[color:var(--gilt)]/25 p-2">
+              <article className={`relative mb-20 w-full max-w-4xl border-t border-[color:var(--copper)]/30 px-1 pt-14 sm:px-8 md:px-12 ${motionOk ? 'animate-fade-in' : ''}`}>
+                <header className="space-y-6 text-center">
+                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center border border-[color:var(--gilt)]/35">
                     <Sparkles size={16} className="text-[color:var(--gilt)]" />
                   </div>
-                  <p className="font-ritual text-3xl leading-snug text-[color:var(--bone)] md:text-5xl">&quot;{interpretation.mirrorStatement}&quot;</p>
-                </div>
+                  <h2 className="font-ritual text-3xl leading-snug text-[color:var(--bone)] md:text-5xl">&quot;{interpretation.mirrorStatement}&quot;</h2>
+                </header>
 
-                <div className="border-y border-[color:var(--copper)]/12 py-12">
-                  <div className="mx-auto max-w-2xl space-y-4 text-center">
-                    <h3 className="text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Archetype & Shadow</h3>
-                    <div className="space-y-5 text-left">
+                <section className="mt-14 border-y border-[color:var(--copper)]/24 py-10">
+                  <h3 className="mb-8 text-center text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Where You Stand in the Work</h3>
+                  {interpretation.phase ? (
+                    <PhaseArc phase={interpretation.phase} reason={interpretation.phaseReason} />
+                  ) : (
+                    <p className="mx-auto max-w-2xl whitespace-pre-wrap text-lg leading-relaxed text-[color:var(--mist)]">
+                      {interpretation.alchemicalPhase}
+                    </p>
+                  )}
+                </section>
+
+                <section className="py-12">
+                  <div className="mx-auto max-w-2xl space-y-4">
+                    <h3 className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)] sm:tracking-[0.18em]">Archetype & Shadow</h3>
+                    <div className="space-y-5">
                       {interpretation.archetypeShadow.split(/\n{2,}/).map((paragraph, index) => (
-                        <p key={index} className="text-lg leading-relaxed text-[color:#D5D0C6]">
+                        <p key={index} className="text-lg leading-relaxed text-[color:var(--mist)]">
                           {paragraph}
                         </p>
                       ))}
                     </div>
                   </div>
-                </div>
+                </section>
 
-                <div className="border-b border-[color:var(--copper)]/12 py-12">
-                  <h3 className="mb-8 text-center text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">Where You Stand in the Work</h3>
-                  {interpretation.phase ? (
-                    <PhaseArc phase={interpretation.phase} reason={interpretation.phaseReason} />
-                  ) : (
-                    <p className="mx-auto max-w-2xl whitespace-pre-wrap text-lg leading-relaxed text-[color:#D5D0C6]">
-                      {interpretation.alchemicalPhase}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-6">
-                  <h3 className="text-center text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">Practical Integration</h3>
-                  <ul className="grid gap-4">
+                <section className="border-t border-[color:var(--copper)]/24 py-12">
+                  <h3 className="mb-6 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] sm:tracking-[0.18em]">Practical Integration</h3>
+                  <ol className="divide-y divide-[color:var(--copper)]/20 border-y border-[color:var(--copper)]/20">
                     {interpretation.practicalGuidance.map((guidance, index) => (
-                      <li key={`guidance-${index}`} className="flex items-center gap-6 border border-[color:var(--copper)]/12 bg-[rgba(4,7,13,0.64)] p-4">
+                      <li key={`guidance-${index}`} className="flex items-start gap-5 py-5">
                         <span className="font-ritual text-3xl text-[color:var(--gilt)]/55">0{index + 1}</span>
-                        <span className="text-[color:#D5D0C6]">{guidance}</span>
+                        <span className="pt-1 leading-relaxed text-[color:var(--mist)]">{guidance}</span>
                       </li>
                     ))}
-                  </ul>
-                </div>
+                  </ol>
+                </section>
 
-                <div className="grid grid-cols-1 gap-8 pt-8 md:grid-cols-2">
+                <section className="grid grid-cols-1 gap-10 border-t border-[color:var(--copper)]/24 py-12 md:grid-cols-[1.2fr_0.8fr]">
                   <div className="space-y-6">
-                    <h3 className="text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">Journal Inquiries</h3>
+                    <h3 className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] sm:tracking-[0.18em]">Journal Inquiries</h3>
                     <div className="space-y-6">
                       {interpretation.journalPrompts.map((prompt, index) => (
-                        <div key={`prompt-${index}`} className="border-l border-[color:var(--gilt)]/22 pl-6 font-ritual text-xl italic text-[color:#D5D0C6]">
+                        <div key={`prompt-${index}`} className="border-l border-[color:var(--gilt)]/30 pl-6 font-ritual text-xl italic text-[color:var(--mist)]">
                           {prompt}
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="relative flex flex-col items-center justify-center border border-[color:var(--copper)]/12 bg-[rgba(4,7,13,0.72)] p-8 text-center">
-                    <h3 className="mb-4 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]">Mantra</h3>
+                  <div className="relative flex flex-col items-center justify-center border-l border-[color:var(--copper)]/24 p-8 text-center">
+                    <h3 className="mb-4 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] sm:tracking-[0.18em]">Mantra</h3>
                     <p className="font-ritual text-3xl text-[color:var(--gilt)]">{interpretation.mantra}</p>
                   </div>
-                </div>
+                </section>
 
-                <div className="flex justify-center pt-8">
-                  <button onClick={() => onNavigate('journal')} className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.24em] text-[color:var(--mist)] transition hover:text-[color:var(--gilt)]">
+                <footer className="flex justify-center border-t border-[color:var(--copper)]/24 pt-8">
+                  <button onClick={() => onNavigate('journal')} className="inline-flex min-h-[44px] items-center gap-3 border-b border-transparent text-xs uppercase tracking-[0.12em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--gilt)] sm:tracking-[0.18em]">
                     <Save size={14} /> Saved to Journal
                   </button>
-                </div>
-              </div>
+                </footer>
+              </article>
             )}
           </>
         )}
       </div>
 
       {selectedCard && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04070d]/96 p-4 backdrop-blur-xl" onClick={() => setSelectedCardId(null)}>
-          <div className="relative flex h-[85vh] w-full max-w-6xl flex-col overflow-hidden border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.96)] shadow-2xl md:flex-row" onClick={(event) => event.stopPropagation()}>
-            <button onClick={() => setSelectedCardId(null)} className="absolute right-6 top-6 z-20 p-2 text-[color:var(--mist)] transition hover:text-[color:var(--bone)]">
-              <X size={24} />
-            </button>
-
-            <div className="relative flex h-1/2 items-center justify-center border-r border-[color:var(--copper)]/10 bg-[#050810] p-10 md:h-full md:w-1/2">
-              <div className={`w-[min(100%,22rem)] aspect-[2/3] ${selectedCard.isReversed ? 'rotate-180' : ''}`}>
-                <TarotCardFace card={selectedCard} className="shadow-[0_0_40px_rgba(0,0,0,0.4)]" />
-              </div>
-
-              <div className="absolute inset-x-0 bottom-6 flex justify-center gap-12 md:hidden">
-                <button onClick={handlePrevCard} className="text-[color:var(--bone)] disabled:opacity-20" disabled={drawnCards.indexOf(selectedCard) === 0}>
-                  <ChevronLeft size={32} />
-                </button>
-                <button onClick={handleNextCard} className="text-[color:var(--bone)] disabled:opacity-20" disabled={drawnCards.indexOf(selectedCard) === drawnCards.length - 1}>
-                  <ChevronRight size={32} />
-                </button>
-              </div>
-            </div>
-
-            <div className="relative h-1/2 overflow-y-auto bg-[rgba(6,11,19,0.92)] p-12 md:h-full md:w-1/2">
-              <div className="space-y-10">
-                <div>
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="rounded-full border border-[color:var(--gilt)]/30 px-3 py-1 text-xs uppercase tracking-[0.16em] text-[color:var(--gilt)]">
-                      Position {activePosition?.id}
-                    </span>
-                    <span className="text-xs uppercase tracking-widest text-[color:var(--mist)]">{activePosition?.name}</span>
-                  </div>
-
-                  <h2 className="mb-4 font-ritual text-5xl text-[color:var(--bone)]">{selectedCard.name}</h2>
-
-                  <div className="text-sm font-ritual italic text-[color:var(--mist)]">
-                    {selectedCard.isReversed ? 'Inverted Energy (Reversed)' : 'Direct Energy (Upright)'}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-xs uppercase tracking-[0.2em] text-[color:var(--mist)]">Interpretation</h3>
-                  <p className="font-ritual text-2xl leading-relaxed text-[color:#D5D0C6]">
-                    {selectedCard.isReversed ? selectedCard.meaningReversed : selectedCard.meaningUpright}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-12 border-t border-[color:var(--copper)]/10 pt-8">
-                  <div>
-                    <span className="mb-3 block text-xs uppercase tracking-[0.16em] text-[color:var(--gilt)]">The Shadow</span>
-                    <p className="text-sm leading-relaxed text-[color:var(--mist)]">{selectedCard.shadow}</p>
-                  </div>
-                  <div>
-                    <span className="mb-3 block text-xs uppercase tracking-[0.16em] text-[color:var(--gilt)]">The Gift</span>
-                    <p className="text-sm leading-relaxed text-[color:var(--mist)]">{selectedCard.gift}</p>
-                  </div>
-                </div>
-
-                <div className="pt-6">
-                  <div className="flex flex-wrap gap-3">
-                    {selectedCard.keywords.map((keyword) => (
-                      <span key={keyword} className="border border-[color:var(--copper)]/16 bg-[#050810] px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-[color:var(--mist)]">
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-16 hidden justify-between border-t border-[color:var(--copper)]/10 pt-8 md:flex">
-                <button
-                  onClick={handlePrevCard}
-                  disabled={drawnCards.indexOf(selectedCard) === 0}
-                  className="flex items-center gap-3 text-xs uppercase tracking-widest text-[color:var(--mist)] transition hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-20"
-                >
-                  <ChevronLeft size={14} /> Previous
-                </button>
-                <button
-                  onClick={handleNextCard}
-                  disabled={drawnCards.indexOf(selectedCard) === drawnCards.length - 1}
-                  className="flex items-center gap-3 text-xs uppercase tracking-widest text-[color:var(--mist)] transition hover:text-[color:var(--gilt)] disabled:cursor-not-allowed disabled:opacity-20"
-                >
-                  Next <ChevronRight size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CardDetailsDialog
+          card={selectedCard}
+          position={activePosition}
+          currentIndex={drawnCards.indexOf(selectedCard)}
+          cardCount={drawnCards.length}
+          onClose={closeCardDialog}
+          onPrevious={handlePrevCard}
+          onNext={handleNextCard}
+          dialogRef={cardDialogRef}
+          initialFocusRef={cardDialogInitialFocusRef}
+        />
       )}
     </TarotShell>
   );
 };
+
+function getReadingStatus(stage: ReadingStage, isLoadingAI: boolean, loadingMessageIndex: number, allFlipped: boolean) {
+  if (stage === 'shuffling') return 'Shuffling the symbolic field.';
+  if (isLoadingAI) return LOADING_MESSAGES[loadingMessageIndex];
+  if (stage === 'complete') return 'Guidance ready. Your interpretation is available.';
+  if (allFlipped) return 'Cards ready. All cards have been revealed; guidance is available.';
+  return 'Cards ready. The cards are revealing one at a time.';
+}
 
 export default Reading;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { ArchivalFigure, MarginalNote } from "@/components/editorial";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { getSubstackUrl, isExternalHref } from "@/lib/substack";
 
@@ -62,30 +63,30 @@ export default function StartHerePage() {
 
   return (
     <div className="min-h-screen px-6 py-20 text-[color:var(--bone)] sm:px-10 lg:px-20">
-      <div className="mx-auto max-w-5xl space-y-10">
-        <header className="space-y-6">
-          <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">Orientation</p>
-          <div className="space-y-5">
-            <h1 className="font-ritual text-4xl sm:text-6xl">Start Here</h1>
-            <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
-              Welcome to Awareness Paradox. This is the clearest first path through the library:
-              foundations, direct experience, symbolic study, and the pages most worth your attention first.
-            </p>
-          </div>
-          <div className="max-w-3xl border-l border-[color:var(--copper)]/24 pl-5">
-            <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Best use</p>
-            <p className="mt-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
-              Start with one door only. Read less than you want to, stay with it longer than feels efficient,
-              and let one symbol travel with you into daily life.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
+      <div className="mx-auto max-w-6xl space-y-16">
+        <header className="grid gap-10 border-b border-[color:var(--copper)]/22 pb-12 lg:grid-cols-[1.05fr_0.72fr] lg:items-end">
+          <div className="space-y-6">
+            <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">Orientation</p>
+            <div className="space-y-5">
+              <h1 className="font-ritual text-4xl sm:text-6xl">Start Here</h1>
+              <p className="max-w-3xl text-base leading-relaxed text-[color:var(--mist)] sm:text-lg">
+                Welcome to Awareness Paradox. This is the clearest first path through the library:
+                foundations, direct experience, symbolic study, and the pages most worth your attention first.
+              </p>
+            </div>
+            <MarginalNote heading="Best use" headingLevel="h2" glyph="I">
+              <p>
+                Start with one door only. Read less than you want to, stay with it longer than feels efficient,
+                and let one symbol travel with you into daily life.
+              </p>
+            </MarginalNote>
+            <div className="flex flex-wrap gap-3">
             <TrackedLink
               href="/study"
               location="start-here:header"
               label="See The Full Path"
               variant="primary"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--gilt)]/55 bg-[color:var(--gilt)]/10 px-4 py-2 text-xs uppercase tracking-[0.24em] text-[color:var(--bone)] transition-colors hover:border-[color:var(--gilt)]"
             >
               See The Full Path
             </TrackedLink>
@@ -96,11 +97,18 @@ export default function StartHerePage() {
               variant="secondary"
               target={isExternal ? "_blank" : undefined}
               rel={isExternal ? "noopener noreferrer" : undefined}
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.24em] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.24em] transition-colors hover:border-[color:var(--gilt)]"
             >
               Subscribe on Substack
             </TrackedLink>
+            </div>
           </div>
+          <ArchivalFigure
+            figureId="alchemical-manuscript"
+            sizes="(max-width: 1023px) 100vw, 36vw"
+            priority
+            imageClassName="h-full w-full object-cover object-top"
+          />
         </header>
 
         <section className="space-y-5 border-t border-[color:var(--copper)]/22 pt-8">
@@ -108,11 +116,11 @@ export default function StartHerePage() {
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Your first week</p>
             <h2 className="mt-3 font-ritual text-2xl">A simple initiation rhythm</h2>
           </div>
-          <ol className="grid gap-3 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
+          <ol aria-label="Your first week" className="border-y border-[color:var(--copper)]/22 text-sm leading-relaxed text-[color:var(--mist)] sm:text-base">
             {firstWeekSteps.map((step, index) => (
               <li
                 key={step}
-                className="grid gap-3 rounded-[1.2rem] border border-[color:var(--copper)]/14 bg-[color:var(--obsidian)]/12 p-4 sm:grid-cols-[2.5rem_1fr] sm:items-start"
+                className="grid gap-3 border-b border-[color:var(--copper)]/16 py-5 last:border-b-0 sm:grid-cols-[3.5rem_1fr] sm:items-start"
               >
                 <span className="font-ritual text-2xl leading-none text-[color:var(--gilt)]/88">
                   {String(index + 1).padStart(2, "0")}
@@ -128,11 +136,11 @@ export default function StartHerePage() {
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Choose your first door</p>
             <h2 className="mt-2 font-ritual text-3xl">Four ways into the work</h2>
           </div>
-          <div className="grid gap-5 lg:grid-cols-2">
+          <ul aria-label="Four ways into the work" className="grid border-y border-[color:var(--copper)]/22 lg:grid-cols-2">
             {tracks.map((track) => (
-              <article
+              <li
                 key={track.title}
-                className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6"
+                className="border-b border-[color:var(--copper)]/18 py-7 odd:lg:pr-8 even:lg:border-l even:lg:pl-8"
               >
                 <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">
                   {track.subtitle}
@@ -148,21 +156,21 @@ export default function StartHerePage() {
                     location="start-here:track"
                     label={track.cta}
                     variant={track.title}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+                    className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/55 px-1 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
                   >
                     {track.cta}
                   </TrackedLink>
                 </div>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
-          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/24 bg-[color:var(--obsidian)]/24 p-6">
+          <article className="border-y border-[color:var(--copper)]/22 py-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Reading order</p>
             <h2 className="mt-3 font-ritual text-2xl">If you want the clearest path</h2>
-            <ol className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
+            <ol aria-label="Recommended reading order" className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
               {readingOrder.map((entry, index) => (
                 <li key={entry.href} className="flex items-start justify-between gap-4 border-b border-[color:var(--copper)]/15 pb-3 last:border-b-0 last:pb-0">
                   <span>
@@ -173,7 +181,7 @@ export default function StartHerePage() {
                     location="start-here:reading-order"
                     label={`Open ${entry.title}`}
                     variant="open"
-                    className="text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition hover:text-[color:var(--bone)]"
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-xs uppercase tracking-[0.24em] text-[color:var(--gilt)] transition-colors hover:text-[color:var(--bone)]"
                   >
                     Open
                   </TrackedLink>
@@ -182,7 +190,7 @@ export default function StartHerePage() {
             </ol>
           </article>
 
-          <article className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/16 p-6">
+          <article className="border-y border-[color:var(--copper)]/22 py-6">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--gilt)]">Simple rhythm</p>
             <h2 className="mt-3 font-ritual text-2xl">A weekly way to use the site</h2>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[color:var(--mist)]">
@@ -208,7 +216,7 @@ export default function StartHerePage() {
           tertiaryLabel="Preview the Guide"
         />
 
-        <section className="rounded-[1.6rem] border border-[color:var(--copper)]/20 bg-[color:var(--obsidian)]/18 p-6">
+        <section className="border-y border-[color:var(--copper)]/20 py-7">
           <h2 className="font-ritual text-2xl">Keep Going</h2>
           <div className="mt-4 flex flex-wrap gap-3">
             <TrackedLink
@@ -216,7 +224,7 @@ export default function StartHerePage() {
               location="start-here:keep-going"
               label="Enter The Great Work"
               variant="keep-going"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
             >
               Enter The Great Work
             </TrackedLink>
@@ -225,7 +233,7 @@ export default function StartHerePage() {
               location="start-here:keep-going"
               label="Practice Journey"
               variant="keep-going"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
             >
               Practice Journey
             </TrackedLink>
@@ -234,7 +242,7 @@ export default function StartHerePage() {
               location="start-here:keep-going"
               label="Explore The Path"
               variant="keep-going"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--copper)]/55 px-4 py-2 text-xs uppercase tracking-[0.25em] transition-colors hover:border-[color:var(--gilt)]"
             >
               Explore The Path
             </TrackedLink>
@@ -245,7 +253,7 @@ export default function StartHerePage() {
               variant="keep-going-primary"
               target={isExternal ? "_blank" : undefined}
               rel={isExternal ? "noopener noreferrer" : undefined}
-              className="inline-flex min-h-[44px] items-center rounded-full border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/15 px-4 py-2 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition hover:border-[color:var(--gilt)]"
+              className="ritual-link inline-flex min-h-[44px] items-center border border-[color:var(--gilt)]/60 bg-[color:var(--gilt)]/15 px-4 py-2 text-xs uppercase tracking-[0.25em] text-[color:var(--bone)] transition-colors hover:border-[color:var(--gilt)]"
             >
               Subscribe on Substack
             </TrackedLink>

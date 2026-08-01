@@ -7,6 +7,7 @@ interface GenerateInterpretationParams {
   spread: SpreadDefinition;
   cards: DrawnCard[];
   apiKey?: string;
+  isCustomDeck?: boolean;
 }
 
 interface GeminiCandidatePart {
@@ -46,7 +47,7 @@ async function callGeminiDirect({
   spread,
   cards,
   apiKey,
-}: Required<GenerateInterpretationParams>): Promise<Interpretation> {
+}: Pick<GenerateInterpretationParams, 'question' | 'intention' | 'spread' | 'cards' | 'apiKey'> & { apiKey: string }): Promise<Interpretation> {
   const prompt = buildPrompt({ question, intention, spread, cards });
 
   const response = await fetch(
@@ -106,8 +107,12 @@ async function callSharedEndpoint({ question, intention, spread, cards }: Omit<G
     body: JSON.stringify({
       question,
       intention,
-      spread,
-      cards,
+      spreadId: spread.id,
+      cards: cards.map(({ id, isReversed, positionId }) => ({
+        id,
+        reversed: isReversed,
+        position: positionId,
+      })),
     }),
   });
 
@@ -138,7 +143,24 @@ export const generateInterpretation = async ({
   spread,
   cards,
   apiKey,
+  isCustomDeck = false,
 }: GenerateInterpretationParams): Promise<Interpretation> => {
+  const personalKey = apiKey?.trim();
+
+  if (isCustomDeck) {
+    if (!personalKey) {
+      throw new TarotInterpretationError(
+        'This custom deck needs your personal Gemini key. Add one in Settings to continue.',
+        {
+          code: 'CUSTOM_DECK_REQUIRES_PERSONAL_KEY',
+          needsPersonalKey: true,
+        },
+      );
+    }
+
+    return callGeminiDirect({ question, intention, spread, cards, apiKey: personalKey });
+  }
+
   try {
     return await callSharedEndpoint({ question, intention, spread, cards });
   } catch (error) {
@@ -148,11 +170,11 @@ export const generateInterpretation = async ({
         : new TarotInterpretationError(error instanceof Error ? error.message : 'Unknown interpretation error.');
 
     if (tarotError.needsPersonalKey) {
-      const personalKey = apiKey?.trim();
-
       if (!personalKey) {
         const sharedMessage =
-          tarotError.code === 'SHARED_KEY_UNAVAILABLE'
+          tarotError.code === 'SHARED_QUOTA_EXCEEDED'
+            ? tarotError.message
+            : tarotError.code === 'SHARED_KEY_UNAVAILABLE'
             ? 'Shared readings are not configured on this server. Add your personal Gemini key in Settings to continue.'
             : tarotError.code === 'SHARED_KEY_INVALID'
               ? 'The shared reading service is misconfigured. Add your personal Gemini key in Settings to continue.'

@@ -1,21 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import type { MouseEvent } from "react";
+import { ArchivalFigure } from "@/components/editorial";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { greatWork } from "@/data/greatWork";
-import { Ouroboros } from "@/components/Ouroboros";
 import { AlchemyGlyph } from "@/components/AlchemyGlyph";
 import { EtchHeading } from "@/components/motion/EtchHeading";
 import { EtchRule } from "@/components/motion/EtchRule";
 import { Reveal } from "@/components/motion/Reveal";
+import { useFocusDialog } from "@/components/ui/useFocusDialog";
 
 export default function GreatWorkPage() {
   const [activeGlyph, setActiveGlyph] = useState<string | null>(null);
+  const closeGlyph = useCallback(() => setActiveGlyph(null), []);
+  const { triggerRef, dialogRef, initialFocusRef } = useFocusDialog({
+    open: activeGlyph !== null,
+    onClose: closeGlyph,
+  });
+  const openGlyph = useCallback(
+    (glyphId: string, event: MouseEvent<HTMLButtonElement>) => {
+      triggerRef.current = event.currentTarget;
+      setActiveGlyph(glyphId);
+    },
+    [triggerRef],
+  );
   const glyph = greatWork.glyphs.find((item) => item.id === activeGlyph);
 
   return (
     <div className="min-h-screen px-6 py-18 text-[color:var(--bone)] sm:px-10 sm:py-22 lg:px-20">
-      <div className="mx-auto flex max-w-5xl flex-col gap-16">
+      <div className="mx-auto flex max-w-6xl flex-col gap-20">
         <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="space-y-5">
             <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
@@ -36,13 +50,12 @@ export default function GreatWorkPage() {
               </p>
             </Reveal>
           </div>
-          <div className="relative flex items-center justify-center py-4 lg:justify-end lg:pt-8">
-            <div className="relative flex items-center justify-center rounded-full border border-[color:var(--copper)]/24 bg-[color:var(--char)]/20 p-8 sm:p-10">
-              <div className="violet-aura" aria-hidden="true" />
-              <Ouroboros className="h-48 w-48 text-[color:var(--bone)] sm:h-60 sm:w-60" />
-              <div className="pointer-events-none absolute inset-5 rounded-full border border-[color:var(--copper)]/15" />
-            </div>
-          </div>
+          <ArchivalFigure
+            figureId="the-alchemist"
+            sizes="(max-width: 1023px) 100vw, 40vw"
+            priority
+            imageClassName="h-full w-full object-cover object-center grayscale-[0.28]"
+          />
         </section>
 
         <section className="grid gap-8 lg:grid-cols-2">
@@ -79,11 +92,11 @@ export default function GreatWorkPage() {
             <span className="h-px w-12 bg-[color:var(--copper)]" />
             The Work in Four Colors
           </h2>
-          <div className="space-y-10">
+          <ol aria-label="The work in four colors" className="relative border-l border-[color:var(--copper)]/26 pl-7 sm:pl-10">
             {greatWork.stages.map((stage, index) => (
-              <article key={stage.id} id={stage.id} className="scroll-mt-24 py-6 first:pt-0">
+              <li key={stage.id} id={stage.id} className="relative scroll-mt-24 py-8 first:pt-0">
                 {index > 0 && <EtchRule className="mb-10" />}
-                <div className="prose-measure space-y-4">
+                <article className="prose-measure space-y-4">
                   <div className="flex items-center gap-4">
                     <p className="font-ritual text-4xl text-[color:var(--gilt)]/86 sm:text-5xl">
                       {["I", "II", "III", "IV"][index]}
@@ -105,10 +118,10 @@ export default function GreatWorkPage() {
                       <p key={line}>{line}</p>
                     ))}
                   </div>
-                </div>
-              </article>
+                </article>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
         <section className="space-y-6">
@@ -131,25 +144,23 @@ export default function GreatWorkPage() {
             <span className="h-px w-12 bg-[color:var(--copper)]" />
             Visual Index
           </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <ul aria-label="Alchemical glyph index" className="grid border-y border-[color:var(--copper)]/22 sm:grid-cols-2 lg:grid-cols-4">
             {greatWork.glyphs.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveGlyph(item.id)}
-                className="group flex flex-col items-center gap-3 rounded-xl border border-[color:var(--copper)]/14 bg-[color:var(--char)]/8 p-4 text-left transition hover:border-[color:var(--gilt)]/65 hover:bg-[color:var(--char)]/14 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] sm:rounded-2xl"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[color:var(--copper)]/28 text-[color:var(--gilt)] transition group-hover:text-[color:var(--bone)]">
-                  <AlchemyGlyph id={item.id} className="h-9 w-9" />
-                </div>
-                <div className="text-center">
-                  <p className="text-[11px] uppercase tracking-[0.32em] text-[color:var(--mist)]">
-                    {item.title}
-                  </p>
-                </div>
-              </button>
+              <li key={item.id} className="border-b border-r border-[color:var(--copper)]/16 last:border-r-0">
+                <button
+                  type="button"
+                  aria-label={`Open ${item.title} glyph`}
+                  onClick={(event) => openGlyph(item.id, event)}
+                  className="group flex min-h-[112px] w-full items-center gap-4 px-4 py-5 text-left transition-colors hover:bg-[color:var(--char)]/14 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)]"
+                >
+                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[color:var(--copper)]/28 text-[color:var(--gilt)] transition-colors group-hover:text-[color:var(--bone)]">
+                    <AlchemyGlyph id={item.id} className="h-9 w-9" />
+                  </span>
+                  <span className="text-xs uppercase tracking-[0.25em] text-[color:var(--mist)]">{item.title}</span>
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
         <section className="space-y-4">
@@ -157,14 +168,14 @@ export default function GreatWorkPage() {
             <span className="h-px w-12 bg-[color:var(--copper)]" />
             Sources
           </h2>
-          <ul className="space-y-3 text-sm text-[color:var(--mist)]">
+          <ul aria-label="Sources" className="border-t border-[color:var(--copper)]/18 text-sm text-[color:var(--mist)]">
             {greatWork.sources.map((source) => (
-              <li key={source.url}>
+              <li key={source.url} className="border-b border-[color:var(--copper)]/14">
                 <a
                   href={source.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="transition hover:text-[color:var(--bone)]"
+                  className="inline-flex min-h-[44px] items-center py-2 transition-colors hover:text-[color:var(--bone)]"
                 >
                   {source.title}
                 </a>
@@ -187,31 +198,36 @@ export default function GreatWorkPage() {
       {glyph && (
         <div
           className="fixed inset-0 z-40 flex items-center justify-center bg-[color:var(--obsidian)]/80 px-6 py-10"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setActiveGlyph(null)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) closeGlyph();
+          }}
         >
-          <div
-            className="w-full max-w-md rounded-[1.65rem] border border-[color:var(--copper)]/26 bg-[color:var(--char)]/92 p-5 sm:rounded-[2rem] sm:p-6"
-            onClick={(event) => event.stopPropagation()}
+          <section
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="great-work-glyph-title"
+            tabIndex={-1}
+            className="w-full max-w-md border border-[color:var(--copper)]/26 bg-[color:var(--char)]/92 p-5 sm:p-6"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--copper)]/40 text-[color:var(--gilt)]">
                   <AlchemyGlyph id={glyph.id} className="h-7 w-7" />
                 </div>
-                <h3 className="font-ritual text-2xl">{glyph.title}</h3>
+                <h3 id="great-work-glyph-title" className="font-ritual text-2xl">{glyph.title}</h3>
               </div>
               <button
                 type="button"
-                onClick={() => setActiveGlyph(null)}
-                className="text-xs uppercase tracking-[0.35em] text-[color:var(--mist)] transition hover:text-[color:var(--bone)]"
+                ref={initialFocusRef}
+                onClick={closeGlyph}
+                className="inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.35em] text-[color:var(--mist)] transition-colors hover:text-[color:var(--bone)]"
               >
                 Close
               </button>
             </div>
             <p className="mt-4 text-sm text-[color:var(--mist)]">{glyph.description}</p>
-          </div>
+          </section>
         </div>
       )}
     </div>

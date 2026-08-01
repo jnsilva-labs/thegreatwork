@@ -41,7 +41,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
     <TarotShell>
       <div className="mx-auto max-w-5xl space-y-8 px-6 py-16 md:px-12">
         <header className="flex items-center gap-4">
-          <button onClick={() => onNavigate('home')} className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
+          <button type="button" onClick={() => onNavigate('home')} aria-label="Return to tarot home" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -51,13 +51,17 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
         </header>
 
         <div className="relative">
+          <label htmlFor="journal-search" className="sr-only">Search saved readings</label>
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--mist)]/72" size={18} />
           <input
+            id="journal-search"
+            name="search"
             type="text"
             placeholder="Search your journey..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            className="w-full border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.72)] py-3 pl-12 pr-4 text-[color:#D5D0C6] outline-none transition focus:border-[color:var(--gilt)]/42"
+            autoComplete="off"
+            className="min-h-[44px] w-full border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.72)] py-3 pl-12 pr-4 text-[color:#D5D0C6] outline-none transition-[border-color] focus:border-[color:var(--gilt)]/42"
           />
         </div>
 
@@ -70,7 +74,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
             </div>
           ) : (
             filteredReadings.map((reading) => (
-              <div key={reading.id} className="border border-[color:var(--copper)]/14 bg-[rgba(6,11,19,0.72)] p-6 transition group hover:border-[color:var(--gilt)]/26">
+              <div key={reading.id} className="group border border-[color:var(--copper)]/14 bg-[rgba(6,11,19,0.72)] p-6 transition-colors hover:border-[color:var(--gilt)]/26">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <span className="mb-1 block text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">{reading.intention}</span>
@@ -116,7 +120,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                     onBlur={(event) => handleNotesBlur(reading.id, event.target.value)}
                     placeholder="What did this reading stir? Write it while it is warm."
                     rows={2}
-                    className="w-full resize-y border border-[color:var(--copper)]/14 bg-[rgba(4,7,13,0.6)] p-3 text-sm leading-relaxed text-[color:#D5D0C6] outline-none transition placeholder:text-[color:var(--mist)]/40 focus:border-[color:var(--gilt)]/42"
+                    className="w-full resize-y border border-[color:var(--copper)]/14 bg-[rgba(4,7,13,0.6)] p-3 text-sm leading-relaxed text-[color:#D5D0C6] outline-none transition-[border-color] placeholder:text-[color:var(--mist)]/40 focus:border-[color:var(--gilt)]/42"
                   />
                 </div>
 
@@ -125,12 +129,14 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                     <div className="flex items-center gap-4 text-xs">
                       <span className="text-[color:var(--mist)]">Remove this reading for good?</span>
                       <button
+                        type="button"
                         onClick={() => handleDelete(reading.id)}
                         className="min-h-[44px] uppercase tracking-[0.22em] text-red-300/90 transition hover:text-red-200"
                       >
                         Remove
                       </button>
                       <button
+                        type="button"
                         onClick={() => setConfirmingDeleteId(null)}
                         className="min-h-[44px] uppercase tracking-[0.22em] text-[color:var(--mist)]/72 transition hover:text-[color:var(--bone)]"
                       >
@@ -139,6 +145,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                     </div>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => setConfirmingDeleteId(reading.id)}
                       className="min-h-[44px] text-[10px] uppercase tracking-[0.24em] text-[color:var(--mist)]/48 transition hover:text-red-300/80"
                     >

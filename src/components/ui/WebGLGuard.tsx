@@ -36,7 +36,7 @@ export function WebGLGuard({ fallback, children }: WebGLGuardProps) {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
-  if (supported === false) {
+  if (supported !== true) {
     return <>{fallback}</>;
   }
 

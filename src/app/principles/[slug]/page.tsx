@@ -74,11 +74,11 @@ export default async function PrincipleDetailPage({
           aria-label="Breadcrumb"
           className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.3em] text-[color:var(--mist)]"
         >
-          <Link href="/" className="transition hover:text-[color:var(--bone)]">
+          <Link href="/" className="inline-flex min-h-[44px] items-center transition-colors hover:text-[color:var(--bone)]">
             Home
           </Link>
           <span aria-hidden="true">/</span>
-          <Link href="/principles" className="transition hover:text-[color:var(--bone)]">
+          <Link href="/principles" className="inline-flex min-h-[44px] items-center transition-colors hover:text-[color:var(--bone)]">
             Principles
           </Link>
           <span aria-hidden="true">/</span>
@@ -92,26 +92,26 @@ export default async function PrincipleDetailPage({
           <p className="text-lg text-[color:var(--mist)]">{principle.short}</p>
         </header>
 
-        <section className="space-y-6 text-[color:var(--mist)]">
+        <section className="space-y-6 border-y border-[color:var(--copper)]/20 py-8 text-[color:var(--mist)]">
           <p className="text-base leading-relaxed sm:text-lg">{principle.body}</p>
         </section>
 
         <section className="grid gap-6 sm:grid-cols-2">
-          <div className="rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/40 p-6">
+          <div className="border-y border-[color:var(--copper)]/30 py-6">
             <h2 className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
               Keys
             </h2>
-            <ul className="mt-4 space-y-2 text-sm text-[color:var(--bone)]">
+            <ul aria-label="Keys" className="mt-4 space-y-2 text-sm text-[color:var(--bone)]">
               {principle.keys.map((key) => (
                 <li key={key}>— {key}</li>
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-[color:var(--copper)]/40 bg-[color:var(--char)]/40 p-6">
+          <div className="border-y border-[color:var(--copper)]/30 py-6">
             <h2 className="text-xs uppercase tracking-[0.4em] text-[color:var(--mist)]">
               Practice
             </h2>
-            <ul className="mt-4 space-y-2 text-sm text-[color:var(--bone)]">
+            <ul aria-label="Practice" className="mt-4 space-y-2 text-sm text-[color:var(--bone)]">
               {principle.practice.map((prompt) => (
                 <li key={prompt}>— {prompt}</li>
               ))}
@@ -121,7 +121,8 @@ export default async function PrincipleDetailPage({
 
         <nav
           aria-label="Related principle navigation"
-          className="grid gap-4 rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--char)]/40 p-5 sm:grid-cols-2"
+          data-ruled-navigation="principles"
+          className="grid gap-8 border-y border-[color:var(--copper)]/30 py-6 sm:grid-cols-2"
         >
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--mist)]">
@@ -131,7 +132,7 @@ export default async function PrincipleDetailPage({
               {previousPrinciple ? (
                 <Link
                   href={`/principles/${previousPrinciple.slug}`}
-                  className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 transition hover:border-[color:var(--gilt)]"
+                  className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/60 px-1 py-2 transition-colors hover:border-[color:var(--gilt)]"
                 >
                   Previous: {previousPrinciple.title}
                 </Link>
@@ -139,7 +140,7 @@ export default async function PrincipleDetailPage({
               {nextPrinciple ? (
                 <Link
                   href={`/principles/${nextPrinciple.slug}`}
-                  className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 transition hover:border-[color:var(--gilt)]"
+                  className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/60 px-1 py-2 transition-colors hover:border-[color:var(--gilt)]"
                 >
                   Next: {nextPrinciple.title}
                 </Link>
@@ -153,13 +154,13 @@ export default async function PrincipleDetailPage({
             <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.25em]">
               <Link
                 href="/principles"
-                className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 transition hover:border-[color:var(--gilt)]"
+                className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/60 px-1 py-2 transition-colors hover:border-[color:var(--gilt)]"
               >
                 All Principles
               </Link>
               <Link
                 href="/gallery"
-                className="rounded-full border border-[color:var(--copper)]/60 px-4 py-2 transition hover:border-[color:var(--gilt)]"
+                className="ritual-link inline-flex min-h-[44px] items-center border-t border-[color:var(--copper)]/60 px-1 py-2 transition-colors hover:border-[color:var(--gilt)]"
               >
                 Sacred Geometry
               </Link>

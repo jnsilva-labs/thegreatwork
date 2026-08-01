@@ -16,6 +16,7 @@ import {
   verifyTurnstileToken
 } from "@/lib/astro/protection";
 import { requestMonthAheadReading } from "@/lib/openai/respond";
+import { getAstroServiceSecret, AstroServiceConfigurationError } from "@/lib/astro/serviceAuth";
 
 export const runtime = "nodejs";
 
@@ -272,9 +273,19 @@ export async function POST(request: NextRequest) {
     return jsonError("INVALID_START_DATE", "startDateUtc must be a valid ISO datetime.", 400);
   }
 
-  const astroServiceUrl = process.env.ASTRO_SERVICE_URL;
+  const astroServiceUrl = process.env.ASTRO_SERVICE_URL?.trim();
   if (!astroServiceUrl) {
-    return jsonError("CONFIG_ERROR", "ASTRO_SERVICE_URL is not configured on the server.", 503);
+    return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
+  }
+
+  let serviceSecret: string;
+  try {
+    serviceSecret = getAstroServiceSecret();
+  } catch (error) {
+    if (error instanceof AstroServiceConfigurationError) {
+      return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
+    }
+    throw error;
   }
 
   try {
@@ -282,7 +293,10 @@ export async function POST(request: NextRequest) {
       `${astroServiceUrl.replace(/\/$/, "")}/transits/month-ahead`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Astro-Service-Secret": serviceSecret
+        },
         body: JSON.stringify({
           startDateUtc: toUtcIsoSeconds(startDateUtc),
           durationDays: 30,

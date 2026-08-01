@@ -11,6 +11,7 @@ import { useExportImage } from "./useExportImage";
 
 interface SharePanelProps {
   chart: AstroChart;
+  previewEnabled?: boolean;
 }
 
 type ExtendedShareStyle = "bigThree" | "constellation";
@@ -32,7 +33,7 @@ const triggerBlobDownload = (blob: Blob, filename: string): void => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
-export function SharePanel({ chart }: SharePanelProps) {
+export function SharePanel({ chart, previewEnabled = true }: SharePanelProps) {
   const [style, setStyle] = useState<ExtendedShareStyle>("bigThree");
   const [watermark, setWatermark] = useState(true);
   const [background, setBackground] = useState<ShareCardBackground>("dark");
@@ -89,6 +90,12 @@ export function SharePanel({ chart }: SharePanelProps) {
   }, [style, chart, dimensions.width, dimensions.height, watermark, background, includeAspects]);
 
   useEffect(() => {
+    if (!previewEnabled) {
+      setBigThreePreviewLoading(false);
+      setBigThreePreviewUrl(null);
+      return;
+    }
+
     if (style !== "bigThree") {
       setBigThreePreviewLoading(false);
       setBigThreePreviewUrl((previousUrl) => {
@@ -156,7 +163,7 @@ export function SharePanel({ chart }: SharePanelProps) {
         URL.revokeObjectURL(nextUrl);
       }
     };
-  }, [style, bigThreePayload]);
+  }, [style, bigThreePayload, previewEnabled]);
 
   const filenameBase = `awarenessparadox-${style}-${dimensions.width}x${dimensions.height}`;
 
@@ -184,6 +191,11 @@ export function SharePanel({ chart }: SharePanelProps) {
   };
 
   const onDownloadBigThreePng = async () => {
+    if (!previewEnabled) {
+      setStatus("Network export is disabled in this visual fixture.");
+      return;
+    }
+
     if (!bigThreePayload) {
       setStatus("Big Three export failed: missing Sun/Moon.");
       return;
@@ -228,10 +240,10 @@ export function SharePanel({ chart }: SharePanelProps) {
   };
 
   return (
-    <section className="astro-reveal rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/55 p-4 sm:p-5">
+    <section className="astro-reveal border-y border-[color:var(--copper)]/30 py-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">Share</h3>
-        <p className="text-[11px] text-[color:var(--mist)]">Deterministic export from chart facts</p>
+        <h3 className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">Share</h3>
+        <p className="text-xs text-[color:var(--mist)]">Deterministic export from chart facts</p>
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -241,6 +253,7 @@ export function SharePanel({ chart }: SharePanelProps) {
             <div className="flex gap-2">
               <button
                 type="button"
+                aria-pressed={style === "bigThree"}
                 className={`min-h-[44px] rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] ${
                   style === "bigThree"
                     ? "border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 text-[color:var(--bone)]"
@@ -252,6 +265,7 @@ export function SharePanel({ chart }: SharePanelProps) {
               </button>
               <button
                 type="button"
+                aria-pressed={style === "constellation"}
                 className={`min-h-[44px] rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] ${
                   style === "constellation"
                     ? "border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/15 text-[color:var(--bone)]"
@@ -292,6 +306,7 @@ export function SharePanel({ chart }: SharePanelProps) {
                 <button
                   key={mode}
                   type="button"
+                  aria-pressed={background === mode}
                   onClick={() => setBackground(mode)}
                   disabled={style !== "constellation"}
                   className={`min-h-[44px] rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em] ${
@@ -310,7 +325,7 @@ export function SharePanel({ chart }: SharePanelProps) {
             <button
               type="button"
               onClick={onDownloadPng}
-              className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/16 px-4 py-2 text-xs uppercase tracking-[0.22em] text-[color:var(--bone)]"
+              className="min-h-[44px] rounded-full border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/16 px-4 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--bone)]"
             >
               {style === "bigThree" ? "Download Big Three (PNG)" : "Download PNG"}
             </button>
@@ -318,7 +333,7 @@ export function SharePanel({ chart }: SharePanelProps) {
               type="button"
               onClick={onDownloadSvg}
               disabled={style === "bigThree"}
-              className="min-h-[44px] rounded-full border border-[color:var(--copper)]/45 px-4 py-2 text-xs uppercase tracking-[0.22em] text-[color:var(--bone)]"
+              className="min-h-[44px] rounded-full border border-[color:var(--copper)]/45 px-4 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--bone)]"
             >
               Download SVG
             </button>
@@ -329,8 +344,8 @@ export function SharePanel({ chart }: SharePanelProps) {
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/45 p-2">
-          <div className="mx-auto w-full max-w-[320px] overflow-hidden rounded-lg border border-[color:var(--copper)]/20 bg-[color:var(--bg)]/70">
+        <div className="overflow-hidden border border-[color:var(--copper)]/35 bg-[color:var(--bg)]/35 p-2">
+          <div className="mx-auto w-full max-w-[320px] overflow-hidden border border-[color:var(--copper)]/20 bg-[color:var(--bg)]/70">
             <div
               className="relative w-full"
               style={{ aspectRatio: `${dimensions.width} / ${dimensions.height}` }}
@@ -346,7 +361,7 @@ export function SharePanel({ chart }: SharePanelProps) {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs text-[color:var(--mist)]">
-                    {bigThreePreviewLoading ? "Rendering preview..." : "Preview unavailable."}
+                    {bigThreePreviewLoading ? "Rendering preview..." : previewEnabled ? "Preview unavailable." : "Preview disabled in this fixture."}
                   </div>
                 )
               ) : (

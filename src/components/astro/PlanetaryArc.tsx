@@ -84,8 +84,8 @@ export function PlanetaryArc({ points }: PlanetaryArcProps) {
   }, [points]);
 
   return (
-    <div className="relative rounded-2xl border border-[color:var(--copper)]/35 bg-[color:var(--char)]/35 p-4 backdrop-blur-sm">
-      <p className="mb-3 text-[10px] uppercase tracking-[0.32em] text-[color:var(--mist)]">
+    <div className="relative border-y border-[color:var(--copper)]/35 py-5">
+      <p className="mb-3 text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">
         Planetary Arc
       </p>
       <div className="relative h-28 w-full">
@@ -139,33 +139,29 @@ export function PlanetaryArc({ points }: PlanetaryArcProps) {
           })}
         </svg>
 
+      </div>
+      <ul className="mt-3 grid grid-cols-4 gap-px border-y border-[color:var(--copper)]/20 sm:grid-cols-6">
         {markers.map((marker) => {
-          const left = `${marker.x}%`;
           const isActive = activeKey === marker.key;
-
           return (
-            <button
-              key={`hit-${marker.key}`}
-              type="button"
-              className="absolute top-0 -translate-x-1/2 rounded-full"
-              style={{ left, width: 28, height: 28 }}
-              onMouseEnter={() => setActiveKey(marker.key)}
-              onFocus={() => setActiveKey(marker.key)}
-              onMouseLeave={() => setActiveKey(null)}
-              onBlur={() => setActiveKey(null)}
-              onClick={() => setActiveKey((prev) => (prev === marker.key ? null : marker.key))}
-              aria-label={`${marker.key} ${marker.sign} ${marker.degree}`}
-            >
-              <span className="sr-only">{marker.key}</span>
-              {isActive ? (
-                <span className="pointer-events-none absolute left-1/2 top-[-36px] w-max -translate-x-1/2 rounded-lg border border-[color:var(--copper)]/40 bg-[color:var(--bg)]/95 px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-[color:var(--bone)] shadow-lg">
-                  {planetGlyph[marker.key] ?? marker.key.slice(0, 1).toUpperCase()} {marker.key}: {marker.sign} {marker.degree}
-                </span>
-              ) : null}
-            </button>
+            <li key={`hit-${marker.key}`} className="min-w-0">
+              <button
+                type="button"
+                className={`flex min-h-[44px] min-w-[44px] w-full items-center justify-center gap-1 px-1 text-xs transition-[background-color,color] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] ${isActive ? "bg-[color:var(--gilt)]/12 text-[color:var(--bone)]" : "text-[color:var(--mist)]"}`}
+                onMouseEnter={() => setActiveKey(marker.key)}
+                onFocus={() => setActiveKey(marker.key)}
+                onMouseLeave={() => setActiveKey(null)}
+                onBlur={() => setActiveKey(null)}
+                onClick={() => setActiveKey((prev) => (prev === marker.key ? null : marker.key))}
+                aria-label={`${marker.key} ${marker.sign} ${marker.degree}`}
+              >
+                <span className="font-ritual text-base text-[color:var(--gilt)]" aria-hidden="true">{planetGlyph[marker.key] ?? marker.key.slice(0, 1).toUpperCase()}</span>
+                <span className="truncate">{marker.sign.slice(0, 3)} {marker.degree}</span>
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }

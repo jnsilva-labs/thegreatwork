@@ -78,6 +78,7 @@ type LineParticlesProps = {
   alpha: number;
   density: number;
   flow: number;
+  motionEnabled: boolean;
   renderOrder?: number;
 };
 
@@ -88,6 +89,7 @@ export function LineParticles({
   alpha,
   density,
   flow,
+  motionEnabled,
   renderOrder = 1,
 }: LineParticlesProps) {
   const pointsRef = useRef<Points | null>(null);
@@ -148,7 +150,7 @@ export function LineParticles({
   useFrame((state) => {
     const material = pointsRef.current?.material as ShaderMaterial | undefined;
     if (!material?.uniforms) return;
-    material.uniforms.uTime.value = state.clock.elapsedTime;
+    material.uniforms.uTime.value = motionEnabled ? state.clock.elapsedTime : 0;
     material.uniforms.uClarity.value = clarity;
     material.uniforms.uSize.value = size;
     material.uniforms.uAlpha.value = alpha;

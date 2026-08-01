@@ -56,11 +56,17 @@ export default async function GalleryDetailPage({
           aria-label="Breadcrumb"
           className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.3em] text-[color:var(--mist)]"
         >
-          <Link href="/" className="transition hover:text-[color:var(--bone)]">
+          <Link
+            href="/"
+            className="inline-flex min-h-[44px] items-center transition-colors hover:text-[color:var(--bone)]"
+          >
             Home
           </Link>
           <span aria-hidden="true">/</span>
-          <Link href="/gallery" className="transition hover:text-[color:var(--bone)]">
+          <Link
+            href="/gallery"
+            className="inline-flex min-h-[44px] items-center transition-colors hover:text-[color:var(--bone)]"
+          >
             Sacred Geometry
           </Link>
           <span aria-hidden="true">/</span>
@@ -84,7 +90,7 @@ export default async function GalleryDetailPage({
         })}
       />
       <GalleryDetailClient plate={plate} />
-      <div className="mx-auto mt-10 max-w-6xl rounded-2xl border border-[color:var(--copper)]/30 bg-[color:var(--char)]/40 p-6">
+      <div className="open-field mx-auto mt-16 max-w-6xl px-6 py-8 sm:px-8">
         <h2 className="font-ritual text-2xl">Related Study Paths</h2>
         <p className="mt-2 text-sm text-[color:var(--mist)]">
           Compare this plate against the Hermetic principles or return to the full gallery
