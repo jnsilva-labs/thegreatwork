@@ -56,7 +56,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
     <TarotShell>
       <div className="mx-auto max-w-4xl space-y-10 px-6 py-16">
         <header className="flex items-center gap-4">
-          <button type="button" onClick={() => onNavigate('home')} aria-label="Return to tarot home" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
+          <button type="button" onClick={() => onNavigate('home')} aria-label="Return to tarot home" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -67,7 +67,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
 
         <div className="grid gap-6">
           {decks.map((deck) => (
-            <div key={deck.id} className={`relative overflow-hidden border p-6 transition-[border-color,background-color,box-shadow] ${activeDeckId === deck.id ? 'border-[color:var(--gilt)]/45 bg-[rgba(184,155,94,0.06)] shadow-[0_0_15px_rgba(184,155,94,0.08)]' : 'border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.68)]'}`}>
+            <div key={deck.id} className={`relative overflow-hidden border p-6 transition-[border-color,background-color,box-shadow] ${activeDeckId === deck.id ? 'border-[color:var(--gilt)]/45 bg-[color:var(--gilt)]/6 shadow-[0_0_15px_color-mix(in_srgb,var(--gilt)_8%,transparent)]' : 'border-[color:var(--copper)]/16 bg-[color:var(--obsidian)]/68'}`}>
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="mb-2 font-ritual text-2xl text-[color:var(--bone)]">{deck.name}</h2>
@@ -75,11 +75,11 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
                   <div className="text-xs font-bold uppercase tracking-widest text-[color:var(--mist)]">{deck.cards.length} Cards</div>
                 </div>
                 {activeDeckId === deck.id ? (
-                  <div className="flex items-center gap-1 rounded-full border border-[color:var(--gilt)] bg-[rgba(184,155,94,0.14)] px-3 py-1 text-xs font-bold text-[color:var(--bone)]">
+                  <div className="flex items-center gap-1 border border-[color:var(--gilt)] bg-[color:var(--gilt)]/14 px-3 py-1 text-xs font-bold text-[color:var(--bone)]">
                     <Check size={12} /> ACTIVE
                   </div>
                 ) : (
-                  <button type="button" onClick={() => handleActivate(deck.id)} className="min-h-[44px] rounded-full border border-[color:var(--copper)]/18 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
+                  <button type="button" onClick={() => handleActivate(deck.id)} className="min-h-[44px] border border-[color:var(--copper)]/18 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
                     USE THIS DECK
                   </button>
                 )}
@@ -92,12 +92,12 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
           {!isCreating ? (
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-[color:var(--bone)]">Library</h3>
-              <button type="button" onClick={() => setIsCreating(true)} className="flex min-h-[44px] items-center gap-2 rounded-full border border-[color:var(--copper)]/18 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
+              <button type="button" onClick={() => setIsCreating(true)} className="flex min-h-[44px] items-center gap-2 border border-[color:var(--copper)]/18 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
                 <Plus size={14} /> Import Deck
               </button>
             </div>
           ) : (
-            <div className="space-y-4 border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.78)] p-6 animate-fade-in">
+            <div className="space-y-4 border border-[color:var(--copper)]/16 bg-[color:var(--obsidian)]/78 p-6 animate-fade-in">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-ritual text-2xl text-[color:var(--bone)]">Import Custom Deck</h3>
                 <button type="button" onClick={() => setIsCreating(false)} aria-label="Close deck import form" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center">
@@ -105,7 +105,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
                 </button>
               </div>
 
-              <div className="flex gap-3 border border-[color:var(--gilt)]/12 bg-[rgba(184,155,94,0.06)] p-4 text-xs text-[color:var(--mist)]">
+              <div className="flex gap-3 border border-[color:var(--gilt)]/12 bg-[color:var(--gilt)]/6 p-4 text-xs text-[color:var(--mist)]">
                 <Info className="flex-shrink-0" size={16} />
                 <div>
                   <p className="font-bold mb-1">Power User Tip:</p>
@@ -124,7 +124,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
                   id="deck-name"
                   name="deckName"
                   type="text"
-                  className="w-full border border-[color:var(--copper)]/16 bg-[#050810] p-3 text-[color:#D5D0C6] outline-none transition-[border-color] focus:border-[color:var(--gilt)]/45"
+                  className="w-full border border-[color:var(--copper)]/16 bg-[color:var(--obsidian)] p-3 text-[color:var(--bone)] outline-none transition-[border-color] focus:border-[color:var(--gilt)]/45"
                   value={newDeckName}
                   onChange={(event) => setNewDeckName(event.target.value)}
                   placeholder="e.g. Sola Busca Tarot"
@@ -140,7 +140,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
                     id="deck-base-url"
                     name="deckBaseUrl"
                     type="text"
-                    className="w-full border border-[color:var(--copper)]/16 bg-[#050810] p-3 pl-10 text-[color:#D5D0C6] outline-none transition-[border-color] focus:border-[color:var(--gilt)]/45"
+                    className="w-full border border-[color:var(--copper)]/16 bg-[color:var(--obsidian)] p-3 pl-10 text-[color:var(--bone)] outline-none transition-[border-color] focus:border-[color:var(--gilt)]/45"
                     value={newDeckBaseUrl}
                     onChange={(event) => setNewDeckBaseUrl(event.target.value)}
                     placeholder="https://your-host.com/tarot-images"
@@ -152,7 +152,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={handleCreateDeck}
-                className="min-h-[44px] w-full border border-[color:var(--gilt)]/45 bg-[rgba(6,11,19,0.86)] py-3 text-sm uppercase tracking-[0.28em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[rgba(184,155,94,0.12)] hover:text-[color:var(--bone)]"
+                className="min-h-[44px] w-full border border-[color:var(--gilt)]/45 bg-[color:var(--obsidian)]/86 py-3 text-sm uppercase tracking-[0.28em] text-[color:var(--gilt)] transition-[background-color,color] hover:bg-[color:var(--gilt)]/12 hover:text-[color:var(--bone)]"
               >
                 Save Deck
               </button>
@@ -161,7 +161,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
 
           <div className="mt-8 border border-dashed border-[color:var(--copper)]/18 p-6 text-center">
             <p className="mb-2 text-sm text-[color:var(--mist)]">Want to generate a deck with AI?</p>
-            <button disabled className="border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.42)] px-4 py-2 text-xs text-[color:var(--mist)]/72 opacity-50">
+            <button disabled className="border border-[color:var(--copper)]/16 bg-[color:var(--obsidian)]/42 px-4 py-2 text-xs text-[color:var(--mist)]/72 opacity-50">
               Nano Banana Integration Coming Soon
             </button>
           </div>
@@ -169,7 +169,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
           <button
             type="button"
             onClick={() => onNavigate('home')}
-            className="mt-6 min-h-[44px] w-full rounded-full border border-[color:var(--copper)]/18 px-4 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
+            className="mt-6 min-h-[44px] w-full border border-[color:var(--copper)]/18 px-4 py-3 text-xs uppercase tracking-[0.28em] text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]"
           >
             Return to Tarot Home
           </button>

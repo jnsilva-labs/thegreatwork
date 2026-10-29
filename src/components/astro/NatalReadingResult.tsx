@@ -149,7 +149,7 @@ export function NatalReadingResult({
             {onRequestMonthAhead ? <button type="button" onClick={onRequestMonthAhead} disabled={monthAheadLoading} className="min-h-[44px] border border-[color:var(--gilt)]/65 px-5 py-3 text-xs uppercase tracking-[0.14em] text-[color:var(--bone)] transition-[background-color] hover:bg-[color:var(--gilt)]/12 disabled:opacity-60">{monthAheadLoading ? "Reading the sky..." : monthAheadResult ? "Refresh the month ahead" : "See the month ahead"}</button> : null}
           </div>
           <p className="mt-4 text-xs text-[color:var(--mist)]" aria-live="polite">{monthAheadStatus}</p>
-          {monthAheadError ? <p role="alert" className="mt-4 border-l-2 border-rose-300/60 pl-4 text-sm text-rose-100">{monthAheadError}</p> : null}
+          {monthAheadError ? <p role="alert" className="mt-4 border-l-2 border-[color:var(--error)]/60 pl-4 text-sm text-[color:var(--error)]">{monthAheadError}</p> : null}
           {monthAheadResult ? (
             <div className="mt-8 space-y-8">
               <div className="max-w-3xl"><p className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)]">{monthAheadResult.reading.timeframe}</p><h4 className="mt-2 font-ritual text-3xl text-[color:var(--bone)]">{monthAheadResult.reading.title}</h4><p className="mt-4 text-base leading-relaxed text-[color:var(--mist)]">{monthAheadResult.reading.overview}</p></div>

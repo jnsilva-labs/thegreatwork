@@ -22,6 +22,8 @@
   --teal: var(--border);
   --gold: var(--accent);
   --stone: var(--muted);
+  /* Shared error treatment for every interactive tool (tarot + astrology). */
+  --error: #dca9a0;
   --font-ritual: "Cormorant Garamond", "Didot", "Bodoni 72", "Iowan Old Style", "Times New Roman", serif;
   --font-ritual-serif: var(--font-ritual);
   --font-ritual-sans: "Manrope", "Avenir Next", "Helvetica Neue", "Neue Haas Grotesk", "Segoe UI", sans-serif;

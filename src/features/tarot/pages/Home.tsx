@@ -80,7 +80,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onStartReading }) => {
               <p id="tarot-question-helper" className="max-w-[58ch] text-xs leading-relaxed text-[color:var(--mist)]">
                 Hold one clear question. A sentence or two is enough; the reading will follow the attention you bring.
               </p>
-              {questionError && <p id="tarot-question-error" role="alert" className="text-sm text-red-200">{questionError}</p>}
+              {questionError && <p id="tarot-question-error" role="alert" className="text-sm text-[color:var(--error)]">{questionError}</p>}
             </div>
 
             <fieldset className="space-y-3 border-0 p-0">
