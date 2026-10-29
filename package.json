@@ -11,6 +11,7 @@
     "check:plates": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\",\"moduleResolution\":\"node\"}' node -r ts-node/register -r tsconfig-paths/register scripts/check-plates.cjs"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.136",
     "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/manrope": "^5.3.0",
     "@react-three/drei": "^10.7.7",

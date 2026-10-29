@@ -15,7 +15,12 @@ import {
   setAstroSession,
   verifyTurnstileToken
 } from "@/lib/astro/protection";
-import { requestMonthAheadReading } from "@/lib/openai/respond";
+import {
+  ReadingConfigError,
+  ReadingTimeoutError,
+  ReadingUpstreamError,
+  requestMonthAheadReading
+} from "@/lib/anthropic/astroReading";
 import { getAstroServiceSecret, AstroServiceConfigurationError } from "@/lib/astro/serviceAuth";
 
 export const runtime = "nodejs";
@@ -328,7 +333,7 @@ export async function POST(request: NextRequest) {
       canonicalBigThree,
       placements,
       transits: enrichedPayload,
-      timeoutMs: 18000
+      timeoutMs: 30_000
     });
 
     const responsePayload = {
@@ -368,6 +373,18 @@ export async function POST(request: NextRequest) {
       totalMs: Math.round(totalMs),
       message
     });
+
+    if (error instanceof ReadingTimeoutError) {
+      return jsonError("READING_TIMEOUT", "Reading generation timed out. Please try again.", 504);
+    }
+
+    if (error instanceof ReadingUpstreamError) {
+      return jsonError("READING_UPSTREAM_ERROR", "Reading service returned an error. Please try again.", 502);
+    }
+
+    if (error instanceof ReadingConfigError) {
+      return jsonError("CONFIG_ERROR", "The reading service is not configured on the server.", 503);
+    }
 
     if (message.includes("Astro service timed out")) {
       return jsonError("ASTRO_TIMEOUT", "Astro service timed out. Please try again.", 504);

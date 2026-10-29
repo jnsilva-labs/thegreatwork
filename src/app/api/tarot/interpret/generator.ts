@@ -1,11 +1,14 @@
-import { gateway, generateText, Output } from 'ai';
+import { generateText, Output } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
 import { buildPrompt, SYSTEM_INSTRUCTION } from '@/features/tarot/services/interpretationHelpers';
 import { interpretationSchema, toInterpretation } from '@/features/tarot/services/interpretationSchema';
+import { TAROT_MODEL } from '@/lib/anthropic/models';
 import { type SharedInterpretationRequest } from './request';
 
 const REQUEST_TIMEOUT_MS = 55_000;
-const PRIMARY_MODEL = 'google/gemini-3.5-flash';
-const FALLBACK_MODEL = 'anthropic/claude-sonnet-4.6';
+// Adaptive thinking shares the output budget; 2048 risked truncated JSON on
+// Claude models, surfacing as NoObjectGeneratedError.
+const MAX_OUTPUT_TOKENS = 6000;
 
 export async function generateSharedInterpretation({
   question,
@@ -14,19 +17,12 @@ export async function generateSharedInterpretation({
   cards,
 }: SharedInterpretationRequest) {
   const result = await generateText({
-    model: gateway(PRIMARY_MODEL),
+    model: anthropic(TAROT_MODEL),
     system: SYSTEM_INSTRUCTION,
     prompt: buildPrompt({ question, intention, spread, cards }),
-    temperature: 0.8,
-    maxOutputTokens: 2048,
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
     output: Output.object({ schema: interpretationSchema }),
     abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    providerOptions: {
-      gateway: {
-        models: [FALLBACK_MODEL],
-        tags: ['feature:tarot-interpretation'],
-      },
-    },
   });
 
   return toInterpretation(result.output);

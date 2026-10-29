@@ -16,12 +16,12 @@ const dataFlows = [
   {
     id: "tarot-providers",
     title: "Tarot interpretation providers",
-    body: "Tarot questions, intentions, selected cards, and spread context are processed by the interpretation service. Shared readings use Vercel AI Gateway with Google Gemini as the primary model and Anthropic Claude as a fallback. If you use a personal Gemini key, your browser sends the key and reading prompt directly to Google Gemini.",
+    body: "Tarot questions, intentions, selected cards, and spread context are processed by the interpretation service. Shared readings are interpreted by Anthropic Claude. If you use a personal Gemini key, your browser sends the key and reading prompt directly to Google Gemini.",
   },
   {
     id: "astrology-providers",
     title: "Astrology calculation and interpretation",
-    body: "Birth details and chart data are processed by several services. A birthplace search goes to OpenCage or OpenStreetMap Nominatim; converted time and coordinates go to the configured astrology calculation service; the resulting chart data and optional name go to OpenAI for interpretive text.",
+    body: "Birth details and chart data are processed by several services. A birthplace search goes to OpenCage or OpenStreetMap Nominatim; converted time and coordinates go to the configured astrology calculation service; the resulting chart data and optional name go to Anthropic Claude for interpretive text.",
   },
   {
     id: "cookies-verification",

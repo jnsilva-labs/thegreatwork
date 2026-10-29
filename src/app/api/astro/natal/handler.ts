@@ -17,7 +17,12 @@ import {
   verifyTurnstileToken
 } from "@/lib/astro/protection";
 import { deriveBigThreeFromChart, derivePlacementFacts } from "@/lib/astro/derive";
-import { requestNatalReading } from "@/lib/openai/respond";
+import {
+  ReadingConfigError,
+  ReadingTimeoutError,
+  ReadingUpstreamError,
+  requestNatalReading
+} from "@/lib/anthropic/astroReading";
 import {
   checkDailyUsage,
   DAILY_USAGE_COOKIE,
@@ -236,7 +241,7 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
     let geocodeMs = 0;
     let conversionMs = 0;
     let astroMs = 0;
-    let openaiMs = 0;
+    let readingMs = 0;
 
     try {
       const geocodeStart = performance.now();
@@ -282,7 +287,7 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
       const canonicalBigThree = deriveBigThreeFromChart(chart, input.timeUnknown);
       const placements = derivePlacementFacts(chart);
 
-      const openaiStart = performance.now();
+      const readingStart = performance.now();
       const reading = await dependencies.generateReading({
         name: input.name,
         chart,
@@ -291,16 +296,16 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
         zodiac: input.zodiac,
         canonicalBigThree,
         placements,
-        timeoutMs: 16_000
+        timeoutMs: 25_000
       });
-      openaiMs = performance.now() - openaiStart;
+      readingMs = performance.now() - readingStart;
 
       console.info("[api/astro/natal] success", {
         totalMs: Math.round(performance.now() - routeStart),
         geocodeMs: Math.round(geocodeMs),
         conversionMs: Math.round(conversionMs),
         astroMs: Math.round(astroMs),
-        openaiMs: Math.round(openaiMs),
+        readingMs: Math.round(readingMs),
         timeUnknown: input.timeUnknown
       });
 
@@ -329,27 +334,27 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
         geocodeMs: Math.round(geocodeMs),
         conversionMs: Math.round(conversionMs),
         astroMs: Math.round(astroMs),
-        openaiMs: Math.round(openaiMs),
+        readingMs: Math.round(readingMs),
         message
       });
 
       if (error instanceof AstroServiceConfigurationError) {
         return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
       }
+      if (error instanceof ReadingTimeoutError) {
+        return jsonError("READING_TIMEOUT", "Reading generation timed out. Please try again.", 504);
+      }
+      if (error instanceof ReadingUpstreamError) {
+        return jsonError("READING_UPSTREAM_ERROR", "Reading service returned an error. Please try again.", 502);
+      }
+      if (error instanceof ReadingConfigError) {
+        return jsonError("CONFIG_ERROR", "The reading service is not configured on the server.", 503);
+      }
       if (message.includes("Geocode") || message.includes("timezone from geocoded")) {
         return jsonError("GEOCODE_FAILED", "Could not resolve that birthplace. Try a more specific location.", 422);
       }
       if (message.includes("Astro service timed out")) {
         return jsonError("ASTRO_TIMEOUT", "Astro service timed out. Please try again.", 504);
-      }
-      if (message.includes("OpenAI request timed out")) {
-        return jsonError("READING_TIMEOUT", "Reading generation timed out. Please try again.", 504);
-      }
-      if (message.includes("OpenAI request failed")) {
-        return jsonError("READING_UPSTREAM_ERROR", "Reading service returned an error. Please try again.", 502);
-      }
-      if (message.includes("OPENAI_API_KEY")) {
-        return jsonError("CONFIG_ERROR", "OPENAI_API_KEY is not configured on the server.", 503);
       }
       if (
         message.includes("Invalid birthDate") ||

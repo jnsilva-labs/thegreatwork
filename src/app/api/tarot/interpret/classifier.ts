@@ -51,8 +51,9 @@ export function classifyInterpretError(error: unknown): ClassifiedInterpretError
     };
   }
 
-  // The gateway provider throws a plain Error when no OIDC token / API key is
-  // available locally (before any HTTP call is made).
+  // The Anthropic provider throws LoadAPIKeyError (a plain Error subclass whose
+  // message names ANTHROPIC_API_KEY) when no key is configured, before any HTTP
+  // call is made.
   if (error instanceof Error && /oidc|api key|authentication|credentials/i.test(error.message)) {
     return {
       code: 'SHARED_KEY_UNAVAILABLE',

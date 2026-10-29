@@ -98,10 +98,10 @@ describe('global trust architecture', () => {
     expect(privacy).toMatch(/signed daily-usage cookie/i);
     expect(privacy).toMatch(/astrology session cookie/i);
     expect(privacy).toMatch(/Cloudflare Turnstile/i);
-    expect(privacy).toMatch(/Vercel AI Gateway/i);
-    expect(privacy).toMatch(/Google Gemini/i);
     expect(privacy).toMatch(/Anthropic Claude/i);
-    expect(privacy).toMatch(/OpenAI/i);
+    expect(privacy).toMatch(/Google Gemini/i);
+    expect(privacy).not.toMatch(/Vercel AI Gateway/i);
+    expect(privacy).not.toMatch(/OpenAI/i);
     expect(privacy).toMatch(/OpenCage/i);
     expect(privacy).toMatch(/OpenStreetMap Nominatim/i);
     expect(privacy).toMatch(/configured astrology calculation service/i);
