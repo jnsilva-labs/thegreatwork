@@ -3,16 +3,15 @@ import type {
   NatalChartResponse,
   NatalChartPoints,
   HouseSystem
-} from "../types/chart";
+} from "./chartTypes";
 import { calculateAspects } from "./aspects";
 import { normalizeDegrees, roundTo } from "./math";
 import {
   calcHousesPlacidus,
   calcPlanetLongitude,
-  calcUtFlags,
   planets,
   toJulianDayUtc
-} from "./swissEphemeris";
+} from "./ephemeris";
 
 export class CalculationError extends Error {
   constructor(message: string) {
@@ -58,8 +57,7 @@ export const buildNatalChart = async (
       neptune,
       pluto,
       node,
-      houses,
-      chironResult
+      houses
     ] = await Promise.all([
       calcPlanetLongitude(jdUt, planets.sun),
       calcPlanetLongitude(jdUt, planets.moon),
@@ -71,11 +69,13 @@ export const buildNatalChart = async (
       calcPlanetLongitude(jdUt, planets.uranus),
       calcPlanetLongitude(jdUt, planets.neptune),
       calcPlanetLongitude(jdUt, planets.pluto),
-      calcPlanetLongitude(jdUt, planets.nodeTrue),
-      calcHousesPlacidus(jdUt, input.lat, input.lon),
-      calcPlanetLongitude(jdUt, planets.chiron).catch(() => undefined)
+      calcPlanetLongitude(jdUt, planets.node),
+      calcHousesPlacidus(jdUt, input.lat, input.lon)
     ]);
 
+    // Chiron is intentionally absent: the swisseph service never shipped the
+    // asteroid data file, so it was already missing from production output,
+    // and every consuming schema keeps it optional.
     const points: NatalChartPoints = {
       sun,
       moon,
@@ -92,10 +92,6 @@ export const buildNatalChart = async (
       mc: houses.mc
     };
 
-    if (typeof chironResult === "number" && Number.isFinite(chironResult)) {
-      points.chiron = chironResult;
-    }
-
     const cusps = resolveHouseCusps(input.houseSystem, houses.cusps, houses.asc);
 
     return {
@@ -105,8 +101,7 @@ export const buildNatalChart = async (
         zodiac: input.zodiac,
         houseSystem: input.houseSystem,
         ephemeris: {
-          backend: "swisseph",
-          calcUtFlags,
+          backend: "astronomy-engine",
           trueNode: true,
           houseSource:
             input.houseSystem === "placidus"

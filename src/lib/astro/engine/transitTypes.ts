@@ -1,4 +1,4 @@
-import type { AspectType, NatalChartPoints } from "./chart";
+import type { AspectType, NatalChartPoints } from "./chartTypes";
 
 export type TransitPlanet =
   | "sun"

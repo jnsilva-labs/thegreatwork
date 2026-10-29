@@ -1,4 +1,4 @@
-import type { AspectType, NatalChartPoints } from "../types/chart";
+import type { AspectType, NatalChartPoints } from "./chartTypes";
 import type {
   LunarPhase,
   LunarStageEvent,
@@ -9,9 +9,9 @@ import type {
   TransitContactEvent,
   TransitNatalPoint,
   TransitPlanet,
-} from "../types/transits";
+} from "./transitTypes";
 import { normalizeDegrees, roundTo } from "./math";
-import { calcPlanetState, planets, toJulianDayUtc } from "./swissEphemeris";
+import { calcPlanetState, planets, toJulianDayUtc } from "./ephemeris";
 import { CalculationError } from "./natalChart";
 
 const SAMPLE_HOURS = 6;
@@ -162,7 +162,7 @@ type PlanetState = {
   speed: number;
 };
 
-const planetIdByName: Record<TransitPlanet, number> = {
+const planetIdByName: Record<TransitPlanet, (typeof planets)[keyof typeof planets]> = {
   sun: planets.sun,
   moon: planets.moon,
   mercury: planets.mercury,

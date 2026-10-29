@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateAspects } from "../src/lib/aspects";
+import { calculateAspects } from "../lib/astro/engine/aspects";
 
 describe("calculateAspects", () => {
   const options = { orbDefault: 6, orbLuminary: 8 };

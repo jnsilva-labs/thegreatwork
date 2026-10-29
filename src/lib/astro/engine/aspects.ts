@@ -1,4 +1,4 @@
-import type { NatalAspect, NatalChartPoints } from "../types/chart";
+import type { NatalAspect, NatalChartPoints } from "./chartTypes";
 import { angularDistance, roundTo } from "./math";
 
 const aspectTargets = [

@@ -28,8 +28,7 @@ export interface NatalChartMeta {
   zodiac: Zodiac;
   houseSystem: HouseSystem;
   ephemeris: {
-    backend: "swisseph";
-    calcUtFlags: number;
+    backend: "astronomy-engine";
     trueNode: true;
     houseSource: "placidus" | "whole-sign-from-asc";
   };

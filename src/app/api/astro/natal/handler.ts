@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { geocodeBirthPlace } from "@/lib/astro/geocode";
-import { getAstroServiceSecret, AstroServiceConfigurationError } from "@/lib/astro/serviceAuth";
 import { convertBirthLocalToUtc } from "@/lib/astro/time";
+import { buildNatalChart, CalculationError } from "@/lib/astro/engine/natalChart";
 import {
   astroChartSchema,
   natalInputSchema,
@@ -52,10 +52,9 @@ type ProtectionDependencies = {
 export type NatalHandlerDependencies = {
   now: () => Date;
   geocode: (place: string) => Promise<GeocodeResult>;
-  fetchChart: (url: string, body: AstroServiceRequest, serviceSecret: string) => Promise<unknown>;
+  computeChart: (body: AstroServiceRequest) => Promise<unknown>;
   generateReading: typeof requestNatalReading;
   protection: ProtectionDependencies;
-  getServiceSecret: () => string;
 };
 
 const getClientIp = (request: NextRequest): string => {
@@ -93,42 +92,10 @@ const jsonError = (
   headers?: Record<string, string>
 ) => NextResponse.json({ code, error: message, details }, { status, headers });
 
-const fetchChart = async (url: string, body: AstroServiceRequest, serviceSecret: string): Promise<unknown> => {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 12_000);
-
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Astro-Service-Secret": serviceSecret
-      },
-      body: JSON.stringify(body),
-      cache: "no-store",
-      signal: controller.signal
-    });
-
-    if (!response.ok) {
-      const detail = await response.text();
-      throw new Error(`Upstream request failed (${response.status}): ${detail.slice(0, 240)}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("Astro service timed out");
-    }
-    throw error;
-  } finally {
-    clearTimeout(timer);
-  }
-};
-
 const defaultDependencies: NatalHandlerDependencies = {
   now: () => new Date(),
   geocode: geocodeBirthPlace,
-  fetchChart,
+  computeChart: (body: AstroServiceRequest) => buildNatalChart(body),
   generateReading: requestNatalReading,
   protection: {
     enabled: astroProtectionEnabled,
@@ -136,8 +103,7 @@ const defaultDependencies: NatalHandlerDependencies = {
     hasSession: hasAstroSession,
     setSession: setAstroSession,
     verifyTurnstile: verifyTurnstileToken
-  },
-  getServiceSecret: getAstroServiceSecret
+  }
 };
 
 const scrubTimedChartData = (chart: AstroChart): AstroChart => {
@@ -228,16 +194,6 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
       );
     }
 
-    let serviceSecret: string;
-    try {
-      serviceSecret = dependencies.getServiceSecret();
-    } catch (error) {
-      if (!(error instanceof AstroServiceConfigurationError)) {
-        console.error("[api/astro/natal] unable to read astro service secret", error);
-      }
-      return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
-    }
-
     let geocodeMs = 0;
     let conversionMs = 0;
     let astroMs = 0;
@@ -257,10 +213,6 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
       });
       conversionMs = performance.now() - conversionStart;
 
-      const astroServiceUrl = process.env.ASTRO_SERVICE_URL?.trim();
-      if (!astroServiceUrl) {
-        return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
-      }
       const astroRequest: AstroServiceRequest = {
         datetimeUtc: utcInfo.datetimeUtc,
         lat: geocoded.lat,
@@ -271,11 +223,7 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
       };
 
       const astroStart = performance.now();
-      const astroRaw = await dependencies.fetchChart(
-        `${astroServiceUrl.replace(/\/$/, "")}/chart/natal`,
-        astroRequest,
-        serviceSecret
-      );
+      const astroRaw = await dependencies.computeChart(astroRequest);
       astroMs = performance.now() - astroStart;
 
       const parsedChart = astroChartSchema.safeParse(astroRaw);
@@ -338,8 +286,8 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
         message
       });
 
-      if (error instanceof AstroServiceConfigurationError) {
-        return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
+      if (error instanceof CalculationError) {
+        return jsonError("CALCULATION_ERROR", "The chart could not be calculated for that time and place.", 422);
       }
       if (error instanceof ReadingTimeoutError) {
         return jsonError("READING_TIMEOUT", "Reading generation timed out. Please try again.", 504);
@@ -352,9 +300,6 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
       }
       if (message.includes("Geocode") || message.includes("timezone from geocoded")) {
         return jsonError("GEOCODE_FAILED", "Could not resolve that birthplace. Try a more specific location.", 422);
-      }
-      if (message.includes("Astro service timed out")) {
-        return jsonError("ASTRO_TIMEOUT", "Astro service timed out. Please try again.", 504);
       }
       if (
         message.includes("Invalid birthDate") ||
