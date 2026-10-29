@@ -1,0 +1,203 @@
+{
+  "input": {
+    "datetimeUtc": "1990-07-15T14:30:00Z",
+    "lat": 40.7128,
+    "lon": -74.006,
+    "zodiac": "tropical",
+    "houseSystem": "wholeSign",
+    "aspects": {
+      "orbDefault": 6,
+      "orbLuminary": 8
+    }
+  },
+  "output": {
+    "meta": {
+      "input": {
+        "datetimeUtc": "1990-07-15T14:30:00Z",
+        "lat": 40.7128,
+        "lon": -74.006,
+        "zodiac": "tropical",
+        "houseSystem": "wholeSign",
+        "aspects": {
+          "orbDefault": 6,
+          "orbLuminary": 8
+        }
+      },
+      "jdUt": 2448088.10416667,
+      "zodiac": "tropical",
+      "houseSystem": "wholeSign",
+      "ephemeris": {
+        "backend": "swisseph",
+        "calcUtFlags": 258,
+        "trueNode": true,
+        "houseSource": "whole-sign-from-asc"
+      },
+      "generatedAt": "2026-10-29T22:44:36.132Z"
+    },
+    "points": {
+      "sun": 112.845531,
+      "moon": 24.720813,
+      "mercury": 126.96849,
+      "venus": 84.536207,
+      "mars": 32.011862,
+      "jupiter": 112.572463,
+      "saturn": 291.955912,
+      "uranus": 276.962719,
+      "neptune": 282.918441,
+      "pluto": 224.998891,
+      "node": 307.358907,
+      "asc": 169.43225,
+      "mc": 77.742818
+    },
+    "houses": {
+      "cusps": [
+        150,
+        180,
+        210,
+        240,
+        270,
+        300,
+        330,
+        0,
+        30,
+        60,
+        90,
+        120
+      ]
+    },
+    "aspects": [
+      {
+        "a": "asc",
+        "b": "mc",
+        "type": "square",
+        "orb": 1.689432
+      },
+      {
+        "a": "jupiter",
+        "b": "asc",
+        "type": "sextile",
+        "orb": 3.140213
+      },
+      {
+        "a": "jupiter",
+        "b": "saturn",
+        "type": "opposition",
+        "orb": 0.616551
+      },
+      {
+        "a": "mars",
+        "b": "node",
+        "type": "square",
+        "orb": 5.347045
+      },
+      {
+        "a": "mars",
+        "b": "uranus",
+        "type": "trine",
+        "orb": 4.950857
+      },
+      {
+        "a": "mercury",
+        "b": "mars",
+        "type": "square",
+        "orb": 4.956628
+      },
+      {
+        "a": "mercury",
+        "b": "node",
+        "type": "opposition",
+        "orb": 0.390417
+      },
+      {
+        "a": "moon",
+        "b": "jupiter",
+        "type": "square",
+        "orb": 2.14835
+      },
+      {
+        "a": "moon",
+        "b": "mars",
+        "type": "conjunction",
+        "orb": 7.291049
+      },
+      {
+        "a": "moon",
+        "b": "mc",
+        "type": "sextile",
+        "orb": 6.977995
+      },
+      {
+        "a": "moon",
+        "b": "saturn",
+        "type": "square",
+        "orb": 2.764901
+      },
+      {
+        "a": "moon",
+        "b": "venus",
+        "type": "sextile",
+        "orb": 0.184606
+      },
+      {
+        "a": "neptune",
+        "b": "pluto",
+        "type": "sextile",
+        "orb": 2.08045
+      },
+      {
+        "a": "pluto",
+        "b": "asc",
+        "type": "sextile",
+        "orb": 4.433359
+      },
+      {
+        "a": "saturn",
+        "b": "asc",
+        "type": "trine",
+        "orb": 2.523662
+      },
+      {
+        "a": "sun",
+        "b": "asc",
+        "type": "sextile",
+        "orb": 3.413281
+      },
+      {
+        "a": "sun",
+        "b": "jupiter",
+        "type": "conjunction",
+        "orb": 0.273068
+      },
+      {
+        "a": "sun",
+        "b": "moon",
+        "type": "square",
+        "orb": 1.875282
+      },
+      {
+        "a": "sun",
+        "b": "pluto",
+        "type": "trine",
+        "orb": 7.84664
+      },
+      {
+        "a": "sun",
+        "b": "saturn",
+        "type": "opposition",
+        "orb": 0.889619
+      },
+      {
+        "a": "uranus",
+        "b": "neptune",
+        "type": "conjunction",
+        "orb": 5.955722
+      },
+      {
+        "a": "venus",
+        "b": "asc",
+        "type": "square",
+        "orb": 5.103957
+      }
+    ]
+  }
+}

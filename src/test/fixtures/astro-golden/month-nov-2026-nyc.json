@@ -1,0 +1,312 @@
+{
+  "input": {
+    "startDateUtc": "2026-11-01T00:00:00Z",
+    "durationDays": 30,
+    "timeUnknown": false,
+    "natalPoints": {
+      "sun": 112.845531,
+      "moon": 24.720813,
+      "mercury": 126.96849,
+      "venus": 84.536207,
+      "mars": 32.011862,
+      "jupiter": 112.572463,
+      "saturn": 291.955912,
+      "uranus": 276.962719,
+      "neptune": 282.918441,
+      "pluto": 224.998891,
+      "node": 307.358907,
+      "asc": 169.43225,
+      "mc": 77.742818
+    }
+  },
+  "output": {
+    "meta": {
+      "startDateUtc": "2026-11-01T00:00:00Z",
+      "endDateUtc": "2026-12-01T00:00:00Z",
+      "durationDays": 30,
+      "generatedAt": "2026-10-29T22:44:36.249Z",
+      "sampleHours": 6,
+      "zodiac": "tropical"
+    },
+    "lunarStages": [
+      {
+        "kind": "lunarStage",
+        "phase": "lastQuarter",
+        "timestampUtc": "2026-11-01T20:28:42Z",
+        "orb": 0.002593,
+        "priority": 90
+      },
+      {
+        "kind": "lunarStage",
+        "phase": "newMoon",
+        "timestampUtc": "2026-11-09T07:02:13Z",
+        "orb": 0.001256,
+        "priority": 100
+      },
+      {
+        "kind": "lunarStage",
+        "phase": "firstQuarter",
+        "timestampUtc": "2026-11-17T11:47:41Z",
+        "orb": 0.000351,
+        "priority": 92
+      },
+      {
+        "kind": "lunarStage",
+        "phase": "fullMoon",
+        "timestampUtc": "2026-11-24T14:53:19Z",
+        "orb": 0.002203,
+        "priority": 98
+      }
+    ],
+    "skyShifts": [
+      {
+        "kind": "skyShift",
+        "eventType": "stationDirect",
+        "planet": "mercury",
+        "timestampUtc": "2026-11-13T15:53:47Z",
+        "longitude": 215.033493,
+        "speed": -0.000028,
+        "priority": 88,
+        "sign": "Scorpio"
+      },
+      {
+        "kind": "skyShift",
+        "eventType": "stationDirect",
+        "planet": "venus",
+        "timestampUtc": "2026-11-14T00:27:25Z",
+        "longitude": 202.863666,
+        "speed": 0,
+        "priority": 88,
+        "sign": "Libra"
+      },
+      {
+        "kind": "skyShift",
+        "eventType": "ingress",
+        "planet": "sun",
+        "timestampUtc": "2026-11-22T07:23:40Z",
+        "longitude": 240.000263,
+        "speed": 1.00972,
+        "priority": 78,
+        "fromSign": "Scorpio",
+        "toSign": "Sagittarius"
+      },
+      {
+        "kind": "skyShift",
+        "eventType": "ingress",
+        "planet": "mars",
+        "timestampUtc": "2026-11-25T23:37:30Z",
+        "longitude": 150.000135,
+        "speed": 0.399232,
+        "priority": 90,
+        "fromSign": "Leo",
+        "toSign": "Virgo"
+      }
+    ],
+    "transitContacts": [
+      {
+        "kind": "transitContact",
+        "transitPlanet": "jupiter",
+        "natalPoint": "moon",
+        "aspect": "trine",
+        "timestampUtc": "2026-11-04T09:00:00Z",
+        "orb": 0.000776,
+        "transitLongitude": 144.720037,
+        "natalLongitude": 24.720813,
+        "priority": 90.99224
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "mars",
+        "natalPoint": "moon",
+        "aspect": "trine",
+        "timestampUtc": "2026-11-13T16:00:00Z",
+        "orb": 0.004545,
+        "transitLongitude": 144.716268,
+        "natalLongitude": 24.720813,
+        "priority": 76.95455
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "venus",
+        "natalPoint": "moon",
+        "aspect": "opposition",
+        "timestampUtc": "2026-11-23T22:30:00Z",
+        "orb": 0.0009,
+        "transitLongitude": 204.721713,
+        "natalLongitude": 24.720813,
+        "priority": 74.991
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "venus",
+        "natalPoint": "moon",
+        "aspect": "opposition",
+        "timestampUtc": "2026-11-04T11:00:00Z",
+        "orb": 0.001259,
+        "transitLongitude": 204.719554,
+        "natalLongitude": 24.720813,
+        "priority": 74.98741
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "venus",
+        "natalPoint": "sun",
+        "aspect": "square",
+        "timestampUtc": "2026-11-14T00:30:00Z",
+        "orb": 0.018135,
+        "transitLongitude": 202.863666,
+        "natalLongitude": 112.845531,
+        "priority": 73.81865
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "mercury",
+        "natalPoint": "asc",
+        "aspect": "sextile",
+        "timestampUtc": "2026-11-29T04:00:00Z",
+        "orb": 0.01287,
+        "transitLongitude": 229.41938,
+        "natalLongitude": 169.43225,
+        "priority": 71.8713
+      }
+    ],
+    "highlights": [
+      {
+        "kind": "lunarStage",
+        "phase": "lastQuarter",
+        "timestampUtc": "2026-11-01T20:28:42Z",
+        "orb": 0.002593,
+        "priority": 90
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "jupiter",
+        "natalPoint": "moon",
+        "aspect": "trine",
+        "timestampUtc": "2026-11-04T09:00:00Z",
+        "orb": 0.000776,
+        "transitLongitude": 144.720037,
+        "natalLongitude": 24.720813,
+        "priority": 90.99224
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "venus",
+        "natalPoint": "moon",
+        "aspect": "opposition",
+        "timestampUtc": "2026-11-04T11:00:00Z",
+        "orb": 0.001259,
+        "transitLongitude": 204.719554,
+        "natalLongitude": 24.720813,
+        "priority": 74.98741
+      },
+      {
+        "kind": "lunarStage",
+        "phase": "newMoon",
+        "timestampUtc": "2026-11-09T07:02:13Z",
+        "orb": 0.001256,
+        "priority": 100
+      },
+      {
+        "kind": "skyShift",
+        "eventType": "stationDirect",
+        "planet": "mercury",
+        "timestampUtc": "2026-11-13T15:53:47Z",
+        "longitude": 215.033493,
+        "speed": -0.000028,
+        "priority": 88,
+        "sign": "Scorpio"
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "mars",
+        "natalPoint": "moon",
+        "aspect": "trine",
+        "timestampUtc": "2026-11-13T16:00:00Z",
+        "orb": 0.004545,
+        "transitLongitude": 144.716268,
+        "natalLongitude": 24.720813,
+        "priority": 76.95455
+      },
+      {
+        "kind": "skyShift",
+        "eventType": "stationDirect",
+        "planet": "venus",
+        "timestampUtc": "2026-11-14T00:27:25Z",
+        "longitude": 202.863666,
+        "speed": 0,
+        "priority": 88,
+        "sign": "Libra"
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "venus",
+        "natalPoint": "sun",
+        "aspect": "square",
+        "timestampUtc": "2026-11-14T00:30:00Z",
+        "orb": 0.018135,
+        "transitLongitude": 202.863666,
+        "natalLongitude": 112.845531,
+        "priority": 73.81865
+      },
+      {
+        "kind": "lunarStage",
+        "phase": "firstQuarter",
+        "timestampUtc": "2026-11-17T11:47:41Z",
+        "orb": 0.000351,
+        "priority": 92
+      },
+      {
+        "kind": "skyShift",
+        "eventType": "ingress",
+        "planet": "sun",
+        "timestampUtc": "2026-11-22T07:23:40Z",
+        "longitude": 240.000263,
+        "speed": 1.00972,
+        "priority": 78,
+        "fromSign": "Scorpio",
+        "toSign": "Sagittarius"
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "venus",
+        "natalPoint": "moon",
+        "aspect": "opposition",
+        "timestampUtc": "2026-11-23T22:30:00Z",
+        "orb": 0.0009,
+        "transitLongitude": 204.721713,
+        "natalLongitude": 24.720813,
+        "priority": 74.991
+      },
+      {
+        "kind": "lunarStage",
+        "phase": "fullMoon",
+        "timestampUtc": "2026-11-24T14:53:19Z",
+        "orb": 0.002203,
+        "priority": 98
+      },
+      {
+        "kind": "skyShift",
+        "eventType": "ingress",
+        "planet": "mars",
+        "timestampUtc": "2026-11-25T23:37:30Z",
+        "longitude": 150.000135,
+        "speed": 0.399232,
+        "priority": 90,
+        "fromSign": "Leo",
+        "toSign": "Virgo"
+      },
+      {
+        "kind": "transitContact",
+        "transitPlanet": "mercury",
+        "natalPoint": "asc",
+        "aspect": "sextile",
+        "timestampUtc": "2026-11-29T04:00:00Z",
+        "orb": 0.01287,
+        "transitLongitude": 229.41938,
+        "natalLongitude": 169.43225,
+        "priority": 71.8713
+      }
+    ]
+  }
+}
