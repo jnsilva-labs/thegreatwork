@@ -29,6 +29,11 @@
 - Social/video direction: prioritize audience growth through awe, curiosity, and inspiration. Synthetic on-screen talent is acceptable if it feels realistic, wise, and cinematically mythic rather than cheesy or cosplay-like.
 
 ## Patterns That Work
+- AI providers (2026-10): BOTH tarot (`/api/tarot/interpret`) and astrology readings (`src/lib/anthropic/astroReading.ts`) call the Anthropic Claude API directly via `@ai-sdk/anthropic@^3` (v3 pairs with ai@6; v4 is for ai@7) with `ANTHROPIC_API_KEY`; models default to `claude-sonnet-5-5` via `ANTHROPIC_TAROT_MODEL`/`ANTHROPIC_ASTRO_MODEL` in `src/lib/anthropic/models.ts`. Current Claude models 400 on non-default `temperature` — never add sampling params. The AI Gateway/OIDC and OpenAI paths are gone.
+- Chart math (2026-10): astro-service/Render is retired; `src/lib/astro/engine/` computes charts in-process on MIT `astronomy-engine` (numeric Placidus solver, osculating node from GeoMoonState r×v). Parity is pinned by `src/test/astro.engine-parity.test.ts` against golden swisseph fixtures in `src/test/fixtures/astro-golden/` — regenerate fixtures only from a swisseph build. Chiron was already absent in production (no ephe files = Moshier fallback); keep it optional everywhere.
+- Building legacy `swisseph` locally on this Mac: homebrew Python 3.14 breaks old node-gyp twice (no distutils; broken pyexpat during gyp-mac-tool). Fix: `npm_config_python=/usr/bin/python3` AND prepend a dir whose `python3` symlinks `/usr/bin/python3` to PATH for the make step.
+- `src/test/visual.foundation.test.ts` bans `text-[9|10|11]px` labels — use `text-xs` (12px) as the floor.
+- Stillness (2026-10): `uiStore.stillness` is the persistent preference; always toggle through `src/lib/stillness.ts` (syncs hermeticStore scene params; Space-release restores the preference).
 - Start by checking git status and deployment config before modifying routes/pages.
 - Integrate external app exports into `src/features/...` and keep raw exports as ignored snapshots to avoid build/lint contamination.
 - For AI features, default to a server-side shared key endpoint and fall back to BYOK only on quota/auth failures so users get zero-friction first use.
@@ -38,7 +43,7 @@
 - Homepage data lives in `src/data/homepage.ts` with `trackedSections` export for the scroll-tracked subset (excludes hero).
 - Award-level direction for this brand is `Editorial Ritual`: preserve sacred-library restraint, then add selective cinematic moments, stronger editorial pacing, and richer materiality.
 - For third-party Codex skills, inspect the source repo's `.codex/INSTALL.md` before using the generic installer; some use native discovery through `~/.agents/skills/<name>` symlinks instead of copying into `~/.codex/skills`.
-- Tarot AI (2026-07): `/api/tarot/interpret` runs AI SDK v6 `generateText` + `Output.object` through Vercel AI Gateway (OIDC; primary `google/gemini-3.5-flash`, fallback `anthropic/claude-sonnet-4.6`). Error contract preserved (`SHARED_*` codes) so the BYOK client fallback still works; BYOK direct path uses Google REST `gemini-3.5-flash`. Verify Gateway model slugs against https://ai-gateway.vercel.sh/v1/models (public), not memory.
+- Tarot AI error contract: `SHARED_*` codes are load-bearing for the BYOK client fallback (`SHARED_QUOTA_EXCEEDED`/`SHARED_KEY_UNAVAILABLE` trigger the personal-key path); BYOK stays Gemini REST from the browser (key in `x-goog-api-key` header, custom decks require it). Superseded 2026-10: shared readings now call Anthropic directly, see the 2026-10 entry above.
 - Motion system (2026-07): `src/components/motion/` (Reveal/EtchRule/EtchHeading/Dissolve + motionTokens + useMotionPreference). GSAP core only, no ScrollTrigger — Lenis + hermeticStore stay the only scroll authority; GSAP fires one-shot intersection timelines. Homepage sections choreograph under `[data-gsap]` (CSS transitions disabled there); `.is-revealed` CSS path remains the reduced-motion/stillness/low-power branch.
 
 ## Patterns That Don't Work
