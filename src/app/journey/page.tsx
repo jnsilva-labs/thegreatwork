@@ -9,6 +9,8 @@ import { generateGeometry } from "@/lib/geometry/generators";
 import { geometryToLineSet } from "@/lib/geometry/convertToLineSet";
 import type { LineSet } from "@/lib/geometry";
 import { useHermeticStore } from "@/lib/hermeticStore";
+import { toggleStillness as toggleSharedStillness } from "@/lib/stillness";
+import { useUiStore } from "@/lib/uiStore";
 import { setPreset } from "@/lib/audio/engine";
 
 type JourneyChapter = {
@@ -87,9 +89,8 @@ export default function JourneyPage() {
   const [cameraMode] = useState<CameraMode>("cinematic");
   const soundEnabled = useHermeticStore((state) => state.soundEnabled);
   const soundPlaying = useHermeticStore((state) => state.soundPlaying);
-  const stillnessMode = useHermeticStore((state) => state.stillnessMode);
+  const stillnessMode = useUiStore((state) => state.stillness);
   const setSoundPreset = useHermeticStore((state) => state.setSoundPreset);
-  const setHermeticState = useHermeticStore((state) => state.setState);
 
   const chapters = useMemo(() => {
     return principles.map((principle) => {
@@ -176,7 +177,7 @@ export default function JourneyPage() {
   };
 
   const toggleStillness = () => {
-    setHermeticState({ stillnessMode: !stillnessMode });
+    toggleSharedStillness();
   };
 
   return (

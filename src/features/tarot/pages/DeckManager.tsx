@@ -112,7 +112,7 @@ const DeckManager: React.FC<DeckManagerProps> = ({ onNavigate }) => {
                   <p className="mb-2">To use external decks like <strong>Sola Busca</strong> or <strong>Etteilla</strong>:</p>
                   <ol className="list-decimal list-inside space-y-1 opacity-80">
                     <li>Host the images online (e.g., GitHub Pages, S3).</li>
-                    <li>Ensure filenames match the standard format (e.g., <code>ar00.jpg</code> for Fool, <code>wa01.jpg</code> for Ace of Wands).</li>
+                    <li>Ensure filenames match this deck&apos;s format: majors <code>m00.jpg</code>&ndash;<code>m21.jpg</code> (e.g., <code>m00.jpg</code> for the Fool), minors <code>w01.jpg</code>&ndash;<code>w14.jpg</code>, <code>c01.jpg</code>, <code>s01.jpg</code>, <code>p01.jpg</code> (e.g., <code>w01.jpg</code> for the Ace of Wands).</li>
                     <li>Paste the base URL folder below.</li>
                   </ol>
                 </div>

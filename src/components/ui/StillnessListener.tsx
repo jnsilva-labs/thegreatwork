@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useHermeticStore } from "@/lib/hermeticStore";
+import { useUiStore } from "@/lib/uiStore";
 
 export function StillnessListener() {
   const setState = useHermeticStore((state) => state.setState);
@@ -15,6 +16,11 @@ export function StillnessListener() {
 
     const onKeyUp = (event: KeyboardEvent) => {
       if (event.code === "Space") {
+        // Releasing Space restores the persistent preference, never plain
+        // "motion on" - a user who toggled stillness in the nav keeps it.
+        if (useUiStore.getState().stillness) {
+          return;
+        }
         const scrollProgress = useHermeticStore.getState().scrollProgress;
         setState({
           stillnessMode: false,

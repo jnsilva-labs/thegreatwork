@@ -6,6 +6,7 @@ import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { useFocusDialog } from "@/components/ui/useFocusDialog";
 import { useUiStore } from "@/lib/uiStore";
 import { useHermeticStore } from "@/lib/hermeticStore";
+import { toggleStillness } from "@/lib/stillness";
 import { createEngine, setVolume, start, stop } from "@/lib/audio/engine";
 import { getStoredTheme, useThemeStore } from "@/lib/themeStore";
 import { useMotionPreference } from "@/components/motion/useMotionPreference";
@@ -34,8 +35,6 @@ export function NavBar() {
   const showUi = useUiStore((state) => state.showUi);
   const toggleUi = useUiStore((state) => state.toggleUi);
   const stillness = useUiStore((state) => state.stillness);
-  const toggleStillness = useUiStore((state) => state.toggleStillness);
-  const setHermetic = useHermeticStore((state) => state.setState);
   const qualityTier = useHermeticStore((state) => state.qualityTier);
   const autoQuality = useHermeticStore((state) => state.autoQuality);
   const setQuality = useHermeticStore((state) => state.setQuality);
@@ -93,13 +92,6 @@ export function NavBar() {
 
   const handleAnimateToggle = () => {
     toggleStillness();
-    const nextStillness = !useHermeticStore.getState().stillnessMode;
-    const scrollProgress = useHermeticStore.getState().scrollProgress;
-    setHermetic({
-      stillnessMode: nextStillness,
-      clarity: nextStillness ? 0.95 : 0.6 + scrollProgress * 0.2,
-      intensity: nextStillness ? 0.35 : 0.7 - scrollProgress * 0.2,
-    });
   };
 
   const qualityLabel = autoQuality ? "Auto" : qualityTier === "low" ? "Low" : "High";

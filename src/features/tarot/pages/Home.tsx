@@ -111,7 +111,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onStartReading }) => {
               <div className="grid grid-cols-1 border-y border-[color:var(--copper)]/28 md:grid-cols-3">
                 {[
                   { id: 'one-card', name: 'Focus', desc: 'Single insight', icon: CircleDot },
-                  { id: 'three-card', name: 'Trinity', desc: 'Context · center · outcome', icon: Triangle },
+                  { id: 'three-card', name: 'Trinity', desc: 'Root · stem · bloom', icon: Triangle },
                   { id: 'celtic-cross', name: 'Celtic', desc: 'A complete field', icon: Infinity },
                 ].map((spread, index) => (
                   <button

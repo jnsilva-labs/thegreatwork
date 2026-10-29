@@ -51,11 +51,14 @@ async function callGeminiDirect({
   const prompt = buildPrompt({ question, intention, spread, cards });
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent',
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // The personal key travels in a header, never in the URL, so it cannot
+        // land in server logs or browser history.
+        'x-goog-api-key': apiKey,
       },
       body: JSON.stringify({
         system_instruction: {
