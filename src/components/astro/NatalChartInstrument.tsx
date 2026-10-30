@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { WebGLGuard } from "@/components/ui/WebGLGuard";
 import { useThemeStore } from "@/lib/themeStore";
-import { buildChartMarkers, planetGlyph } from "@/lib/astro/display";
+import { buildChartMarkers, findHouse, formatDegreeMinute, planetGlyph } from "@/lib/astro/display";
 import { PlanetaryArc } from "./PlanetaryArc";
 import type { AstroAspect } from "@/lib/astro/types";
 
@@ -24,6 +24,20 @@ export function NatalChartInstrument({ points, cusps, aspects }: NatalChartInstr
   const colors = useThemeStore((state) => state.colors);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const markers = useMemo(() => buildChartMarkers(points), [points]);
+
+  const activeDetail = useMemo(() => {
+    if (!activeKey) return null;
+    const marker = markers.find((entry) => entry.key === activeKey);
+    if (!marker) return null;
+    const house = findHouse(marker.lon, cusps);
+    const related = aspects
+      .filter((aspect) => aspect.a === activeKey || aspect.b === activeKey)
+      .map((aspect) => {
+        const other = aspect.a === activeKey ? aspect.b : aspect.a;
+        return `${aspect.type} ${other}`;
+      });
+    return { marker, house, related };
+  }, [activeKey, markers, cusps, aspects]);
 
   if (markers.length === 0) {
     return null;
@@ -50,6 +64,26 @@ export function NatalChartInstrument({ points, cusps, aspects }: NatalChartInstr
             onSelect={setActiveKey}
           />
         </div>
+        <p
+          className="mt-3 min-h-[1.5rem] text-center text-xs text-[color:var(--mist)]"
+          role="status"
+          aria-live="polite"
+        >
+          {activeDetail ? (
+            <>
+              <span className="font-ritual text-sm text-[color:var(--gilt)]" aria-hidden="true">
+                {planetGlyph[activeDetail.marker.key]}
+              </span>{" "}
+              <span className="capitalize text-[color:var(--bone)]">{activeDetail.marker.key}</span>
+              {" · "}
+              {formatDegreeMinute(activeDetail.marker.lon)} {activeDetail.marker.sign}
+              {activeDetail.house ? ` · House ${activeDetail.house}` : ""}
+              {activeDetail.related.length > 0 ? ` · ${activeDetail.related.join(", ")}` : ""}
+            </>
+          ) : (
+            "Select a body to read its exact degree, house, and aspects."
+          )}
+        </p>
         <ul className="mt-3 grid grid-cols-4 gap-px border-y border-[color:var(--copper)]/20 sm:grid-cols-6">
           {markers.map((marker) => {
             const isActive = activeKey === marker.key;
@@ -58,8 +92,6 @@ export function NatalChartInstrument({ points, cusps, aspects }: NatalChartInstr
                 <button
                   type="button"
                   className={`flex min-h-[44px] min-w-[44px] w-full items-center justify-center gap-1 px-1 text-xs transition-[background-color,color] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[color:var(--gilt)] ${isActive ? "bg-[color:var(--gilt)]/12 text-[color:var(--bone)]" : "text-[color:var(--mist)]"}`}
-                  onMouseEnter={() => setActiveKey(marker.key)}
-                  onFocus={() => setActiveKey(marker.key)}
                   onClick={() => setActiveKey((prev) => (prev === marker.key ? null : marker.key))}
                   aria-label={`${marker.key} ${marker.sign} ${marker.degree}`}
                   aria-pressed={isActive}

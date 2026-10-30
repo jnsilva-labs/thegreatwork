@@ -50,7 +50,8 @@ const makeGlyphTexture = (text: string, color: string) => {
   if (ctx) {
     ctx.clearRect(0, 0, size, size);
     ctx.fillStyle = color;
-    ctx.font = `400 84px "Cormorant Garamond", "Times New Roman", serif`;
+    const fontSize = text.length > 2 ? 38 : text.length > 1 ? 56 : 84;
+    ctx.font = `400 ${fontSize}px "Cormorant Garamond", "Times New Roman", serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     // U+FE0E forces the text presentation so zodiac/planet glyphs never
@@ -148,7 +149,6 @@ function Planet({
         onPointerOver={(event) => {
           event.stopPropagation();
           setHovered(true);
-          onSelect(marker.key);
         }}
         onPointerOut={() => {
           setHovered(false);
@@ -173,6 +173,72 @@ function Planet({
         scale={emphasis ? 0.34 : 0.26}
         opacity={(emphasis ? 1 : 0.8) * baseOpacity}
       />
+    </group>
+  );
+}
+
+/** Engraved degree ticks: fine every 5 degrees, longer every 10. */
+function DegreeTicks({ ascLon, color }: { ascLon: number; color: string }) {
+  const positions = useMemo(() => {
+    const values: number[] = [];
+    for (let deg = 0; deg < 360; deg += 5) {
+      if (deg % 30 === 0) continue; // sign boundaries draw their own lines
+      const length = deg % 10 === 0 ? 0.09 : 0.045;
+      const [x1, , z1] = lonToPosition(deg, ascLon, RING_INNER, 0);
+      const [x2, , z2] = lonToPosition(deg, ascLon, RING_INNER - length, 0);
+      values.push(x1, 0, z1, x2, 0, z2);
+    }
+    return new Float32Array(values);
+  }, [ascLon]);
+
+  return (
+    <lineSegments>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <lineBasicMaterial color={color} transparent opacity={0.3} />
+    </lineSegments>
+  );
+}
+
+/** Alternating house sectors with engraved numerals, Asc wedge first. */
+function HouseWedges({ cusps, ascLon, colors }: { cusps: number[]; ascLon: number; colors: ThemeColors }) {
+  const wedges = useMemo(() => {
+    return cusps.map((cusp, index) => {
+      const next = cusps[(index + 1) % 12];
+      const spanDeg = (next - cusp + 360) % 360;
+      return {
+        index,
+        thetaStart: lonToAngle(cusp, ascLon),
+        thetaLength: spanDeg * RAD,
+        midLon: cusp + spanDeg / 2
+      };
+    });
+  }, [cusps, ascLon]);
+
+  return (
+    <group>
+      {wedges.map((wedge) => (
+        <group key={`house-${wedge.index}`}>
+          <mesh rotation-x={-Math.PI / 2} position-y={-0.005}>
+            <ringGeometry args={[0.6, RING_INNER, 48, 1, wedge.thetaStart, wedge.thetaLength]} />
+            <meshBasicMaterial
+              color={colors.accent}
+              transparent
+              opacity={wedge.index % 2 === 0 ? 0.045 : 0.015}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+            />
+          </mesh>
+          <GlyphSprite
+            text={String(wedge.index + 1)}
+            color={colors.line}
+            position={lonToPosition(wedge.midLon, ascLon, 0.76, 0.01)}
+            scale={0.17}
+            opacity={0.55}
+          />
+        </group>
+      ))}
     </group>
   );
 }
@@ -250,17 +316,39 @@ function InstrumentScene({ markers, cusps, aspects, ascLon, colors, activeKey, o
         );
       })}
 
-      {/* house cusps */}
+      {/* degree ticks */}
+      <DegreeTicks ascLon={ascLon} color={colors.line} />
+
+      {/* houses */}
+      {cusps && cusps.length === 12 && <HouseWedges cusps={cusps} ascLon={ascLon} colors={colors} />}
       {cusps?.map((cusp, index) => (
         <Line
           key={`cusp-${index}`}
           points={[lonToPosition(cusp, ascLon, 0.55, 0), lonToPosition(cusp, ascLon, RING_INNER, 0)]}
           color={index === 0 || index === 9 ? colors.glow : colors.line}
           transparent
-          opacity={index === 0 || index === 9 ? 0.5 : 0.14}
+          opacity={index === 0 || index === 9 ? 0.55 : 0.18}
           lineWidth={index === 0 || index === 9 ? 1.5 : 1}
         />
       ))}
+      {cusps && cusps.length === 12 && (
+        <>
+          <GlyphSprite
+            text="ASC"
+            color={colors.glow}
+            position={lonToPosition(cusps[0], ascLon, 2.48, 0.02)}
+            scale={0.22}
+            opacity={0.85}
+          />
+          <GlyphSprite
+            text="MC"
+            color={colors.glow}
+            position={lonToPosition(cusps[9], ascLon, 2.48, 0.02)}
+            scale={0.22}
+            opacity={0.85}
+          />
+        </>
+      )}
 
       {/* aspect chords */}
       {aspectLines.map((line) => {

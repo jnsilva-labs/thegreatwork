@@ -58,6 +58,34 @@ export const degreeToLabel = (lon: number) => {
   };
 };
 
+/** Degree and minute within the sign, e.g. 12°24′. */
+export const formatDegreeMinute = (lon: number) => {
+  const normalized = ((lon % 360) + 360) % 360;
+  const inSign = normalized % 30;
+  const degrees = Math.floor(inSign);
+  const minutes = Math.round((inSign - degrees) * 60);
+  if (minutes === 60) {
+    return `${degrees + 1}°00′`;
+  }
+  return `${degrees}°${String(minutes).padStart(2, "0")}′`;
+};
+
+/** 1-based house for a longitude, from 12 cusp longitudes; null without cusps. */
+export const findHouse = (lon: number, cusps: number[] | null | undefined): number | null => {
+  if (!cusps || cusps.length !== 12) return null;
+  const normalized = ((lon % 360) + 360) % 360;
+  for (let index = 0; index < 12; index += 1) {
+    const start = ((cusps[index] % 360) + 360) % 360;
+    const end = ((cusps[(index + 1) % 12] % 360) + 360) % 360;
+    const span = (end - start + 360) % 360;
+    const offset = (normalized - start + 360) % 360;
+    if (span > 0 && offset < span) {
+      return index + 1;
+    }
+  }
+  return null;
+};
+
 export interface ChartMarker {
   key: string;
   lon: number;
