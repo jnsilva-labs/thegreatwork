@@ -7,6 +7,7 @@ import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { greatWork } from "@/data/greatWork";
 import { AlchemyGlyph } from "@/components/AlchemyGlyph";
 import { EtchHeading } from "@/components/motion/EtchHeading";
+import { StageAtmosphere } from "./StageAtmosphere";
 import { EtchRule } from "@/components/motion/EtchRule";
 import { Reveal } from "@/components/motion/Reveal";
 import { useFocusDialog } from "@/components/ui/useFocusDialog";
@@ -29,6 +30,7 @@ export default function GreatWorkPage() {
 
   return (
     <div className="min-h-screen px-6 py-18 text-[color:var(--bone)] sm:px-10 sm:py-22 lg:px-20">
+      <StageAtmosphere stages={greatWork.stages} />
       <div className="mx-auto flex max-w-6xl flex-col gap-20">
         <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="space-y-5">
@@ -98,7 +100,10 @@ export default function GreatWorkPage() {
                 {index > 0 && <EtchRule className="mb-10" />}
                 <article className="prose-measure space-y-4">
                   <div className="flex items-center gap-4">
-                    <p className="font-ritual text-4xl text-[color:var(--gilt)]/86 sm:text-5xl">
+                    <p
+                      className="font-ritual text-4xl sm:text-5xl"
+                      style={{ color: `color-mix(in srgb, ${stage.tone} 52%, var(--bone))` }}
+                    >
                       {["I", "II", "III", "IV"][index]}
                     </p>
                     <span

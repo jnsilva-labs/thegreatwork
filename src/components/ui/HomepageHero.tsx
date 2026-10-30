@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { HeroSigil } from "@/components/ui/HeroSigil";
 import { MagneticLink } from "@/components/ui/MagneticLink";
 import { useMotionPreference } from "@/components/motion/useMotionPreference";
@@ -32,18 +32,7 @@ export function HomepageHero({
 }: HomepageHeroProps) {
   const heroProgress = useHermeticStore((state) => state.heroProgress);
   const { motionOk } = useMotionPreference();
-  const [entered, setEntered] = useState(false);
   const motionBlocked = !motionOk;
-
-  useEffect(() => {
-    if (motionBlocked) {
-      const id = window.setTimeout(() => setEntered(true), 0);
-      return () => window.clearTimeout(id);
-    }
-
-    const id = window.setTimeout(() => setEntered(true), 50);
-    return () => window.clearTimeout(id);
-  }, [motionBlocked]);
 
   const titleTransform = useMemo(() => {
     if (motionBlocked) return undefined;
@@ -73,9 +62,7 @@ export function HomepageHero({
     <section
       id="hero"
       data-motion={motionOk ? "on" : "off"}
-      className={`homepage-hero relative min-h-[100svh] overflow-hidden px-6 pt-20 pb-12 sm:min-h-screen sm:px-10 sm:py-24 lg:px-20 ${
-        entered ? "is-entered" : ""
-      }`}
+      className="homepage-hero relative min-h-[100svh] overflow-hidden px-6 pt-20 pb-12 sm:min-h-screen sm:px-10 sm:py-24 lg:px-20"
     >
       <div className="hero-vignette fixed inset-0 -z-[5]" aria-hidden="true" />
       <div className="hero-sigil-wrap absolute inset-x-0 top-20 z-0 flex justify-center lg:inset-y-0 lg:right-[-10%] lg:left-auto lg:items-center lg:justify-end">
