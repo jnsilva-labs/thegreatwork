@@ -41,7 +41,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
     <TarotShell>
       <div className="mx-auto max-w-5xl space-y-8 px-6 py-16 md:px-12">
         <header className="flex items-center gap-4">
-          <button type="button" onClick={() => onNavigate('home')} aria-label="Return to tarot home" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
+          <button type="button" onClick={() => onNavigate('home')} aria-label="Return to tarot home" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center border border-[color:var(--copper)]/18 px-3 py-2 text-[color:var(--mist)] transition-[border-color,color] hover:border-[color:var(--gilt)] hover:text-[color:var(--bone)]">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -61,7 +61,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             autoComplete="off"
-            className="min-h-[44px] w-full border border-[color:var(--copper)]/16 bg-[rgba(6,11,19,0.72)] py-3 pl-12 pr-4 text-[color:#D5D0C6] outline-none transition-[border-color] focus:border-[color:var(--gilt)]/42"
+            className="min-h-[44px] w-full border border-[color:var(--copper)]/16 bg-[color:var(--obsidian)]/72 py-3 pl-12 pr-4 text-[color:var(--bone)] outline-none transition-[border-color] focus:border-[color:var(--gilt)]/42"
           />
         </div>
 
@@ -74,7 +74,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
             </div>
           ) : (
             filteredReadings.map((reading) => (
-              <div key={reading.id} className="group border border-[color:var(--copper)]/14 bg-[rgba(6,11,19,0.72)] p-6 transition-colors hover:border-[color:var(--gilt)]/26">
+              <div key={reading.id} className="group border border-[color:var(--copper)]/14 bg-[color:var(--obsidian)]/72 p-6 transition-colors hover:border-[color:var(--gilt)]/26">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <span className="mb-1 block text-xs uppercase tracking-[0.28em] text-[color:var(--gilt)]">{reading.intention}</span>
@@ -90,14 +90,14 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                   {reading.cards.map((card, index) => (
                     <div key={`${reading.id}-${index}`} className="relative h-24 w-16 flex-shrink-0 overflow-hidden">
                       <TarotCardFace card={card} />
-                      {card.isReversed && <div className="absolute inset-0 flex items-center justify-center text-[8px] text-red-300 font-bold bg-black/20">REV</div>}
+                      {card.isReversed && <div className="absolute inset-0 flex items-center justify-center text-xs text-[color:var(--error)] font-bold bg-black/20">REV</div>}
                     </div>
                   ))}
                 </div>
 
                 {reading.interpretation && (
                   <div className="border-t border-[color:var(--copper)]/10 pt-4">
-                    <p className="mb-4 font-ritual text-xl italic text-[color:#D5D0C6]">&quot;{reading.interpretation.mirrorStatement}&quot;</p>
+                    <p className="mb-4 font-ritual text-xl italic text-[color:var(--bone)]">&quot;{reading.interpretation.mirrorStatement}&quot;</p>
 
                     <div className="text-sm text-[color:var(--mist)]">
                       <span className="font-bold text-[color:var(--bone)]">Guidance: </span>
@@ -109,7 +109,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                 <div className="mt-5 border-t border-[color:var(--copper)]/10 pt-4">
                   <label
                     htmlFor={`notes-${reading.id}`}
-                    className="mb-2 block text-[10px] uppercase tracking-[0.28em] text-[color:var(--mist)]/72"
+                    className="mb-2 block text-xs uppercase tracking-[0.28em] text-[color:var(--mist)]/72"
                   >
                     Your reflection
                   </label>
@@ -120,7 +120,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                     onBlur={(event) => handleNotesBlur(reading.id, event.target.value)}
                     placeholder="What did this reading stir? Write it while it is warm."
                     rows={2}
-                    className="w-full resize-y border border-[color:var(--copper)]/14 bg-[rgba(4,7,13,0.6)] p-3 text-sm leading-relaxed text-[color:#D5D0C6] outline-none transition-[border-color] placeholder:text-[color:var(--mist)]/40 focus:border-[color:var(--gilt)]/42"
+                    className="w-full resize-y border border-[color:var(--copper)]/14 bg-[color:var(--obsidian)]/60 p-3 text-sm leading-relaxed text-[color:var(--bone)] outline-none transition-[border-color] placeholder:text-[color:var(--mist)]/40 focus:border-[color:var(--gilt)]/42"
                   />
                 </div>
 
@@ -131,7 +131,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                       <button
                         type="button"
                         onClick={() => handleDelete(reading.id)}
-                        className="min-h-[44px] uppercase tracking-[0.22em] text-red-300/90 transition hover:text-red-200"
+                        className="min-h-[44px] uppercase tracking-[0.22em] text-[color:var(--error)]/90 transition hover:text-[color:var(--error)]"
                       >
                         Remove
                       </button>
@@ -147,7 +147,7 @@ const Journal: React.FC<JournalProps> = ({ onNavigate }) => {
                     <button
                       type="button"
                       onClick={() => setConfirmingDeleteId(reading.id)}
-                      className="min-h-[44px] text-[10px] uppercase tracking-[0.24em] text-[color:var(--mist)]/48 transition hover:text-red-300/80"
+                      className="min-h-[44px] text-xs uppercase tracking-[0.24em] text-[color:var(--mist)]/48 transition hover:text-[color:var(--error)]/80"
                     >
                       Remove entry
                     </button>

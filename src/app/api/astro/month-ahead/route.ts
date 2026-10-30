@@ -15,10 +15,18 @@ import {
   setAstroSession,
   verifyTurnstileToken
 } from "@/lib/astro/protection";
-import { requestMonthAheadReading } from "@/lib/openai/respond";
-import { getAstroServiceSecret, AstroServiceConfigurationError } from "@/lib/astro/serviceAuth";
+import {
+  ReadingConfigError,
+  ReadingTimeoutError,
+  ReadingUpstreamError,
+  requestMonthAheadReading
+} from "@/lib/anthropic/astroReading";
+import { CalculationError } from "@/lib/astro/engine/natalChart";
+import { buildMonthAheadTransits } from "@/lib/astro/engine/transits";
+import type { MonthAheadRequest } from "@/lib/astro/engine/transitTypes";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 12;
@@ -79,37 +87,6 @@ const jsonError = (
       headers
     }
   );
-};
-
-const fetchJsonWithTimeout = async <T>(
-  url: string,
-  init: RequestInit,
-  timeoutMs: number,
-  timeoutMessage: string
-): Promise<T> => {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(url, {
-      ...init,
-      signal: controller.signal
-    });
-
-    if (!response.ok) {
-      const detail = await response.text();
-      throw new Error(`Upstream request failed (${response.status}): ${detail.slice(0, 240)}`);
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error(timeoutMessage);
-    }
-    throw error;
-  } finally {
-    clearTimeout(timer);
-  }
 };
 
 const sanitizeChartForTransit = (chart: AstroChart, timeUnknown: boolean): AstroChart => {
@@ -273,41 +250,15 @@ export async function POST(request: NextRequest) {
     return jsonError("INVALID_START_DATE", "startDateUtc must be a valid ISO datetime.", 400);
   }
 
-  const astroServiceUrl = process.env.ASTRO_SERVICE_URL?.trim();
-  if (!astroServiceUrl) {
-    return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
-  }
-
-  let serviceSecret: string;
   try {
-    serviceSecret = getAstroServiceSecret();
-  } catch (error) {
-    if (error instanceof AstroServiceConfigurationError) {
-      return jsonError("SERVICE_UNAVAILABLE", "The astrology service is temporarily unavailable.", 503);
-    }
-    throw error;
-  }
-
-  try {
-    const payload = await fetchJsonWithTimeout<unknown>(
-      `${astroServiceUrl.replace(/\/$/, "")}/transits/month-ahead`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Astro-Service-Secret": serviceSecret
-        },
-        body: JSON.stringify({
-          startDateUtc: toUtcIsoSeconds(startDateUtc),
-          durationDays: 30,
-          timeUnknown: input.timeUnknown,
-          natalPoints: chart.points
-        }),
-        cache: "no-store"
-      },
-      12000,
-      "Astro service timed out"
-    );
+    // The transit engine tolerates missing optional points (asc/mc/chiron);
+    // the chart points come from our own natal response.
+    const payload: unknown = await buildMonthAheadTransits({
+      startDateUtc: toUtcIsoSeconds(startDateUtc),
+      durationDays: 30,
+      timeUnknown: input.timeUnknown,
+      natalPoints: chart.points as unknown as MonthAheadRequest["natalPoints"]
+    });
 
     const parsedPayload = astroMonthAheadResponseSchema.safeParse(payload);
     if (!parsedPayload.success) {
@@ -328,7 +279,7 @@ export async function POST(request: NextRequest) {
       canonicalBigThree,
       placements,
       transits: enrichedPayload,
-      timeoutMs: 18000
+      timeoutMs: 55_000
     });
 
     const responsePayload = {
@@ -369,12 +320,20 @@ export async function POST(request: NextRequest) {
       message
     });
 
-    if (message.includes("Astro service timed out")) {
-      return jsonError("ASTRO_TIMEOUT", "Astro service timed out. Please try again.", 504);
+    if (error instanceof ReadingTimeoutError) {
+      return jsonError("READING_TIMEOUT", "Reading generation timed out. Please try again.", 504);
     }
 
-    if (message.includes("Upstream request failed")) {
-      return jsonError("UPSTREAM_ERROR", "A required upstream service failed to respond successfully.", 502);
+    if (error instanceof ReadingUpstreamError) {
+      return jsonError("READING_UPSTREAM_ERROR", "Reading service returned an error. Please try again.", 502);
+    }
+
+    if (error instanceof ReadingConfigError) {
+      return jsonError("CONFIG_ERROR", "The reading service is not configured on the server.", 503);
+    }
+
+    if (error instanceof CalculationError) {
+      return jsonError("CALCULATION_ERROR", "The month-ahead events could not be calculated.", 422);
     }
 
     return jsonError("INTERNAL_ERROR", "Unexpected error while generating the month-ahead events.", 500);

@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { AstroMonthAheadReadingResponse, AstroNatalResponse } from "@/lib/astro/types";
 import { trackEvent } from "@/lib/analytics/track";
 import { getSubstackUrl, isExternalHref } from "@/lib/substack";
-import { PlanetaryArc } from "./PlanetaryArc";
+import { NatalChartInstrument } from "./NatalChartInstrument";
 import { SharePanel } from "./share/SharePanel";
 
 const planetLabels: Record<string, string> = {
@@ -120,7 +120,11 @@ export function NatalReadingResult({
 
         <section data-result-section="chart-context" aria-labelledby="chart-context-title" className="astro-reveal space-y-6">
           <div className="max-w-2xl space-y-2"><p className="type-eyebrow text-[color:var(--gilt)]">Celestial context</p><h3 id="chart-context-title" className="font-ritual text-3xl text-[color:var(--bone)] sm:text-4xl">Where the bodies gathered</h3></div>
-          <PlanetaryArc points={result.chart.points} />
+          <NatalChartInstrument
+            points={result.chart.points}
+            cusps={result.chart.houses?.cusps ?? null}
+            aspects={result.chart.aspects}
+          />
         </section>
 
         <section data-result-section="supporting-interpretation" aria-labelledby="supporting-title" className="astro-reveal space-y-10">
@@ -149,7 +153,7 @@ export function NatalReadingResult({
             {onRequestMonthAhead ? <button type="button" onClick={onRequestMonthAhead} disabled={monthAheadLoading} className="min-h-[44px] border border-[color:var(--gilt)]/65 px-5 py-3 text-xs uppercase tracking-[0.14em] text-[color:var(--bone)] transition-[background-color] hover:bg-[color:var(--gilt)]/12 disabled:opacity-60">{monthAheadLoading ? "Reading the sky..." : monthAheadResult ? "Refresh the month ahead" : "See the month ahead"}</button> : null}
           </div>
           <p className="mt-4 text-xs text-[color:var(--mist)]" aria-live="polite">{monthAheadStatus}</p>
-          {monthAheadError ? <p role="alert" className="mt-4 border-l-2 border-rose-300/60 pl-4 text-sm text-rose-100">{monthAheadError}</p> : null}
+          {monthAheadError ? <p role="alert" className="mt-4 border-l-2 border-[color:var(--error)]/60 pl-4 text-sm text-[color:var(--error)]">{monthAheadError}</p> : null}
           {monthAheadResult ? (
             <div className="mt-8 space-y-8">
               <div className="max-w-3xl"><p className="text-xs uppercase tracking-[0.12em] text-[color:var(--gilt)]">{monthAheadResult.reading.timeframe}</p><h4 className="mt-2 font-ritual text-3xl text-[color:var(--bone)]">{monthAheadResult.reading.title}</h4><p className="mt-4 text-base leading-relaxed text-[color:var(--mist)]">{monthAheadResult.reading.overview}</p></div>

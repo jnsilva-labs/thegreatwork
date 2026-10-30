@@ -203,7 +203,7 @@ export function NatalChartWidget() {
             {turnstileEnabled && !astroAccessVerified ? <div className="space-y-3 border-t border-[color:var(--copper)]/28 pt-4 sm:col-span-2"><p className="text-xs uppercase tracking-[0.12em] text-[color:var(--mist)]">Verification</p><TurnstileWidget siteKey={turnstileSiteKey} resetKey={turnstileResetKey} onVerify={setTurnstileToken} /><p className="text-xs leading-relaxed text-[color:var(--mist)]">This keeps the public astrology tool usable without opening the API to automated abuse.</p></div> : null}
             <div className="flex flex-col items-start gap-3 border-t border-[color:var(--copper)]/28 pt-5 sm:col-span-2 sm:flex-row sm:items-center"><button type="submit" disabled={loading} className="min-h-[44px] border border-[color:var(--gilt)]/65 bg-[color:var(--gilt)]/12 px-6 py-3 text-xs uppercase tracking-[0.14em] text-[color:var(--bone)] transition-[background-color] hover:bg-[color:var(--gilt)]/22 disabled:opacity-60">{loading ? "Revealing..." : "Reveal the pattern"}</button><span className="text-xs text-[color:var(--mist)]" aria-live="polite">{statusMessage}</span></div>
           </form>
-          {error ? <p className="mt-5 border-l-2 border-rose-300/60 pl-4 text-sm text-rose-100" role="alert">{error}</p> : null}
+          {error ? <p className="mt-5 border-l-2 border-[color:var(--error)]/60 pl-4 text-sm text-[color:var(--error)]" role="alert">{error}</p> : null}
         </div>
       </OraclePanel>
 

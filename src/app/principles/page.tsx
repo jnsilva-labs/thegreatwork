@@ -10,14 +10,16 @@ const PRINCIPLES_DESCRIPTION =
   "Study the seven Hermetic principles in canonical order, with axioms, full explanations, key ideas, and contemplative practices on one continuous page.";
 
 const romanNumerals = ["I", "II", "III", "IV", "V", "VI", "VII"];
+// Per-principle hues. The first two track the theme's teal and gilt tokens;
+// the remaining five are deliberate fixed hues unique to their principles.
 const principleAccents = [
   {
-    accent: "rgba(43, 111, 106, 0.74)",
-    wash: "rgba(43, 111, 106, 0.08)",
+    accent: "color-mix(in srgb, var(--teal) 74%, transparent)",
+    wash: "color-mix(in srgb, var(--teal) 8%, transparent)",
   },
   {
-    accent: "rgba(184, 155, 94, 0.82)",
-    wash: "rgba(184, 155, 94, 0.08)",
+    accent: "color-mix(in srgb, var(--gilt) 82%, transparent)",
+    wash: "color-mix(in srgb, var(--gilt) 8%, transparent)",
   },
   {
     accent: "rgba(118, 137, 167, 0.7)",
@@ -167,7 +169,7 @@ export default function PrinciplesIndexPage() {
                   </div>
 
                   <div className="relative overflow-hidden border-l border-[color:var(--principle-accent)]/55 pl-6 sm:pl-8">
-                    <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,var(--principle-wash),rgba(6,11,19,0)_62%)]" />
+                    <div className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,var(--principle-wash),transparent_62%)]" />
                     <div className="space-y-6">
                       <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--principle-accent)]">
                         Commentary
@@ -191,7 +193,7 @@ export default function PrinciplesIndexPage() {
                       </ul>
                     </section>
 
-                    <section className="border border-[color:var(--principle-accent)]/20 bg-[linear-gradient(135deg,var(--principle-wash),rgba(6,11,19,0.5))] px-5 py-5 sm:px-6">
+                    <section className="border border-[color:var(--principle-accent)]/20 bg-[linear-gradient(135deg,var(--principle-wash),color-mix(in_srgb,var(--obsidian)_50%,transparent))] px-5 py-5 sm:px-6">
                       <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--principle-accent)]">
                         Practice
                       </p>

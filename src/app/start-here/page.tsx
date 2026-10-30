@@ -3,12 +3,14 @@ import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { ArchivalFigure, MarginalNote } from "@/components/editorial";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { getSubstackUrl, isExternalHref } from "@/lib/substack";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Start Here | Awareness Paradox",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Start Here",
   description:
     "A guided first path into Awareness Paradox: foundations, tarot, astrology, contemplative practice, and the next pages to study.",
-};
+  path: "/start-here",
+});
 
 const firstWeekSteps = [
   "Download the Starter Guide and read it once without trying to master everything.",

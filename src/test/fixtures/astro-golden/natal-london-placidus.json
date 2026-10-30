@@ -1,0 +1,173 @@
+{
+  "input": {
+    "datetimeUtc": "1985-12-01T06:45:00Z",
+    "lat": 51.5074,
+    "lon": -0.1278,
+    "zodiac": "tropical",
+    "houseSystem": "placidus",
+    "aspects": {
+      "orbDefault": 6,
+      "orbLuminary": 8
+    }
+  },
+  "output": {
+    "meta": {
+      "input": {
+        "datetimeUtc": "1985-12-01T06:45:00Z",
+        "lat": 51.5074,
+        "lon": -0.1278,
+        "zodiac": "tropical",
+        "houseSystem": "placidus",
+        "aspects": {
+          "orbDefault": 6,
+          "orbLuminary": 8
+        }
+      },
+      "jdUt": 2446400.78125,
+      "zodiac": "tropical",
+      "houseSystem": "placidus",
+      "ephemeris": {
+        "backend": "swisseph",
+        "calcUtFlags": 258,
+        "trueNode": true,
+        "houseSource": "placidus"
+      },
+      "generatedAt": "2026-10-29T22:44:36.132Z"
+    },
+    "points": {
+      "sun": 249.017644,
+      "moon": 110.550148,
+      "mercury": 243.472844,
+      "venus": 237.159116,
+      "mars": 201.631922,
+      "jupiter": 312.379171,
+      "saturn": 241.68734,
+      "uranus": 257.646692,
+      "neptune": 272.443997,
+      "pluto": 216.004392,
+      "node": 38.840669,
+      "asc": 237.041792,
+      "mc": 170.4162
+    },
+    "houses": {
+      "cusps": [
+        237.041792,
+        269.235956,
+        310.961008,
+        350.4162,
+        19.465952,
+        40.508251,
+        57.041792,
+        89.235956,
+        130.961008,
+        170.4162,
+        199.465952,
+        220.508251
+      ]
+    },
+    "aspects": [
+      {
+        "a": "jupiter",
+        "b": "node",
+        "type": "square",
+        "orb": 3.538502
+      },
+      {
+        "a": "jupiter",
+        "b": "uranus",
+        "type": "sextile",
+        "orb": 5.267521
+      },
+      {
+        "a": "mars",
+        "b": "uranus",
+        "type": "sextile",
+        "orb": 3.98523
+      },
+      {
+        "a": "mercury",
+        "b": "saturn",
+        "type": "conjunction",
+        "orb": 1.785504
+      },
+      {
+        "a": "moon",
+        "b": "asc",
+        "type": "trine",
+        "orb": 6.491644
+      },
+      {
+        "a": "moon",
+        "b": "mars",
+        "type": "square",
+        "orb": 1.081774
+      },
+      {
+        "a": "moon",
+        "b": "mc",
+        "type": "sextile",
+        "orb": 0.133948
+      },
+      {
+        "a": "moon",
+        "b": "venus",
+        "type": "trine",
+        "orb": 6.608968
+      },
+      {
+        "a": "neptune",
+        "b": "pluto",
+        "type": "sextile",
+        "orb": 3.560395
+      },
+      {
+        "a": "pluto",
+        "b": "node",
+        "type": "opposition",
+        "orb": 2.836277
+      },
+      {
+        "a": "saturn",
+        "b": "asc",
+        "type": "conjunction",
+        "orb": 4.645548
+      },
+      {
+        "a": "sun",
+        "b": "jupiter",
+        "type": "sextile",
+        "orb": 3.361527
+      },
+      {
+        "a": "sun",
+        "b": "mercury",
+        "type": "conjunction",
+        "orb": 5.5448
+      },
+      {
+        "a": "sun",
+        "b": "saturn",
+        "type": "conjunction",
+        "orb": 7.330304
+      },
+      {
+        "a": "uranus",
+        "b": "mc",
+        "type": "square",
+        "orb": 2.769508
+      },
+      {
+        "a": "venus",
+        "b": "asc",
+        "type": "conjunction",
+        "orb": 0.117324
+      },
+      {
+        "a": "venus",
+        "b": "saturn",
+        "type": "conjunction",
+        "orb": 4.528224
+      }
+    ]
+  }
+}

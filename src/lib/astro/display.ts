@@ -1,0 +1,104 @@
+// Shared presentation constants for natal chart visuals (2D fallback and the
+// 3D instrument). Pure data, safe on server and client.
+
+export const SIGNS = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces"
+] as const;
+
+export const SIGN_GLYPHS = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"] as const;
+
+export const planetOrder = [
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+  "pluto",
+  "node",
+  "chiron"
+] as const;
+
+export const planetGlyph: Record<string, string> = {
+  sun: "☉",
+  moon: "☽",
+  mercury: "☿",
+  venus: "♀",
+  mars: "♂",
+  jupiter: "♃",
+  saturn: "♄",
+  uranus: "♅",
+  neptune: "♆",
+  pluto: "♇",
+  node: "☊",
+  chiron: "⚷"
+};
+
+export const degreeToLabel = (lon: number) => {
+  const normalized = ((lon % 360) + 360) % 360;
+  const signIndex = Math.floor(normalized / 30);
+  const degreeInSign = normalized - signIndex * 30;
+  return {
+    sign: SIGNS[signIndex],
+    degree: `${degreeInSign.toFixed(2)}°`
+  };
+};
+
+/** Degree and minute within the sign, e.g. 12°24′. */
+export const formatDegreeMinute = (lon: number) => {
+  const normalized = ((lon % 360) + 360) % 360;
+  const inSign = normalized % 30;
+  const degrees = Math.floor(inSign);
+  const minutes = Math.round((inSign - degrees) * 60);
+  if (minutes === 60) {
+    return `${degrees + 1}°00′`;
+  }
+  return `${degrees}°${String(minutes).padStart(2, "0")}′`;
+};
+
+/** 1-based house for a longitude, from 12 cusp longitudes; null without cusps. */
+export const findHouse = (lon: number, cusps: number[] | null | undefined): number | null => {
+  if (!cusps || cusps.length !== 12) return null;
+  const normalized = ((lon % 360) + 360) % 360;
+  for (let index = 0; index < 12; index += 1) {
+    const start = ((cusps[index] % 360) + 360) % 360;
+    const end = ((cusps[(index + 1) % 12] % 360) + 360) % 360;
+    const span = (end - start + 360) % 360;
+    const offset = (normalized - start + 360) % 360;
+    if (span > 0 && offset < span) {
+      return index + 1;
+    }
+  }
+  return null;
+};
+
+export interface ChartMarker {
+  key: string;
+  lon: number;
+  sign: string;
+  degree: string;
+}
+
+export const buildChartMarkers = (points: Record<string, number | undefined>): ChartMarker[] => {
+  return planetOrder
+    .map((key) => {
+      const value = points[key];
+      if (typeof value !== "number") return null;
+      return { key, lon: value, ...degreeToLabel(value) };
+    })
+    .filter(Boolean) as ChartMarker[];
+};

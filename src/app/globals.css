@@ -22,6 +22,8 @@
   --teal: var(--border);
   --gold: var(--accent);
   --stone: var(--muted);
+  /* Shared error treatment for every interactive tool (tarot + astrology). */
+  --error: #dca9a0;
   --font-ritual: "Cormorant Garamond", "Didot", "Bodoni 72", "Iowan Old Style", "Times New Roman", serif;
   --font-ritual-serif: var(--font-ritual);
   --font-ritual-sans: "Manrope", "Avenir Next", "Helvetica Neue", "Neue Haas Grotesk", "Segoe UI", sans-serif;
@@ -85,18 +87,6 @@ html[data-theme="crimson"] {
   --color-foreground: var(--fg);
   --font-sans: var(--font-ritual-sans);
   --font-serif: var(--font-ritual-serif);
-  --color-void-950: #050505;
-  --color-void-900: #0a0a0a;
-  --color-void-800: #121212;
-  --color-void-700: #1c1c1c;
-  --color-alchemy-gold: #c5a059;
-  --color-alchemy-gold-dim: #8a703d;
-  --color-alchemy-red: #7f1d1d;
-  --color-mystic-950: #07070f;
-  --color-mystic-900: #0e1020;
-  --color-mystic-800: #171a31;
-  --color-mystic-700: #24284a;
-  --color-mystic-gold: #d4af37;
   --font-headers: var(--font-ritual);
   --animate-fade-in: fadeIn 0.9s ease-out both;
   --animate-pulse-slow: pulseSlow 6s ease-in-out infinite;

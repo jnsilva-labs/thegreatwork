@@ -1,14 +1,12 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createNatalHandler } from "@/app/api/astro/natal/handler";
+import { CalculationError } from "@/lib/astro/engine/natalChart";
 import { readDailyUsage, serializeDailyUsage, type DailyUsage } from "@/lib/usage/dailyUsage";
 
 const SECRET = "natal-handler-test-secret";
-const SERVICE_SECRET = "astro-service-test-secret";
 const NOW = new Date("2030-04-05T12:00:00.000Z");
 const originalUsageSecret = process.env.DAILY_USAGE_COOKIE_SECRET;
-const originalServiceSecret = process.env.ASTRO_SERVICE_SECRET;
-const originalServiceUrl = process.env.ASTRO_SERVICE_URL;
 
 const input = {
   name: "Aurelia",
@@ -65,14 +63,14 @@ const createHandler = (overrides: Record<string, unknown> = {}) => {
     provider: "test",
     displayName: "New York, NY"
   });
-  const fetchChart = vi.fn().mockResolvedValue(chart);
+  const computeChart = vi.fn().mockResolvedValue(chart);
   const generateReading = vi.fn().mockResolvedValue(reading);
   const verifyTurnstile = vi.fn();
 
   const handler = createNatalHandler({
     now: () => NOW,
     geocode,
-    fetchChart,
+    computeChart,
     generateReading,
     protection: {
       enabled: () => true,
@@ -84,38 +82,35 @@ const createHandler = (overrides: Record<string, unknown> = {}) => {
     ...overrides
   });
 
-  return { handler, geocode, fetchChart, generateReading, verifyTurnstile };
+  return { handler, geocode, computeChart, generateReading, verifyTurnstile };
 };
 
 beforeEach(() => {
   process.env.DAILY_USAGE_COOKIE_SECRET = SECRET;
-  process.env.ASTRO_SERVICE_SECRET = SERVICE_SECRET;
-  process.env.ASTRO_SERVICE_URL = "https://astro.example.test";
 });
 
 afterEach(() => {
   if (originalUsageSecret === undefined) delete process.env.DAILY_USAGE_COOKIE_SECRET;
   else process.env.DAILY_USAGE_COOKIE_SECRET = originalUsageSecret;
 
-  if (originalServiceSecret === undefined) delete process.env.ASTRO_SERVICE_SECRET;
-  else process.env.ASTRO_SERVICE_SECRET = originalServiceSecret;
 
-  if (originalServiceUrl === undefined) delete process.env.ASTRO_SERVICE_URL;
-  else process.env.ASTRO_SERVICE_URL = originalServiceUrl;
 });
 
 describe("natal daily usage handler", () => {
   it("accepts the third authenticated natal reading and signs its usage cookie", async () => {
-    const { handler, fetchChart, generateReading, verifyTurnstile } = createHandler();
+    const { handler, computeChart, generateReading, verifyTurnstile } = createHandler();
     const cookie = serializeDailyUsage(usage(2), NOW).value;
 
     const response = await handler(request(input, { cookie: `ap_daily_usage=${cookie}` }));
 
     expect(response.status).toBe(200);
-    expect(fetchChart).toHaveBeenCalledWith(
-      "https://astro.example.test/chart/natal",
-      expect.any(Object),
-      SERVICE_SECRET
+    expect(computeChart).toHaveBeenCalledWith(
+      expect.objectContaining({
+        lat: 40.7128,
+        lon: -74.006,
+        zodiac: "tropical",
+        aspects: { orbDefault: 6, orbLuminary: 8 }
+      })
     );
     expect(generateReading).toHaveBeenCalledTimes(1);
     expect(verifyTurnstile).not.toHaveBeenCalled();
@@ -127,7 +122,7 @@ describe("natal daily usage handler", () => {
   });
 
   it("rejects a fourth natal reading before geocoding", async () => {
-    const { handler, geocode, fetchChart, generateReading } = createHandler();
+    const { handler, geocode, computeChart, generateReading } = createHandler();
     const cookie = serializeDailyUsage(usage(3), NOW).value;
 
     const response = await handler(request(input, { cookie: `ap_daily_usage=${cookie}` }));
@@ -139,7 +134,7 @@ describe("natal daily usage handler", () => {
     });
     expect(response.headers.get("retry-after")).toBe("43200");
     expect(geocode).not.toHaveBeenCalled();
-    expect(fetchChart).not.toHaveBeenCalled();
+    expect(computeChart).not.toHaveBeenCalled();
     expect(generateReading).not.toHaveBeenCalled();
   });
 
@@ -153,14 +148,15 @@ describe("natal daily usage handler", () => {
     expect(geocode).not.toHaveBeenCalled();
   });
 
-  it("does not consume usage when the Render request fails", async () => {
+  it("does not consume usage when chart calculation fails", async () => {
     const { handler, generateReading } = createHandler({
-      fetchChart: vi.fn().mockRejectedValue(new Error("Upstream request failed (502)"))
+      computeChart: vi.fn().mockRejectedValue(new CalculationError("ecliptic point is circumpolar"))
     });
 
     const response = await handler(request());
 
-    expect(response.status).toBe(502);
+    expect(response.status).toBe(422);
+    await expect(response.json()).resolves.toMatchObject({ code: "CALCULATION_ERROR" });
     expect(response.headers.get("set-cookie")).toBeNull();
     expect(generateReading).not.toHaveBeenCalled();
   });

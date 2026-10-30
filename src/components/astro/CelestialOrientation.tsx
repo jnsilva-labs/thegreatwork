@@ -72,7 +72,7 @@ export function CelestialOrientation() {
           <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeOpacity="0.35" strokeWidth="0.3" />
           <circle cx="50" cy="50" r="35" fill={`url(#${gradientId})`} stroke="currentColor" strokeOpacity="0.5" strokeWidth="0.4" />
           <circle cx="50" cy="50" r="23" fill="none" stroke="currentColor" strokeOpacity="0.25" strokeDasharray="0.8 1.8" strokeWidth="0.35" />
-          <g className={motionOk ? "origin-center animate-spin-[48s_linear_infinite]" : undefined}>
+          <g className={motionOk ? "origin-center animate-[spin_48s_linear_infinite]" : undefined}>
             {zodiac.map((sign, index) => {
               const outer = pointOnCircle(index, 46);
               const inner = pointOnCircle(index, 35);

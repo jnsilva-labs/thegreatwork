@@ -35,8 +35,8 @@ const chamberCards: DrawnCard[] = DEFAULT_DECK.cards.slice(0, 3).map((card, inde
 const natalResultFixture: AstroNatalResponse = {
   chart: {
     meta: { fixture: true, calculation: "deterministic visual QA" },
-    points: { sun: 222.4, moon: 128.9, mercury: 238.2, venus: 197.6, mars: 84.1, jupiter: 301.7, saturn: 273.4, uranus: 276.9, neptune: 282.3, pluto: 226.8, node: 291.2, chiron: 111.6 },
-    houses: null,
+    points: { sun: 222.4, moon: 128.9, mercury: 238.2, venus: 197.6, mars: 84.1, jupiter: 301.7, saturn: 273.4, uranus: 276.9, neptune: 282.3, pluto: 226.8, node: 291.2, chiron: 111.6, asc: 165.2, mc: 76.1 },
+    houses: { cusps: [165.2, 192.8, 223.4, 256.1, 288.7, 318.9, 345.2, 12.8, 43.4, 76.1, 108.7, 138.9] },
     aspects: [
       { a: "sun", b: "moon", type: "square", orb: 3.5 },
       { a: "venus", b: "saturn", type: "sextile", orb: 1.8 },

@@ -1,86 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { SIGNS, buildChartMarkers, planetGlyph } from "@/lib/astro/display";
 
 interface PlanetaryArcProps {
   points: Record<string, number | undefined>;
 }
 
-const SIGNS = [
-  "Aries",
-  "Taurus",
-  "Gemini",
-  "Cancer",
-  "Leo",
-  "Virgo",
-  "Libra",
-  "Scorpio",
-  "Sagittarius",
-  "Capricorn",
-  "Aquarius",
-  "Pisces"
-];
-
-const planetOrder = [
-  "sun",
-  "moon",
-  "mercury",
-  "venus",
-  "mars",
-  "jupiter",
-  "saturn",
-  "uranus",
-  "neptune",
-  "pluto",
-  "node",
-  "chiron"
-] as const;
-
-const planetGlyph: Record<string, string> = {
-  sun: "☉",
-  moon: "☽",
-  mercury: "☿",
-  venus: "♀",
-  mars: "♂",
-  jupiter: "♃",
-  saturn: "♄",
-  uranus: "♅",
-  neptune: "♆",
-  pluto: "♇",
-  node: "☊",
-  chiron: "⚷"
-};
-
-const degreeToLabel = (lon: number) => {
-  const normalized = ((lon % 360) + 360) % 360;
-  const signIndex = Math.floor(normalized / 30);
-  const degreeInSign = normalized - signIndex * 30;
-  return {
-    sign: SIGNS[signIndex],
-    degree: `${degreeInSign.toFixed(2)}°`
-  };
-};
-
 export function PlanetaryArc({ points }: PlanetaryArcProps) {
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
   const markers = useMemo(() => {
-    return planetOrder
-      .map((key) => {
-        const value = points[key];
-        if (typeof value !== "number") return null;
-
-        const x = (value / 360) * 100;
-        const details = degreeToLabel(value);
-
-        return {
-          key,
-          x,
-          lon: value,
-          ...details
-        };
-      })
-      .filter(Boolean) as Array<{ key: string; x: number; lon: number; sign: string; degree: string }>;
+    return buildChartMarkers(points).map((marker) => ({
+      ...marker,
+      x: (marker.lon / 360) * 100
+    }));
   }, [points]);
 
   return (
@@ -92,9 +26,9 @@ export function PlanetaryArc({ points }: PlanetaryArcProps) {
         <svg viewBox="0 0 100 42" className="h-full w-full" aria-label="Planetary arc visualization">
           <defs>
             <linearGradient id="astroArcGlow" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%" stopColor="rgba(184,155,94,0.2)" />
-              <stop offset="50%" stopColor="rgba(184,155,94,0.75)" />
-              <stop offset="100%" stopColor="rgba(184,155,94,0.2)" />
+              <stop offset="0%" stopColor="var(--gilt)" stopOpacity="0.2" />
+              <stop offset="50%" stopColor="var(--gilt)" stopOpacity="0.75" />
+              <stop offset="100%" stopColor="var(--gilt)" stopOpacity="0.2" />
             </linearGradient>
           </defs>
 
@@ -104,13 +38,14 @@ export function PlanetaryArc({ points }: PlanetaryArcProps) {
             const x = 4 + idx * (92 / 11);
             return (
               <g key={`tick-${idx}`}>
-                <line x1={x} y1={29.5} x2={x} y2={34.5} stroke="rgba(232,227,216,0.4)" strokeWidth="0.35" />
+                <line x1={x} y1={29.5} x2={x} y2={34.5} stroke="var(--bone)" strokeOpacity="0.4" strokeWidth="0.35" />
                 <text
                   x={x}
                   y={39.5}
                   textAnchor="middle"
                   fontSize="2.5"
-                  fill="rgba(232,227,216,0.62)"
+                  fill="var(--bone)"
+                  fillOpacity="0.62"
                   letterSpacing="0.45"
                 >
                   {SIGNS[idx].slice(0, 3).toUpperCase()}
@@ -130,8 +65,10 @@ export function PlanetaryArc({ points }: PlanetaryArcProps) {
                   cx={x}
                   cy={y}
                   r={isActive ? 1.8 : 1.45}
-                  fill={isActive ? "rgba(184,155,94,1)" : "rgba(184,155,94,0.85)"}
-                  stroke="rgba(11,12,16,0.9)"
+                  fill="var(--gilt)"
+                  fillOpacity={isActive ? 1 : 0.85}
+                  stroke="var(--obsidian)"
+                  strokeOpacity="0.9"
                   strokeWidth="0.55"
                 />
               </g>

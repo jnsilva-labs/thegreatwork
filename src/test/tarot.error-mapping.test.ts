@@ -5,7 +5,7 @@ import { classifyInterpretError } from '../app/api/tarot/interpret/classifier';
 function apiError(statusCode: number) {
   return new APICallError({
     message: `status ${statusCode}`,
-    url: 'https://ai-gateway.vercel.sh',
+    url: 'https://api.anthropic.com/v1/messages',
     requestBodyValues: {},
     statusCode,
   });
@@ -55,9 +55,19 @@ describe('classifyInterpretError', () => {
   });
 
   it('maps missing-credentials errors to SHARED_KEY_UNAVAILABLE 503', () => {
-    const classified = classifyInterpretError(new Error('No OIDC token available for AI Gateway'));
-    expect(classified.code).toBe('SHARED_KEY_UNAVAILABLE');
-    expect(classified.status).toBe(503);
+    // The Anthropic provider's LoadAPIKeyError wording; the regex must keep matching it.
+    const anthropicMissingKey = classifyInterpretError(
+      new Error(
+        "Anthropic API key is missing. Pass it using the 'apiKey' parameter or the ANTHROPIC_API_KEY environment variable.",
+      ),
+    );
+    expect(anthropicMissingKey.code).toBe('SHARED_KEY_UNAVAILABLE');
+    expect(anthropicMissingKey.status).toBe(503);
+
+    // Legacy gateway wording stays covered by the same regex.
+    const oidcMissing = classifyInterpretError(new Error('No OIDC token available for AI Gateway'));
+    expect(oidcMissing.code).toBe('SHARED_KEY_UNAVAILABLE');
+    expect(oidcMissing.status).toBe(503);
   });
 
   it('maps unknown errors to SHARED_REQUEST_FAILED 502', () => {

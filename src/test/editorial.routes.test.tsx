@@ -59,10 +59,6 @@ vi.mock("@/components/seo/JsonLd", () => ({
   JsonLd: ({ id }: { id: string }) => <script id={id} type="application/ld+json" />,
 }));
 
-vi.mock("@/components/Ouroboros", () => ({
-  Ouroboros: () => <div aria-label="Ouroboros emblem" />,
-}));
-
 vi.mock("@/components/AlchemyGlyph", () => ({
   AlchemyGlyph: ({ id }: { id: string }) => <span aria-hidden="true">{id}</span>,
 }));

@@ -39,11 +39,13 @@ vercel
 vercel --prod
 ```
 
-## Astrology service secrets
+## AI and astrology secrets
 
 Set `DAILY_USAGE_COOKIE_SECRET` only in Vercel. It signs the soft daily browser allowance for shared tarot and natal readings.
 
-Set `ASTRO_SERVICE_SECRET` in both Vercel and Render, using the exact same value. Vercel sends it only on server-to-server natal and month-ahead requests; Render rejects direct chart and transit requests without it. Do not prefix either variable with `NEXT_PUBLIC_`.
+Set `ANTHROPIC_API_KEY` in Vercel. Tarot interpretations and the natal and month-ahead readings all call the Anthropic Claude API with it. Optional `ANTHROPIC_TAROT_MODEL` / `ANTHROPIC_ASTRO_MODEL` override the default `claude-sonnet-5-5` per service. Do not prefix any of these with `NEXT_PUBLIC_`.
+
+Chart math (planet positions, houses, transits) runs in-process on the MIT-licensed `astronomy-engine`; there is no separate astrology calculation service.
 
 ## Styleguide
 
