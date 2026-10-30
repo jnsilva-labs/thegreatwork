@@ -2146,3 +2146,50 @@ body.nav-panel-open {
     radial-gradient(ellipse 80% 55% at 50% -10%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
     radial-gradient(ellipse 60% 50% at 85% 110%, color-mix(in srgb, var(--accent2) 35%, transparent), transparent 72%);
 }
+
+/* --- Great Work stage wash (StageAtmosphere) --- */
+.stage-wash {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 42%, color-mix(in srgb, var(--stage-tone, transparent) 16%, transparent), transparent 74%),
+    linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--stage-tone, transparent) 9%, transparent) 55%, transparent 100%);
+  transition: opacity 1.4s ease, background 1.4s ease;
+}
+
+.stage-wash-peacock {
+  background:
+    radial-gradient(ellipse 50% 36% at 26% 30%, color-mix(in srgb, #2b6f6a 12%, transparent), transparent 70%),
+    radial-gradient(ellipse 44% 32% at 74% 62%, color-mix(in srgb, #4f3a7a 11%, transparent), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 55% 20%, color-mix(in srgb, #b89b5e 9%, transparent), transparent 70%);
+  animation: stage-peacock-breathe 14s ease-in-out infinite alternate;
+  opacity: 0.8;
+}
+
+@keyframes stage-peacock-breathe {
+  from {
+    transform: scale(1) translateY(0);
+  }
+  to {
+    transform: scale(1.06) translateY(-2%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-wash {
+    transition: none;
+  }
+  .stage-wash-peacock {
+    animation: none;
+  }
+}
+
+/* --- Illuminated axiom drop caps (/principles) --- */
+.axiom-dropcap::first-letter {
+  float: left;
+  font-family: var(--font-ritual);
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding-right: 0.09em;
+  margin-top: 0.04em;
+  font-weight: 600;
+  color: var(--principle-accent, var(--gilt));
+}
