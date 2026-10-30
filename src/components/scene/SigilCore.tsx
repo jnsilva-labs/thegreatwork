@@ -32,9 +32,9 @@ export function SigilCore({
   const themeColors = useThemeStore((state) => state.colors);
 
   const stageScale = [0.92, 1, 1.07, 1.12][activeAlchemyStage] ?? 1;
-  const settle = MathUtils.lerp(1, 0.18, scrollProgress);
+  const settle = MathUtils.lerp(1, 0.4, scrollProgress);
   const emergence = MathUtils.lerp(0.82, 1.05, 1 - heroProgress * 0.35);
-  const orbitOpacity = MathUtils.lerp(0.22, 0.42, 1 - scrollProgress * 0.45);
+  const orbitOpacity = MathUtils.lerp(0.3, 0.42, 1 - scrollProgress * 0.3);
   const nodeOpacity = MathUtils.lerp(0.3, 0.7, 1 - heroProgress * 0.45);
   const shellOpacity = MathUtils.lerp(0.08, 0.2, clarity);
 

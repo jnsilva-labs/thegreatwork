@@ -25,7 +25,7 @@ const trustLinks = [
 
 export function Footer() {
   return (
-    <footer className="footer-shell relative z-10 border-t border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]">
+    <footer className="footer-shell relative z-10 border-t border-[color:var(--copper)]/40 bg-[color:var(--obsidian)]/85">
       <div className="mx-auto max-w-6xl px-6 py-14 sm:px-10 lg:px-20">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr_1.25fr]">
           <section aria-labelledby="footer-purpose" className="space-y-4">

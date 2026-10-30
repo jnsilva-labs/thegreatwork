@@ -798,7 +798,7 @@ body.nav-panel-open {
   transform: translateY(20px);
 }
 
-.homepage-hero.is-entered .hero-intro-row {
+.homepage-hero .hero-intro-row {
   animation: hero-fade-rise 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -811,11 +811,11 @@ body.nav-panel-open {
   will-change: transform;
 }
 
-.homepage-hero.is-entered .hero-title-line-text {
+.homepage-hero .hero-title-line-text {
   animation: hero-line-reveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.homepage-hero.is-entered .hero-title-line-wrap:nth-child(2) .hero-title-line-text {
+.homepage-hero .hero-title-line-wrap:nth-child(2) .hero-title-line-text {
   animation-delay: 0.12s;
 }
 
@@ -828,24 +828,38 @@ body.nav-panel-open {
   transform: translateY(10px);
 }
 
-.homepage-hero.is-entered .hero-subtitle {
+.homepage-hero .hero-subtitle {
+  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+}
+
+.homepage-hero .hero-body {
+  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
+
+.homepage-hero .hero-audience {
+  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+}
+
+.homepage-hero .hero-card-grid {
   animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
 }
 
-.homepage-hero.is-entered .hero-body {
-  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+.homepage-hero .hero-secondary-ctas {
+  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.75s forwards;
 }
 
-.homepage-hero.is-entered .hero-audience {
-  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
-}
-
-.homepage-hero.is-entered .hero-card-grid {
-  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 1.05s forwards;
-}
-
-.homepage-hero.is-entered .hero-secondary-ctas {
-  animation: hero-fade-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
+@media (prefers-reduced-motion: reduce) {
+  .homepage-hero .hero-intro-row,
+  .homepage-hero .hero-subtitle,
+  .homepage-hero .hero-body,
+  .homepage-hero .hero-audience,
+  .homepage-hero .hero-card-grid,
+  .homepage-hero .hero-secondary-ctas,
+  .homepage-hero .hero-title-line-text {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }
 
 .homepage-hero[data-motion="off"] .hero-intro-row,
@@ -2124,4 +2138,11 @@ body.nav-panel-open {
     min-width: 4.1rem;
     min-height: 4.1rem;
   }
+}
+
+/* --- Sitewide ambient backdrop (AmbientBackdrop/AmbientVeil) --- */
+.ambient-glow {
+  background:
+    radial-gradient(ellipse 80% 55% at 50% -10%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 85% 110%, color-mix(in srgb, var(--accent2) 35%, transparent), transparent 72%);
 }
