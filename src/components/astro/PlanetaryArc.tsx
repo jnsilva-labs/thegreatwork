@@ -1,86 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { SIGNS, buildChartMarkers, planetGlyph } from "@/lib/astro/display";
 
 interface PlanetaryArcProps {
   points: Record<string, number | undefined>;
 }
 
-const SIGNS = [
-  "Aries",
-  "Taurus",
-  "Gemini",
-  "Cancer",
-  "Leo",
-  "Virgo",
-  "Libra",
-  "Scorpio",
-  "Sagittarius",
-  "Capricorn",
-  "Aquarius",
-  "Pisces"
-];
-
-const planetOrder = [
-  "sun",
-  "moon",
-  "mercury",
-  "venus",
-  "mars",
-  "jupiter",
-  "saturn",
-  "uranus",
-  "neptune",
-  "pluto",
-  "node",
-  "chiron"
-] as const;
-
-const planetGlyph: Record<string, string> = {
-  sun: "☉",
-  moon: "☽",
-  mercury: "☿",
-  venus: "♀",
-  mars: "♂",
-  jupiter: "♃",
-  saturn: "♄",
-  uranus: "♅",
-  neptune: "♆",
-  pluto: "♇",
-  node: "☊",
-  chiron: "⚷"
-};
-
-const degreeToLabel = (lon: number) => {
-  const normalized = ((lon % 360) + 360) % 360;
-  const signIndex = Math.floor(normalized / 30);
-  const degreeInSign = normalized - signIndex * 30;
-  return {
-    sign: SIGNS[signIndex],
-    degree: `${degreeInSign.toFixed(2)}°`
-  };
-};
-
 export function PlanetaryArc({ points }: PlanetaryArcProps) {
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
   const markers = useMemo(() => {
-    return planetOrder
-      .map((key) => {
-        const value = points[key];
-        if (typeof value !== "number") return null;
-
-        const x = (value / 360) * 100;
-        const details = degreeToLabel(value);
-
-        return {
-          key,
-          x,
-          lon: value,
-          ...details
-        };
-      })
-      .filter(Boolean) as Array<{ key: string; x: number; lon: number; sign: string; degree: string }>;
+    return buildChartMarkers(points).map((marker) => ({
+      ...marker,
+      x: (marker.lon / 360) * 100
+    }));
   }, [points]);
 
   return (

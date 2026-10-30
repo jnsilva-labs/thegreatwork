@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { AstroMonthAheadReadingResponse, AstroNatalResponse } from "@/lib/astro/types";
 import { trackEvent } from "@/lib/analytics/track";
 import { getSubstackUrl, isExternalHref } from "@/lib/substack";
-import { PlanetaryArc } from "./PlanetaryArc";
+import { NatalChartInstrument } from "./NatalChartInstrument";
 import { SharePanel } from "./share/SharePanel";
 
 const planetLabels: Record<string, string> = {
@@ -120,7 +120,11 @@ export function NatalReadingResult({
 
         <section data-result-section="chart-context" aria-labelledby="chart-context-title" className="astro-reveal space-y-6">
           <div className="max-w-2xl space-y-2"><p className="type-eyebrow text-[color:var(--gilt)]">Celestial context</p><h3 id="chart-context-title" className="font-ritual text-3xl text-[color:var(--bone)] sm:text-4xl">Where the bodies gathered</h3></div>
-          <PlanetaryArc points={result.chart.points} />
+          <NatalChartInstrument
+            points={result.chart.points}
+            cusps={result.chart.houses?.cusps ?? null}
+            aspects={result.chart.aspects}
+          />
         </section>
 
         <section data-result-section="supporting-interpretation" aria-labelledby="supporting-title" className="astro-reveal space-y-10">
