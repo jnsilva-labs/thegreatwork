@@ -26,6 +26,7 @@ import { buildMonthAheadTransits } from "@/lib/astro/engine/transits";
 import type { MonthAheadRequest } from "@/lib/astro/engine/transitTypes";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 12;
@@ -278,7 +279,7 @@ export async function POST(request: NextRequest) {
       canonicalBigThree,
       placements,
       transits: enrichedPayload,
-      timeoutMs: 30_000
+      timeoutMs: 55_000
     });
 
     const responsePayload = {

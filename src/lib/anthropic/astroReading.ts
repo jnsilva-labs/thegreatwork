@@ -148,7 +148,7 @@ export const requestNatalReading = async ({
   zodiac,
   canonicalBigThree,
   placements,
-  timeoutMs = 25_000,
+  timeoutMs = 50_000,
   model
 }: RequestNatalReadingInput): Promise<Reading> => {
   const resolvedModel = resolveModel(model);
@@ -226,7 +226,7 @@ export const requestMonthAheadReading = async ({
   canonicalBigThree,
   placements,
   transits,
-  timeoutMs = 30_000,
+  timeoutMs = 55_000,
   model
 }: RequestMonthAheadReadingInput): Promise<MonthAheadReading> => {
   const resolvedModel = resolveModel(model);

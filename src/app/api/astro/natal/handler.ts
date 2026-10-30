@@ -244,7 +244,7 @@ export const createNatalHandler = (overrides: Partial<NatalHandlerDependencies> 
         zodiac: input.zodiac,
         canonicalBigThree,
         placements,
-        timeoutMs: 25_000
+        timeoutMs: 50_000
       });
       readingMs = performance.now() - readingStart;
 
