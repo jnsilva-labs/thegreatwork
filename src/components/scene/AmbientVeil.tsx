@@ -21,7 +21,7 @@ function DriftingStars({ motionOk }: DriftingStarsProps) {
 
   return (
     <group ref={groupRef} rotation={[0.4, 0, 0.1]}>
-      <Stars radius={34} depth={48} count={1100} factor={5} saturation={0} fade speed={motionOk ? 0.5 : 0} />
+      <Stars radius={30} depth={50} count={2200} factor={6} saturation={0} fade speed={motionOk ? 0.6 : 0} />
     </group>
   );
 }

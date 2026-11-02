@@ -1,8 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { CelestialOrientation } from "@/components/astro/CelestialOrientation";
 import { NatalReadingResult } from "@/components/astro/NatalReadingResult";
 import { SharePanel } from "@/components/astro/share/SharePanel";
 import type { AstroChart, AstroMonthAheadReadingResponse, AstroNatalResponse } from "@/lib/astro/types";
@@ -71,15 +70,17 @@ const monthAheadResult: AstroMonthAheadReadingResponse = {
 describe("astrology celestial instrument visual hierarchy", () => {
   it("opens with one route h1 and an early semantic celestial orientation", () => {
     const page = readSource("src/app/astrology/page.tsx");
-    const orientation = readSource("src/components/astro/CelestialOrientation.tsx");
+    const skyNow = readSource("src/components/astro/SkyNow.tsx");
 
     expect(page.match(/<h1\b/g)).toHaveLength(1);
-    expect(page).toContain("<CelestialOrientation");
-    expect(page.indexOf("<CelestialOrientation")).toBeLessThan(page.indexOf("<NatalChartWidget"));
+    expect(page).toContain("<SkyNow");
+    expect(page.indexOf("<SkyNow")).toBeLessThan(page.indexOf("<NatalChartWidget"));
     expect(page.indexOf('href="#natal-widget"')).toBeLessThan(page.indexOf("<NatalChartWidget"));
-    expect(orientation).toContain("<svg");
-    expect(orientation).toMatch(/role="img"/);
-    expect(orientation).not.toMatch(/<canvas|from ["']three|WebGLRenderer|\.glb|\.gltf/i);
+    // The live sky teaser is computed in-process and revalidates hourly.
+    expect(page).toMatch(/export const revalidate = 3600/);
+    expect(skyNow).toContain("calcPlanetLongitude");
+    expect(skyNow).toContain("<NatalChartInstrument");
+    expect(skyNow).not.toMatch(/fetch\(|turnstile/i);
   });
 
   it("reserves OraclePanel for the form and demotes the widget heading", () => {
@@ -131,14 +132,11 @@ describe("astrology celestial instrument visual hierarchy", () => {
     expect(arc).toContain("min-w-[44px]");
   });
 
-  it("routes result and celestial-ring animation through the shared motion preference", () => {
+  it("routes result reveal animation through the shared motion preference", () => {
     const widget = readSource("src/components/astro/NatalChartWidget.tsx");
-    const orientation = readSource("src/components/astro/CelestialOrientation.tsx");
 
     expect(widget).toContain("useMotionPreference");
     expect(widget).toMatch(/if \(!result \|\| !resultRef\.current \|\| !motionOk\) return/);
-    expect(orientation).toContain("useMotionPreference");
-    expect(orientation).toMatch(/motionOk\s*\?/);
   });
 
   it("provides a typed, complete, no-fetch visual QA result fixture", () => {
@@ -168,29 +166,6 @@ describe("astrology celestial instrument visual hierarchy", () => {
     await waitFor(() => expect(fetchSpy).not.toHaveBeenCalled());
   });
 
-  it("provides twelve readable zodiac labels outside the scaled SVG", () => {
-    render(<CelestialOrientation />);
-
-    const legend = screen.getByRole("list", { name: /zodiac stations/i });
-    const labels = within(legend).getAllByRole("listitem");
-    expect(labels).toHaveLength(12);
-    for (const label of labels) expect(label.className).toContain("text-xs");
-  });
-
-  it("stabilizes generated SVG coordinates for server hydration", () => {
-    const { container } = render(<CelestialOrientation />);
-    const coordinateNames = ["x", "y", "x1", "y1", "x2", "y2"];
-    const coordinateValues = Array.from(container.querySelectorAll("line, text")).flatMap((node) =>
-      coordinateNames
-        .map((name) => node.getAttribute(name))
-        .filter((value): value is string => value !== null),
-    );
-
-    expect(coordinateValues.length).toBeGreaterThan(0);
-    for (const value of coordinateValues) {
-      expect(value.split(".")[1]?.length ?? 0).toBeLessThanOrEqual(6);
-    }
-  });
 
   it("preserves complete computed event facts and prior month-ahead CTA telemetry", () => {
     render(

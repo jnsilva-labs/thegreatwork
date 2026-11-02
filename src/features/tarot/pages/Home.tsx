@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { CircleDot, ExternalLink, Infinity, Triangle } from '../icons';
 import { INTENTIONS, ReadingRequest, SpreadType, TarotView } from '../types';
 import TarotShell from '../components/TarotShell';
+import TarotTable from '../components/TarotTable';
 import { useMotionPreference } from '@/components/motion/useMotionPreference';
 import { normalizeTarotQuestion, TAROT_QUESTION_REQUIRED_MESSAGE } from '@/lib/tarot/question';
 
@@ -52,6 +53,8 @@ const Home: React.FC<HomeProps> = ({ onNavigate, onStartReading }) => {
             It shows you who you are becoming through attention.
           </p>
         </header>
+
+        <TarotTable spread={selectedSpread} motionOk={motionOk} />
 
         <section className={`relative w-full max-w-3xl border-y border-[color:var(--copper)]/30 bg-[color:var(--panel)]/55 text-left ${motionOk ? 'animate-fade-in' : ''}`}>
           <div className="pointer-events-none absolute left-0 top-0 h-12 w-px bg-[color:var(--gilt)]/60" />
