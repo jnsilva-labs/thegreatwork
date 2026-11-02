@@ -9,13 +9,14 @@ interface TarotShellProps {
 // material remains token-derived, so obsidian, abyssal, and crimson each carry
 // their own atmosphere into the oracle.
 const TarotShell: React.FC<TarotShellProps> = ({ children, depth = 'entry' }) => {
+  // 88% cover lets the sitewide starfield glimmer through the chamber.
   const chamberBackground = depth === 'reading'
-    ? 'linear-gradient(180deg, color-mix(in srgb, var(--bg) 62%, var(--panel) 38%), color-mix(in srgb, var(--bg) 84%, var(--panel) 16%))'
-    : 'linear-gradient(180deg, color-mix(in srgb, var(--bg) 76%, var(--panel) 24%), var(--bg))';
+    ? 'linear-gradient(180deg, color-mix(in srgb, color-mix(in srgb, var(--bg) 62%, var(--panel) 38%) 88%, transparent), color-mix(in srgb, color-mix(in srgb, var(--bg) 84%, var(--panel) 16%) 88%, transparent))'
+    : 'linear-gradient(180deg, color-mix(in srgb, color-mix(in srgb, var(--bg) 76%, var(--panel) 24%) 88%, transparent), color-mix(in srgb, var(--bg) 88%, transparent))';
 
   return (
     <div
-      className="relative min-h-screen overflow-hidden bg-[color:var(--bg)] text-[color:var(--bone)]"
+      className="relative min-h-screen overflow-hidden text-[color:var(--bone)]"
       data-tarot-depth={depth}
       style={{ background: chamberBackground }}
     >

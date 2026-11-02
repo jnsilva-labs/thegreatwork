@@ -1,5 +1,5 @@
-import { CelestialOrientation } from "@/components/astro/CelestialOrientation";
 import { NatalChartWidget } from "@/components/astro/NatalChartWidget";
+import { SkyNow } from "@/components/astro/SkyNow";
 import { EmailCtaCard } from "@/components/marketing/EmailCtaCard";
 import { EtchedList, MarginalNote, RitualLink } from "@/components/editorial";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -35,6 +35,9 @@ const astrologyPromises = [
   { id: "lineage", title: "Lineage with context", body: "History, language, and practice held together in one place." },
   { id: "practice", title: "Practice after insight", body: "A bridge from beginner curiosity into deeper Hermetic and astrological study." },
 ];
+
+// The sky-now instrument recomputes each hour.
+export const revalidate = 3600;
 
 export const metadata = buildPageMetadata({
   title: "Astrology",
@@ -72,7 +75,7 @@ export default function AstrologyPage() {
           </div>
         </header>
 
-        <CelestialOrientation />
+        <SkyNow />
 
         <section aria-labelledby="big-three-title" className="space-y-7">
           <div className="max-w-2xl space-y-3">

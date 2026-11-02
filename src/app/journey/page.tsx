@@ -142,6 +142,23 @@ export default function JourneyPage() {
   const activeRadius = activeChapter ? lineCache.get(activeChapter.slug)?.radius ?? 1 : 1;
   const activeEntry = chapters[activeIndex];
   const activeBreathStep = activeEntry.meditation?.breathPattern[breathStepIndex];
+  const breathTarget = (() => {
+    if (!sessionStarted || sessionPaused || !activeBreathStep) return null;
+    const pattern = activeEntry.meditation?.breathPattern ?? [];
+    const targetFor = (label: string | undefined): number | undefined =>
+      label === undefined
+        ? undefined
+        : /inhale/i.test(label)
+          ? 1.12
+          : /exhale/i.test(label)
+            ? 0.94
+            : undefined;
+    const current = targetFor(activeBreathStep.label);
+    if (current !== undefined) return current;
+    // A hold ("Rest") keeps the previous phase's fullness.
+    const prev = pattern[(breathStepIndex - 1 + pattern.length) % pattern.length];
+    return targetFor(prev?.label) ?? 1;
+  })();
   const isComplete = sessionStarted && activeIndex === chapters.length - 1 && !sessionPaused;
 
   const resetBreathCycle = (index: number) => {
@@ -223,6 +240,8 @@ export default function JourneyPage() {
               scale={activeChapter.scale * 0.9}
               boundsRadius={activeRadius}
               fitKey={activeIndex}
+              breathTarget={breathTarget}
+              breathSeconds={activeBreathStep?.seconds ?? 4}
             />
           ) : null}
 

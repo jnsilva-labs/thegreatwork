@@ -175,7 +175,7 @@ export default function PrinciplesIndexPage() {
                         Commentary
                       </p>
                       <div className="max-w-5xl space-y-5 text-lg leading-[1.95] text-[color:#D5D0C6]">
-                        <p>{principle.body}</p>
+                        <p className="axiom-dropcap">{principle.body}</p>
                       </div>
                     </div>
                   </div>

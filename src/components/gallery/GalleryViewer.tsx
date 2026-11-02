@@ -28,6 +28,9 @@ type GalleryViewerProps = {
   scale: number;
   boundsRadius: number;
   fitKey: number;
+  /** Breath sync: target scale multiplier (e.g. 1.12 on an inhale) reached over breathSeconds. */
+  breathTarget?: number | null;
+  breathSeconds?: number;
 };
 
 export function GalleryViewer({
@@ -45,6 +48,8 @@ export function GalleryViewer({
   scale,
   boundsRadius,
   fitKey,
+  breathTarget = null,
+  breathSeconds = 4,
 }: GalleryViewerProps) {
   const storeStillnessMode = useHermeticStore((state) => state.stillnessMode);
   const clarity = useHermeticStore((state) => state.clarity);
@@ -105,6 +110,8 @@ export function GalleryViewer({
           scale={scale}
           boundsRadius={boundsRadius}
           fitKey={fitKey}
+          breathTarget={breathTarget}
+          breathSeconds={breathSeconds}
         />
       </Canvas>
     </div>
@@ -126,6 +133,8 @@ type SceneContentProps = {
   scale: number;
   boundsRadius: number;
   fitKey: number;
+  breathTarget: number | null;
+  breathSeconds: number;
 };
 
 function SceneContent({
@@ -143,8 +152,11 @@ function SceneContent({
   scale,
   boundsRadius,
   fitKey,
+  breathTarget,
+  breathSeconds,
 }: SceneContentProps) {
   const groupRef = useRef<Group | null>(null);
+  const breathCurrent = useRef(1);
   const { camera, invalidate } = useThree();
 
   useEffect(() => {
@@ -163,7 +175,18 @@ function SceneContent({
     []
   );
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      if (breathTarget !== null && motion.enabled) {
+        // Ease toward the phase's target so a 4s inhale takes ~4s to arrive.
+        const rate = Math.min(1, (delta * 3.2) / Math.max(breathSeconds, 1));
+        breathCurrent.current += (breathTarget - breathCurrent.current) * rate;
+      } else if (breathTarget === null) {
+        breathCurrent.current += (1 - breathCurrent.current) * Math.min(1, delta * 1.5);
+      }
+      groupRef.current.scale.setScalar(scale * breathCurrent.current);
+    }
+
     if (cameraMode === "cinematic" && motion.enabled) {
       const t = (state.clock.elapsedTime * 0.1) % 1;
       const idx = Math.floor(t * (path.length - 1));

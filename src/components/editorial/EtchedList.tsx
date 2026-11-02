@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Ornament, ornamentFromGlyph } from "./Ornament";
 
 export type EtchedListItem = {
   id: string;
@@ -30,7 +31,16 @@ export function EtchedList({
       {items.map((item, index) => (
         <li key={item.id} className="etched-list__item">
           <span className="etched-list__marker" aria-hidden="true">
-            {marker === "numeral" ? toRoman(index + 1) : (item.glyph ?? "◇")}
+            {marker === "numeral" ? (
+              toRoman(index + 1)
+            ) : typeof (item.glyph ?? "◇") === "string" ? (
+              <Ornament
+                name={ornamentFromGlyph((item.glyph ?? "◇") as string)}
+                className="inline-block h-[1.15em] w-[1.15em]"
+              />
+            ) : (
+              item.glyph
+            )}
           </span>
           <div>
             {item.title ? <Heading className="etched-list__title">{item.title}</Heading> : null}
