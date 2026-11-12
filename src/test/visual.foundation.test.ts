@@ -49,7 +49,9 @@ describe("illuminated archive visual foundation", () => {
       expect(layout).toContain(fontImport);
     }
     expect(layout).not.toContain('@fontsource/manrope/400-italic.css');
-    expect(layout).not.toContain('@fontsource/cormorant-garamond/600.css');
+    // The display face carries 500/600 for drop caps and stage numerals.
+    expect(layout).toContain('@fontsource/cormorant-garamond/500.css');
+    expect(layout).toContain('@fontsource/cormorant-garamond/600.css');
     expect(globals).toMatch(
       /\.italic\s*{[\s\S]*?font-family:\s*var\(--font-ritual-serif\);[\s\S]*?font-style:\s*italic;/,
     );

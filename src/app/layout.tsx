@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { AmbientBackdrop } from "@/components/scene/AmbientBackdrop";
 import { CodexChrome } from "@/components/ui/CodexChrome";
 import { NavBar } from "@/components/ui/NavBar";
 import { Footer } from "@/components/ui/Footer";
@@ -9,6 +10,8 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/seo/schema";
 import "@fontsource/cormorant-garamond/400.css";
 import "@fontsource/cormorant-garamond/400-italic.css";
+import "@fontsource/cormorant-garamond/500.css";
+import "@fontsource/cormorant-garamond/600.css";
 import "@fontsource/manrope/400.css";
 import "@fontsource/manrope/500.css";
 import "@fontsource/manrope/600.css";
@@ -59,6 +62,7 @@ export default function RootLayout({
         <PostHogProvider>
           <JsonLd id="website-schema" data={buildWebsiteSchema()} />
           <JsonLd id="organization-schema" data={buildOrganizationSchema()} />
+          <AmbientBackdrop />
           <NavBar />
           <CodexChrome />
           <main id="main-content" tabIndex={-1} className="relative z-10 pt-20">
